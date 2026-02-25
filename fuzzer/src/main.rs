@@ -15,6 +15,7 @@ mod config;
 mod fuzzer;
 mod python_grammar_loader;
 mod queue;
+mod rl_hook;
 mod shared_state;
 mod state;
 

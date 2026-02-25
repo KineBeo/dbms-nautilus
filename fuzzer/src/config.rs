@@ -14,4 +14,7 @@ pub struct Config {
     pub path_to_grammar: String,
     pub path_to_workdir: String,
     pub arguments: Vec<String>,
+    // Phase 2 hook: when true, RL policy controls mutation selection
+    #[serde(default)]
+    pub rl_enabled: bool,
 }

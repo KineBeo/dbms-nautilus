@@ -116,10 +116,13 @@ impl ForkServer {
 
                 //Asan options: set asan SIG to 223 and disable leak detection
                 let asan_settings =
-                    CString::new("ASAN_OPTIONS=exitcode=223,abort_on_erro=true,detect_leaks=0")
+                    CString::new("ASAN_OPTIONS=exitcode=223,abort_on_error=true,detect_leaks=0")
                         .expect("RAND_2089158993");
+                let ubsan_settings =
+                    CString::new("UBSAN_OPTIONS=halt_on_error=1,exitcode=1")
+                        .expect("RAND_ubsan_opts");
 
-                let env = vec![shm_id, asan_settings];
+                let env = vec![shm_id, asan_settings, ubsan_settings];
 
                 if hide_output {
                     let null = fcntl::open("/dev/null", fcntl::OFlag::O_RDWR, stat::Mode::empty())

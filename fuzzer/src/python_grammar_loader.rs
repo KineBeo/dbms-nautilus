@@ -25,11 +25,12 @@ impl PyContext {
         }
     }
 
-    fn rule(&mut self, py: Python, nt: &str, format: &PyAny) -> PyResult<()> {
+    fn rule(&mut self, py: Python, nt: &str, format: &PyAny, weight: Option<f32>) -> PyResult<()> {
+        let w = weight.unwrap_or(1.0);
         if let Ok(s) = format.extract::<&str>() {
-            self.ctx.add_rule(nt, s.as_bytes());
+            self.ctx.add_rule_weighted(nt, s.as_bytes(), w);
         } else if let Ok(s) = format.extract::<&[u8]>() {
-            self.ctx.add_rule(nt, s);
+            self.ctx.add_rule_weighted(nt, s, w);
         } else {
             return Err(pyo3::exceptions::PyValueError::new_err(
                 "format argument should be string or bytes",
@@ -38,12 +39,14 @@ impl PyContext {
         return Ok(());
     }
 
-    fn script(&mut self, nt: &str, nts: Vec<String>, script: PyObject) {
-        self.ctx.add_script(nt, nts, script);
+    fn script(&mut self, nt: &str, nts: Vec<String>, script: PyObject, weight: Option<f32>) {
+        let w = weight.unwrap_or(1.0);
+        self.ctx.add_script_weighted(nt, nts, script, w);
     }
 
-    fn regex(&mut self, nt: &str, regex: &str) {
-        self.ctx.add_regex(nt, regex);
+    fn regex(&mut self, nt: &str, regex: &str, weight: Option<f32>) {
+        let w = weight.unwrap_or(1.0);
+        self.ctx.add_regex_weighted(nt, regex, w);
     }
 }
 

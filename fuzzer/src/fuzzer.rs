@@ -284,7 +284,8 @@ impl Fuzzer {
         let (exitreason, execution_time) = self.exec_raw(&code)?;
 
         let is_crash = match exitreason {
-            ExitReason::Normal(223) => true,
+            ExitReason::Normal(223) => true,   // ASan
+            ExitReason::Normal(1) => true,     // UBSan
             ExitReason::Signaled(_) => true,
             _ => false,
         };
