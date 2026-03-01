@@ -70,7 +70,7 @@ Config(
     path_to_workdir: "$WORKDIR",
     number_of_threads: $THREADS,
     timeout_in_millis: $TIMEOUT_MS,
-    bitmap_size: 65536,
+    bitmap_size: 2097152,
     thread_size: 4194304,
     number_of_generate_inputs: 100,
     max_tree_size: $MAX_TREE_SIZE,
@@ -80,6 +80,11 @@ Config(
 EOF
 
 echo "Config written to: $CONFIG"
+
+# Dump grammar weights for this run (observability)
+echo "Dumping grammar weights..."
+"$SCRIPT_DIR/weight_dump.sh" "$WORKDIR" 2>&1
+
 echo "Starting fuzzer... (Ctrl+C to stop)"
 echo ""
 

@@ -55,6 +55,9 @@ impl ForkServer {
         timeout_in_millis: u64,
         bitmap_size: usize,
     ) -> Self {
+        // Use a generous startup timeout for the initial handshake (ASan takes ~2-5s to init),
+        // then switch to the per-run timeout for normal execution.
+        let startup_timeout_ms: u64 = 30_000;
         let inp_file = tempfile::NamedTempFile::new().expect("couldn't create temp file");
         let (inp_file, in_path) = inp_file
             .keep()
@@ -76,13 +79,54 @@ impl ForkServer {
             ForkResult::Parent { child: _, .. } => {
                 unistd::close(ctl_out).expect("coulnd't close ctl_out");
                 unistd::close(st_in).expect("coulnd't close st_out");
-                let mut st_out = BufReader::new(TimeoutReader::new(
-                    unsafe { File::from_raw_fd(st_out) },
-                    Duration::from_millis(timeout_in_millis),
+
+                // Use startup_timeout for the handshake (ASan takes ~2s to initialize).
+                // After handshake, dup the fd and rebuild with per-run timeout.
+                let st_out_fd = st_out;
+                let st_out_dup = unistd::dup(st_out_fd).expect("couldn't dup st_out fd");
+                let mut st_handshake = BufReader::new(TimeoutReader::new(
+                    unsafe { File::from_raw_fd(st_out_fd) },
+                    Duration::from_millis(startup_timeout_ms),
                 ));
-                st_out
+
+                // Read child hello.
+                // AFL++ 4.x sends a value in range 0x41464c00..0x41464cff.
+                // The fuzzer must XOR it with 0xffffffff and write the result back.
+                // Then the fork server sends a capabilities u32 (FS_OPT_* flags).
+                // Old AFL 2.x sends value 0 — no response needed.
+                let hello = st_handshake
                     .read_u32::<LittleEndian>()
                     .expect("couldn't read child hello");
+
+                const AFL_NEW_HELLO_MIN: u32  = 0x41464c00;
+                const AFL_NEW_HELLO_MAX: u32  = 0x41464cff;
+                const FS_OPT_MAPSIZE: u32     = 0x40000000;
+
+                if hello >= AFL_NEW_HELLO_MIN && hello <= AFL_NEW_HELLO_MAX {
+                    // AFL++ 4.x extended protocol:
+                    // Step 2: respond with XOR of hello
+                    let xor_reply: u32 = hello ^ 0xffffffff;
+                    unistd::write(ctl_in, &xor_reply.to_le_bytes())
+                        .expect("couldn't send XOR reply to fork server");
+
+                    // Step 3: read capabilities from fork server
+                    let caps = st_handshake
+                        .read_u32::<LittleEndian>()
+                        .expect("couldn't read fork server capabilities");
+                    let _ = caps; // we note the map size negotiation but bitmap_size is already large
+                } else if hello != 0 {
+                    // Unexpected hello value — log it but continue
+                    eprintln!("forksrv: unexpected hello 0x{:08x}", hello);
+                }
+                // hello == 0: old AFL 2.x, nothing extra needed
+
+                // Drop handshake reader (closes st_out_fd), use dup'd fd for runtime
+                drop(st_handshake);
+                let st_out = BufReader::new(TimeoutReader::new(
+                    unsafe { File::from_raw_fd(st_out_dup) },
+                    Duration::from_millis(timeout_in_millis),
+                ));
+
                 return Self {
                     inp_file: inp_file,
                     ctl_in: unsafe { File::from_raw_fd(ctl_in) },
@@ -114,6 +158,10 @@ impl ForkServer {
 
                 let shm_id = CString::new(format!("__AFL_SHM_ID={}", shm_file)).unwrap();
 
+                // Tell AFL++ runtime to use our bitmap_size instead of compile-time MAP_SIZE
+                let afl_map_size = CString::new(format!("AFL_MAP_SIZE={}", bitmap_size))
+                    .expect("RAND_afl_map_size");
+
                 //Asan options: set asan SIG to 223 and disable leak detection
                 let asan_settings =
                     CString::new("ASAN_OPTIONS=exitcode=223,abort_on_error=true,detect_leaks=0")
@@ -122,7 +170,7 @@ impl ForkServer {
                     CString::new("UBSAN_OPTIONS=halt_on_error=1,exitcode=1")
                         .expect("RAND_ubsan_opts");
 
-                let env = vec![shm_id, asan_settings, ubsan_settings];
+                let env = vec![shm_id, afl_map_size, asan_settings, ubsan_settings];
 
                 if hide_output {
                     let null = fcntl::open("/dev/null", fcntl::OFlag::O_RDWR, stat::Mode::empty())
@@ -131,7 +179,6 @@ impl ForkServer {
                     unistd::dup2(null, 2 as RawFd).expect("couldn't dup2 /dev/null to stderr");
                     unistd::close(null).expect("couldn't close /dev/null");
                 }
-                println!("EXECVE {:?} {:?} {:?}", path, args, env);
                 unistd::execve(&path, &args, &env).expect("couldn't execve afl-qemu-tarce");
                 unreachable!();
             }
@@ -213,7 +260,7 @@ impl ForkServer {
                     CString::from_raw(strerror(*__errno_location()))
                 );
             }
-            return (shm_id, trace_bits as *mut [u8; 1 << 16]);
+            return (shm_id, ptr::slice_from_raw_parts_mut(trace_bits as *mut u8, bitmap_size));
         }
     }
 }
