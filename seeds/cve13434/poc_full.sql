@@ -1,0 +1,3 @@
+INSERT INTO a(b) VALUES(NULL);
+UPDATE a SET b = 0;
+INSERT INTO a VALUES('GERMANY''s%'), ('Y'), ('Brand#23');

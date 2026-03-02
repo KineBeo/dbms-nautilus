@@ -3,15 +3,24 @@
 #
 # Each version corresponds to a known CVE targetted in Phase 1.
 #
-# CVE → SQLite version mapping:
+# CVE → SQLite version mapping (corrected 2026-03-02):
 #   CVE-2018-20346  3.26.0   FTS3 heap corruption
-#   CVE-2019-19646  3.30.1   WITH RECURSIVE triggers assertion
 #   CVE-2019-5018   3.27.2   Window function UAF
-#   CVE-2020-11655  3.31.1   ALTERed table aggregate crash
-#   CVE-2020-13434  3.32.2   printf integer overflow (UBSan)
-#   CVE-2020-15358  3.32.3   SELECT subquery heap overflow
-#   CVE-2021-20227  3.34.0   CTE UNION ALL assertion
-#   CVE-2022-35737  3.39.1   printf large-precision buffer overflow
+#   CVE-2019-19646  3.30.1   WITH RECURSIVE triggers assertion
+#   CVE-2020-13434  3.31.1   printf integer overflow in sqlite3_str_vappendf (UBSan)
+#                            — CVE affects through 3.32.0, fixed in 3.32.1
+#                            — 3.31.1 also has CVE-2020-11655 (AggInfo window NULL deref)
+#   CVE-2020-15358  3.32.2   SELECT subquery heap overflow (skiplist)
+#                            — 3.32.2 is patched for CVE-2020-13434 and CVE-2020-11655
+#                            — CVE-2020-15358 may affect 3.32.2 (reported in 3.32.3, boundaries unconfirmed)
+#   CVE-2020-15358  3.32.3   SELECT subquery heap overflow (canonical affected version)
+#   CVE-2021-20227  3.34.0   CTE UNION ALL assertion / use-after-free
+#   CVE-2022-35737  3.39.1   printf large-precision buffer overflow (stack)
+#
+# CORRECTION HISTORY:
+#   Original (incorrect): CVE-2020-13434 → 3.32.2, CVE-2020-11655 → 3.31.1
+#   Corrected: CVE-2020-13434 → 3.31.1 (3.32.2 is PATCHED — fix landed in 3.32.1)
+#              CVE-2020-11655 also affects 3.31.1 (AggInfo window bug, fixed in ~3.32.0)
 #
 # Usage:
 #   ./cve_builds/fetch_sqlite.sh           # download all
@@ -33,13 +42,13 @@ declare -A YEAR=(
     ["3.39.1"]="2022"
 )
 
-# version → CVE label
+# version → CVE label (corrected mapping — see header comment for details)
 declare -A CVE=(
     ["3.26.0"]="CVE-2018-20346"
     ["3.27.2"]="CVE-2019-5018"
     ["3.30.1"]="CVE-2019-19646"
-    ["3.31.1"]="CVE-2020-11655"
-    ["3.32.2"]="CVE-2020-13434"
+    ["3.31.1"]="CVE-2020-13434+CVE-2020-11655"
+    ["3.32.2"]="CVE-2020-15358-candidate"
     ["3.32.3"]="CVE-2020-15358"
     ["3.34.0"]="CVE-2021-20227"
     ["3.39.1"]="CVE-2022-35737"
