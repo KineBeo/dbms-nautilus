@@ -84,7 +84,7 @@ Config(
     timeout_in_millis: $TIMEOUT_MS,
     bitmap_size: 2097152,
     thread_size: 4194304,
-    number_of_generate_inputs: 100,
+    number_of_generate_inputs: 1000,
     max_tree_size: $MAX_TREE_SIZE,
     number_of_deterministic_mutations: 1,
     rl_enabled: false,
@@ -123,8 +123,8 @@ ELAPSED=$((END_TIME - START_TIME))
 echo ""
 echo "=============================================="
 echo " Campaign finished after ${ELAPSED}s"
-echo " Crashes: $(ls "$WORKDIR/crashes/" 2>/dev/null | wc -l)"
-echo " Queue:   $(ls "$WORKDIR/queue/" 2>/dev/null | wc -l)"
+echo " Crashes: $(ls "$WORKDIR/outputs/signaled/" 2>/dev/null | wc -l) (in outputs/signaled/)"
+echo " Queue:   $(ls "$WORKDIR/outputs/queue/" 2>/dev/null | wc -l) (in outputs/queue/)"
 echo "=============================================="
 echo ""
 echo "Run triage:"

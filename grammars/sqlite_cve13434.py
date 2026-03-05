@@ -1,6 +1,9 @@
-# sqlite.py — MAIN grammar for Nautilus general SQLite fuzzing campaigns
-# Use with: sqlite_harness_sqlite-<version> (general harness, no CVE-specific schema)
-# For CVE-2020-13434 targeted fuzzing use: sqlite_cve13434.py
+# sqlite_cve13434.py — CVE-2020-13434 targeted grammar
+# Use with: sqlite_harness_cve13434_sqlite-3.31.1 (pre-loads table `a` with CHECK trigger)
+# DO NOT use with the general harness — INSERT INTO a rules cause 100% crash rate
+#
+# CVE-2020-13434: integer overflow in sqlite3_str_vappendf when precision=INT32_MAX
+# Trigger: SELECT printf('%.*g', 2147483647, 0.01) → UBSan exit 1 on sqlite <= 3.32.0
 #
 # SQLite Grammar for Nautilus — 3-Layer Structured-Bias Design
 # Layer 1: Spec-complete base (~200 rules, EBNF-derived from tree-sitter-sqlite.ebnf)
@@ -745,7 +748,20 @@ ctx.rule("Printf-Boundary",
     "SELECT printf({Printf-Fmt-Spec}, {Boundary-Int}, {Boundary-Int})",
     weight=1.0)
 
-# group_concat with INT32_MAX separator — boundary integer overflow path
+# CVE-2020-13434 full PoC path: printf(b, b) inside CHECK triggers overflow
+# when b is a format string like '%.*g'. The harness pre-loads table `a`
+# with this CHECK constraint, so only DML is needed to trigger it.
+ctx.rule("Printf-Boundary",
+    "INSERT INTO a VALUES({Str-Printf-Fmt})",
+    weight=4.0)
+ctx.rule("Printf-Boundary",
+    "INSERT INTO a VALUES({Str-Printf-Fmt}), ({Str-Printf-Fmt})",
+    weight=3.0)
+ctx.rule("Printf-Boundary",
+    "UPDATE a SET b = {Str-Printf-Fmt}",
+    weight=3.0)
+
+# group_concat with INT32_MAX separator — triggers inside the PoC trigger c
 ctx.rule("Printf-Boundary",
     "SELECT group_concat(c2, 2147483647) FROM t1",
     weight=3.0)
@@ -761,6 +777,18 @@ ctx.rule("Printf-Fmt-Spec", "'%s'", weight=2.0)
 ctx.rule("Printf-Width-Spec", "'%10d'", weight=1.0)
 ctx.rule("Printf-Width-Spec", "'%-10s'", weight=1.0)
 ctx.rule("Printf-Width-Spec", "'%010d'", weight=1.0)
+
+# Str-Printf-Fmt: format strings that trigger printf integer overflow
+# These are the VALUES inserted into table a — when used as printf(b, b),
+# the string becomes both the format and the argument.
+ctx.rule("Str-Printf-Fmt", "'%.*g'", weight=3.0)   # CVE-2020-13434 exact trigger
+ctx.rule("Str-Printf-Fmt", "'%.*f'", weight=2.0)
+ctx.rule("Str-Printf-Fmt", "'%.*e'", weight=2.0)
+ctx.rule("Str-Printf-Fmt", "'%.*c'", weight=2.0)
+ctx.rule("Str-Printf-Fmt", "'%.*s'", weight=2.0)
+ctx.rule("Str-Printf-Fmt", "'GERMANY''s%'", weight=3.0)  # original PoC value
+ctx.rule("Str-Printf-Fmt", "'Y'", weight=1.0)
+ctx.rule("Str-Printf-Fmt", "'Brand#23'", weight=1.0)
 
 # --- Json-Deep: deeply nested JSON construction + extraction ---
 ctx.rule("Json-Deep",

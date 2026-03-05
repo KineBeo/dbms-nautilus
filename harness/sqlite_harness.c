@@ -47,6 +47,9 @@ static const char *SCHEMA_SQL =
     "CREATE VIRTUAL TABLE fts_t1 USING fts3(c1, c2);"
     "INSERT INTO fts_t1 VALUES('1','hello world');"
     "INSERT INTO fts_t1 VALUES('2','foo bar baz');"
+    "CREATE VIRTUAL TABLE fts_t2 USING fts3(c1, c2, c3);"
+    "INSERT INTO fts_t2 VALUES('1','hello','1.5');"
+    "INSERT INTO fts_t2 VALUES('2','world','2.5');"
     "CREATE INDEX idx_t1_c2 ON t1(c2);"
     "CREATE INDEX idx_t2_c1 ON t2(c1);"
     "CREATE VIEW v1 AS SELECT t1.c1, t1.c2, t2.c3 FROM t1 JOIN t2 ON t1.c1=t2.c1;";

@@ -6,9 +6,8 @@ use othertime::strftime;
 
 use std::collections::HashSet;
 use std::collections::VecDeque;
-use std::fs::File;
-use std::io::stdout;
-use std::io::Write;
+use std::fs::{File, OpenOptions};
+use std::io::{stdout, BufWriter, Write};
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::Instant;
@@ -28,6 +27,55 @@ pub enum ExecutionReason {
     Splice,
     Det,
     Gen,
+}
+
+// Logs interesting events (crashes, timeouts, new coverage) to workdir/exec.log.
+// Uses BufWriter for low overhead; log lines written only on interesting events (~1-5% of execs).
+// File is capped at ~10MB: when size exceeds limit, file is truncated and restarted.
+const EXEC_LOG_SIZE_LIMIT: u64 = 10 * 1024 * 1024; // 10 MB
+
+struct ExecLogger {
+    writer: BufWriter<File>,
+    bytes_written: u64,
+    log_path: String,
+}
+
+impl ExecLogger {
+    fn new(work_dir: &str) -> Self {
+        let log_path = format!("{}/exec.log", work_dir);
+        let file = OpenOptions::new()
+            .create(true)
+            .append(true)
+            .open(&log_path)
+            .expect("Failed to open exec.log");
+        ExecLogger {
+            writer: BufWriter::new(file),
+            bytes_written: 0,
+            log_path,
+        }
+    }
+
+    fn log(&mut self, exec_count: u64, exit_reason: &str, sql: &[u8]) {
+        let snippet = String::from_utf8_lossy(&sql[..sql.len().min(200)]);
+        let snippet = snippet.replace('\n', " ").replace('\r', "");
+        let line = format!("{}\t{}\t{}\n", exec_count, exit_reason, snippet);
+        let line_bytes = line.len() as u64;
+
+        if self.bytes_written + line_bytes > EXEC_LOG_SIZE_LIMIT {
+            let file = OpenOptions::new()
+                .create(true)
+                .write(true)
+                .truncate(true)
+                .open(&self.log_path)
+                .expect("Failed to rotate exec.log");
+            self.writer = BufWriter::new(file);
+            self.bytes_written = 0;
+        }
+
+        let _ = self.writer.write_all(line.as_bytes());
+        let _ = self.writer.flush();
+        self.bytes_written += line_bytes;
+    }
 }
 
 pub struct Fuzzer {
@@ -56,6 +104,7 @@ pub struct Fuzzer {
     pub asan_found_by_det_afl: u64,
     pub asan_found_by_gen: u64,
     work_dir: String,
+    exec_logger: ExecLogger,
 }
 
 impl Fuzzer {
@@ -74,6 +123,7 @@ impl Fuzzer {
             timeout_in_millis,
             bitmap_size,
         );
+        let exec_logger = ExecLogger::new(&work_dir);
         return Ok(Fuzzer {
             forksrv: fs,
             last_tried_inputs: HashSet::new(),
@@ -100,6 +150,7 @@ impl Fuzzer {
             asan_found_by_det_afl: 0,
             asan_found_by_gen: 0,
             work_dir: work_dir,
+            exec_logger,
         });
     }
 
@@ -155,6 +206,28 @@ impl Fuzzer {
                         thread::current().name().expect("RAND_4086695190")
                     ))
                     .expect("RAND_3096222153");
+                    tree.unparse_to(ctx, &mut file);
+                }
+            }
+            ExitReason::Normal(1) => {
+                // UBSan — save every unique crash (new_bits = new coverage path)
+                if new_bits.is_some() {
+                    self.global_state
+                        .lock()
+                        .expect("RAND_ubsan_asan")
+                        .total_found_asan += 1;
+                    self.global_state
+                        .lock()
+                        .expect("RAND_ubsan_time")
+                        .last_found_asan = strftime("[%Y-%m-%d] %H:%M:%S", &othertime::now())
+                        .expect("RAND_ubsan_fmt");
+                    let mut file = File::create(format!(
+                        "{}/outputs/signaled/UBSAN_{:09}_{}",
+                        self.work_dir,
+                        self.execution_count,
+                        thread::current().name().expect("RAND_ubsan_thread")
+                    ))
+                    .expect("RAND_ubsan_file");
                     tree.unparse_to(ctx, &mut file);
                 }
             }
@@ -290,6 +363,24 @@ impl Fuzzer {
             _ => false,
         };
 
+        // Log crashes and timeouts immediately (always interesting)
+        match exitreason {
+            ExitReason::Normal(223) => {
+                self.exec_logger.log(self.execution_count, "ASAN(223)", code);
+            }
+            ExitReason::Normal(1) => {
+                self.exec_logger.log(self.execution_count, "UBSAN(1)", code);
+            }
+            ExitReason::Signaled(sig) => {
+                let label = format!("SIGNAL({:?})", sig);
+                self.exec_logger.log(self.execution_count, &label, code);
+            }
+            ExitReason::Timeouted => {
+                self.exec_logger.log(self.execution_count, "TIMEOUT", code);
+            }
+            _ => {}
+        }
+
         let mut final_bits = None;
         if let Some(mut new_bits) = self.new_bits(is_crash) {
             //Only if not Timeout
@@ -300,6 +391,8 @@ impl Fuzzer {
                 if new_bits.len() > 0 {
                     final_bits = Some(new_bits);
                     let tree = tree_like.to_tree(ctx);
+                    // Log new coverage events
+                    self.exec_logger.log(self.execution_count, "NEW_COV", code);
                     self.global_state
                         .lock()
                         .expect("RAND_2835014626")
