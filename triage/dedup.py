@@ -68,9 +68,13 @@ def run_crash(harness: str, crash_file: str, timeout: int = 5) -> tuple[int, str
 
 
 def dedup(workdir: str, harness: str, output_dir: str) -> None:
-    crashes_dir = Path(workdir) / 'crashes'
-    if not crashes_dir.exists():
-        print(f'[dedup] No crashes directory found at {crashes_dir}')
+    # Nautilus stores crashes in outputs/signaled/; fall back to crashes/
+    for candidate in ['outputs/signaled', 'crashes']:
+        crashes_dir = Path(workdir) / candidate
+        if crashes_dir.exists():
+            break
+    else:
+        print(f'[dedup] No crashes directory found at {Path(workdir)}/outputs/signaled or crashes/')
         return
 
     out = Path(output_dir)
@@ -89,8 +93,8 @@ def dedup(workdir: str, harness: str, output_dir: str) -> None:
 
         exitcode, stderr = run_crash(harness, str(crash_file))
 
-        if exitcode not in (223, 1) and exitcode >= 0:
-            # Not an ASan/UBSan crash on replay — skip
+        if exitcode == 0 or exitcode == -1:
+            # Clean exit (0) or timeout (-1) — skip, not a crash
             continue
 
         frames = extract_asan_frames(stderr)

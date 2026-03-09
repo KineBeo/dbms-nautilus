@@ -140,15 +140,14 @@ int main(int argc, char **argv) {
 
     __AFL_INIT();
 
-    while (__AFL_LOOP(1000)) {
-        size_t sql_len = 0;
-        char *sql = read_input(argv[1], &sql_len);
-        if (!sql) continue;
-
+    /* Run one SQL input per fork — Nautilus uses fork-server mode, not AFL
+     * persistent mode, so each child must exit after one execution. */
+    size_t sql_len = 0;
+    char *sql = read_input(argv[1], &sql_len);
+    if (sql) {
         char *errmsg = NULL;
         sqlite3_exec(db, sql, NULL, NULL, &errmsg);
         if (errmsg) sqlite3_free(errmsg);
-
         free(sql);
     }
 

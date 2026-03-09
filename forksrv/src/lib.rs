@@ -151,10 +151,14 @@ impl ForkServer {
                 unistd::close(st_out).expect("couldn't close ctl_out");
 
                 let path = CString::new(path).expect("binary path must not contain zero");
-                let args = args
-                    .into_iter()
-                    .map(|s| CString::new(s).expect("args must not contain zero"))
-                    .collect::<Vec<_>>();
+                let mut full_args: Vec<CString> = vec![
+                    CString::new(path.as_bytes()).expect("argv0"), // argv[0] = binary name (POSIX)
+                ];
+                full_args.extend(
+                    args.into_iter()
+                        .map(|s| CString::new(s).expect("args must not contain zero"))
+                );
+                let args = full_args;
 
                 let shm_id = CString::new(format!("__AFL_SHM_ID={}", shm_file)).unwrap();
 
