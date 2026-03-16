@@ -29,6 +29,16 @@ $(TARGET): sqlite_harness.c
 	@if [ -z "$(SQLITE)" ]; then echo "Error: SQLITE not set"; exit 1; fi
 	$(AFL_CC) $(CFLAGS) -o $@ sqlite_harness.c -ldl -lpthread -lm
 
+# Build blank-DB harness for pattern grammar (sqlite_patterns.py)
+# Usage: make patterns-build SQLITE=../cve_builds/sqlite-3.31.1/sqlite3.c TARGET=sqlite_harness_patterns_3311
+patterns-build:
+	@if [ -z "$(SQLITE)" ]; then echo "Error: SQLITE not set"; exit 1; fi
+	$(AFL_CC) $(CFLAGS) -o $(TARGET) sqlite_harness_patterns.c -ldl -lpthread -lm
+
+patterns-test:
+	@if [ -z "$(SQLITE)" ]; then echo "Error: SQLITE not set"; exit 1; fi
+	clang $(CFLAGS) -o $(TARGET)_test sqlite_harness_patterns.c -ldl -lpthread -lm
+
 # Build all CVE versions defined in cve_builds/
 build-all:
 	@for dir in $$(dirname $(firstword $(MAKEFILE_LIST)))/../cve_builds/sqlite-*/; do \
@@ -64,4 +74,4 @@ cve13434-test:
 clean:
 	rm -f sqlite_harness sqlite_harness_* *_test *_debug
 
-.PHONY: all build-all test-build debug-build clean
+.PHONY: all build-all test-build debug-build patterns-build patterns-test clean

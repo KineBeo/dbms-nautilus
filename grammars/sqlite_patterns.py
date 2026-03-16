@@ -1,26 +1,21 @@
-# DEPRECATED (2026-03-16): Use grammars/sqlite_patterns.py instead.
-# sqlite_patterns.py is the canonical pattern-based grammar replacing both
-# sqlite.py and this file. It encodes 7 cross-CVE structural patterns without
-# literal PoC triggers. This file is kept for reference only.
+# sqlite_patterns.py — Pattern-grammar for Nautilus SQLite fuzzing
+# Use with: sqlite_harness_patterns_<version> (blank DB, no pre-loaded schema)
 #
-# sqlite_cve13434.py — CVE-2020-13434 targeted grammar
-# Use with: sqlite_harness_cve13434_sqlite-3.31.1 (pre-loads table `a` with CHECK trigger)
-# DO NOT use with the general harness — INSERT INTO a rules cause 100% crash rate
+# DESIGN: Structural-bias grammar — CVE-specific literal PoCs replaced with
+# 7 generalizable structural patterns derived from cross-CVE analysis.
+# A crash found via a pattern rule is a genuine discovery, not PoC replay.
 #
-# CVE-2020-13434: integer overflow in sqlite3_str_vappendf when precision=INT32_MAX
-# Trigger: SELECT printf('%.*g', 2147483647, 0.01) → UBSan exit 1 on sqlite <= 3.32.0
+# Pattern taxonomy (from docs/cve-list.md CVE analysis):
+#   P1: DDL→DQL          — CREATE TABLE + SELECT w/ JOINs      (4/6 CVEs)
+#   P2: GenCol-Op        — generated column + query/PRAGMA      (2/6 CVEs)
+#   P4: Compound         — INTERSECT/EXCEPT compound operators  (2/6 CVEs)
+#   P6: Schema-Pragma    — DDL + INSERT → PRAGMA integrity      (1/6 CVEs)
+#   P7: Boundary-Func    — ANY func(boundary-int arg)           (generalized)
+#   P3/P5 inline in Select-Complex via Window-Agg-Expr
 #
-# SQLite Grammar for Nautilus — 3-Layer Structured-Bias Design
-# Layer 1: Spec-complete base (~200 rules, EBNF-derived from tree-sitter-sqlite.ebnf)
-# Layer 2: CVE-pattern execution stress templates (~150 rules, separate nonterminals)
-# Layer 3: Weights embedded in rule calls (RL-tunable in Phase 2)
-#
-# Fixed schema (harness pre-loads):
-#   CREATE TABLE t1(c1 INTEGER PRIMARY KEY, c2 TEXT, c3 REAL)
-#   CREATE TABLE t2(c1 INTEGER, c2 TEXT, c3 REAL)
-#   CREATE TABLE t3(c1 INTEGER, c2 TEXT NOT NULL, c3 REAL DEFAULT 0.0)
-#   CREATE VIRTUAL TABLE fts_t1 USING fts5(c1, c2)
-#   CREATE VIRTUAL TABLE fts_t2 USING fts3(c1, c2)
+# BLANK DB: harness opens empty :memory: — all tables created by generated SQL.
+# Layer 1 rules referencing t1/t2/t3 silently fail (no table); only pattern
+# rules exercise the interesting code paths.
 #
 # Phase 2 RL interface:
 #   ctx.set_weight(rule_id, new_weight)   — RL action
@@ -37,6 +32,7 @@ ctx.rule("Sql-Stmt-List", "{Sql-Stmt};\n{Sql-Stmt-List}")
 # LAYER 1 + LAYER 2: Sql-Stmt dispatch with weights
 # Layer 1 base statements: weight 0.1–1.0
 # Layer 2 stress templates: weight 1.5–3.5
+# P1–P7 CVE structural patterns: weight 2.0–3.0
 # ============================================================
 ctx.rule("Sql-Stmt", "{Select-Stmt}", weight=1.0)
 ctx.rule("Sql-Stmt", "{Insert-Stmt}", weight=1.0)
@@ -62,11 +58,17 @@ ctx.rule("Sql-Stmt", "{Deep-Nested-Select}", weight=2.5)
 ctx.rule("Sql-Stmt", "{Long-Join-Chain}", weight=2.0)
 ctx.rule("Sql-Stmt", "{Recursive-CTE-Heavy}", weight=2.5)
 ctx.rule("Sql-Stmt", "{Window-Func-Complex}", weight=3.0)
-ctx.rule("Sql-Stmt", "{FTS-Stress}", weight=3.5)
-ctx.rule("Sql-Stmt", "{Printf-Boundary}", weight=5.0)  # raised: CVE-2020-13434 primary target
+ctx.rule("Sql-Stmt", "{FTS-Stress}", weight=0.5)  # lowered: fts tables not pre-loaded in blank DB
 ctx.rule("Sql-Stmt", "{Json-Deep}", weight=2.5)
 ctx.rule("Sql-Stmt", "{Aggregate-Complex}", weight=2.0)
 ctx.rule("Sql-Stmt", "{Explain-Stress}", weight=1.5)
+# P7: Boundary-value function (replaces Printf-Boundary literal PoC rules)
+ctx.rule("Sql-Stmt", "{Pattern-Boundary-Func}", weight=3.0)
+# P1–P6: CVE structural patterns (multi-statement, self-contained DDL→DQL)
+ctx.rule("Sql-Stmt", "{Pattern-DDL-DQL}", weight=2.5)
+ctx.rule("Sql-Stmt", "{Pattern-GenCol-Op}", weight=2.5)
+ctx.rule("Sql-Stmt", "{Pattern-Compound}", weight=2.0)
+ctx.rule("Sql-Stmt", "{Pattern-Schema-Pragma}", weight=2.0)
 
 # ============================================================
 # LAYER 1: SELECT
@@ -492,13 +494,21 @@ ctx.rule("Signed-Number", "{Int-Literal}")
 ctx.rule("Signed-Number", "+{Int-Literal}")
 ctx.rule("Signed-Number", "-{Int-Literal}")
 
-# Fixed schema identifiers
+# Schema identifiers — t1/t2/t3 kept for Layer 1 rule coverage (blank DB
+# means those queries silently fail, which is fine for a fuzzer).
+# p/q/r/s added as fresh-names for pattern rules and Layer 1 rule coverage.
 ctx.rule("Table-Name", "t1", weight=1.0)
 ctx.rule("Table-Name", "t2", weight=1.0)
 ctx.rule("Table-Name", "t3", weight=1.0)
+ctx.rule("Table-Name", "p", weight=0.4)   # fresh-name: used in pattern rules
+ctx.rule("Table-Name", "q", weight=0.4)
+ctx.rule("Table-Name", "r", weight=0.3)
+ctx.rule("Table-Name", "s", weight=0.2)
 ctx.rule("Col-Name", "c1", weight=1.0)
 ctx.rule("Col-Name", "c2", weight=1.0)
 ctx.rule("Col-Name", "c3", weight=1.0)
+ctx.rule("Col-Name", "a", weight=0.8)     # used in pattern DDL rules
+ctx.rule("Col-Name", "b", weight=0.8)
 ctx.rule("Col-Name", "rowid", weight=0.5)
 ctx.rule("Col-Name", "_rowid_", weight=0.3)
 ctx.rule("Col-Ref", "{Col-Name}", weight=1.0)
@@ -681,6 +691,8 @@ ctx.rule("Win-Frame", "ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING"
 ctx.rule("Win-Frame", "RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW", weight=1.0)
 
 # --- FTS-Stress: FTS3/FTS5 auxiliary functions ---
+# Note: fts_t1/fts_t2 not pre-loaded in blank-DB harness.
+# Queries fail silently (no such table). Weight lowered to 0.5 from 3.5.
 ctx.rule("FTS-Stress",
     "SELECT * FROM fts_t1 WHERE fts_t1 MATCH {Fts-Query}",
     weight=3.0)
@@ -713,66 +725,39 @@ ctx.rule("Fts-Highlight", "'<b>'", weight=1.0)
 ctx.rule("Fts-Highlight", "'</b>'", weight=1.0)
 ctx.rule("Fts-Highlight", "''", weight=1.0)
 
-# --- Printf-Boundary: printf with boundary-length arguments ---
-# CVE-2020-13434 root cause: integer overflow in sqlite3_str_vappendf when
-# precision is INT32_MAX (2147483647). The overflow happens in %.*g, %.*f,
-# %.*e, %.*c, %.*s format specifiers — any that take a dynamic precision.
-# drh's simplified PoC: SELECT printf('%.*g', 2147483647, 0.01)
+# --- Pattern-Boundary-Func (P7): generalized boundary-value function calls ---
+# Replaces Printf-Boundary literal PoC rules.
+# Root cause of CVE-2020-13434: integer overflow in sqlite3_str_vappendf when
+# precision arg is INT32_MAX. Generalized to ANY function taking a boundary int.
+# A crash found here means the fuzzer generated a *class* of boundary SQL.
 
-# Direct CVE-2020-13434 simplified PoC (highest weight — exact trigger)
-ctx.rule("Printf-Boundary",
-    "SELECT printf('%.*g', {Boundary-Int}, {Boundary-Float})",
-    weight=5.0)
-ctx.rule("Printf-Boundary",
-    "SELECT printf('%.*g', 2147483647, 0.01)",
-    weight=5.0)  # literal simplified PoC from SQLite ticket
-
-# Format variants — NOTE: empirically verified on sqlite-3.31.1:
-#   %.*g → UBSan exit 1 ✅ (signed integer overflow in sqlite3_str_vappendf)
-#   %.*f → exit 0 (different precision path, no overflow on 3.31.1)
-#   %.*e → exit 0 (same — no UBSan trigger on 3.31.1)
-#   %.*c → OOM/hang (allocates before UBSan fires)
-#   %.*s → OOM/hang (same)
-# Keep lower weights for %.*f/%.*e (may trigger on other SQLite versions)
-ctx.rule("Printf-Boundary",
-    "SELECT printf('%.*f', {Boundary-Int}, {Boundary-Float})",
+ctx.rule("Pattern-Boundary-Func",
+    "SELECT {Boundary-Func-Call}",
+    weight=3.0)
+ctx.rule("Pattern-Boundary-Func",
+    "SELECT {Boundary-Func-Call}, {Boundary-Func-Call}",
     weight=1.5)
-ctx.rule("Printf-Boundary",
-    "SELECT printf('%.*e', {Boundary-Int}, {Boundary-Float})",
-    weight=1.5)
-# Omit %.*c and %.*s with INT32_MAX — they cause OOM not UBSan
-
-# Generic format dispatch
-ctx.rule("Printf-Boundary",
-    "SELECT printf({Printf-Fmt-Spec}, {Boundary-Int})",
+# group_concat variant requires a table — create one inline
+ctx.rule("Pattern-Boundary-Func",
+    "CREATE TABLE IF NOT EXISTS p(x TEXT);\n"
+    "INSERT INTO p VALUES({Str-Literal}),({Str-Literal}),({Str-Literal});\n"
+    "SELECT group_concat(x, {Boundary-Int}) FROM p",
     weight=2.0)
-ctx.rule("Printf-Boundary",
-    "SELECT printf({Printf-Width-Spec}, {Boundary-Int}, {Str-Literal})",
-    weight=2.0)
-ctx.rule("Printf-Boundary",
-    "SELECT printf({Printf-Fmt-Spec}, {Boundary-Int}, {Boundary-Int})",
-    weight=1.0)
 
-# CVE-2020-13434 full PoC path: printf(b, b) inside CHECK triggers overflow
-# when b is a format string like '%.*g'. The harness pre-loads table `a`
-# with this CHECK constraint, so only DML is needed to trigger it.
-ctx.rule("Printf-Boundary",
-    "INSERT INTO a VALUES({Str-Printf-Fmt})",
-    weight=4.0)
-ctx.rule("Printf-Boundary",
-    "INSERT INTO a VALUES({Str-Printf-Fmt}), ({Str-Printf-Fmt})",
-    weight=3.0)
-ctx.rule("Printf-Boundary",
-    "UPDATE a SET b = {Str-Printf-Fmt}",
-    weight=3.0)
+ctx.rule("Boundary-Func-Call", "printf({Format-Spec}, {Boundary-Int}, {Boundary-Float})", weight=3.0)
+ctx.rule("Boundary-Func-Call", "printf({Format-Spec}, {Boundary-Int})", weight=2.0)
+ctx.rule("Boundary-Func-Call", "printf({Printf-Fmt-Spec}, {Boundary-Int}, {Str-Literal})", weight=1.5)
+ctx.rule("Boundary-Func-Call", "substr({Str-Literal}, {Boundary-Int})", weight=2.0)
+ctx.rule("Boundary-Func-Call", "substr({Str-Literal}, {Boundary-Int}, {Boundary-Int})", weight=1.5)
+ctx.rule("Boundary-Func-Call", "hex(zeroblob({Boundary-Int}))", weight=2.0)
+ctx.rule("Boundary-Func-Call", "round({Boundary-Float}, {Boundary-Int})", weight=1.5)
 
-# group_concat with INT32_MAX separator — triggers inside the PoC trigger c
-ctx.rule("Printf-Boundary",
-    "SELECT group_concat(c2, 2147483647) FROM t1",
-    weight=3.0)
-ctx.rule("Printf-Boundary",
-    "SELECT group_concat(c1, {Boundary-Int}) FROM t1",
-    weight=2.0)
+# Format-Spec: precision format specifiers (CVE-2020-13434 root cause class)
+ctx.rule("Format-Spec", "'%.*g'", weight=3.0)  # CVE-2020-13434 root specifier
+ctx.rule("Format-Spec", "'%.*f'", weight=2.0)
+ctx.rule("Format-Spec", "'%.*e'", weight=2.0)
+ctx.rule("Format-Spec", "'%.*d'", weight=1.0)
+ctx.rule("Format-Spec", "'%.*s'", weight=1.0)
 
 ctx.rule("Printf-Fmt-Spec", "'%d'", weight=2.0)
 ctx.rule("Printf-Fmt-Spec", "'%u'", weight=1.0)
@@ -782,18 +767,6 @@ ctx.rule("Printf-Fmt-Spec", "'%s'", weight=2.0)
 ctx.rule("Printf-Width-Spec", "'%10d'", weight=1.0)
 ctx.rule("Printf-Width-Spec", "'%-10s'", weight=1.0)
 ctx.rule("Printf-Width-Spec", "'%010d'", weight=1.0)
-
-# Str-Printf-Fmt: format strings that trigger printf integer overflow
-# These are the VALUES inserted into table a — when used as printf(b, b),
-# the string becomes both the format and the argument.
-ctx.rule("Str-Printf-Fmt", "'%.*g'", weight=3.0)   # CVE-2020-13434 exact trigger
-ctx.rule("Str-Printf-Fmt", "'%.*f'", weight=2.0)
-ctx.rule("Str-Printf-Fmt", "'%.*e'", weight=2.0)
-ctx.rule("Str-Printf-Fmt", "'%.*c'", weight=2.0)
-ctx.rule("Str-Printf-Fmt", "'%.*s'", weight=2.0)
-ctx.rule("Str-Printf-Fmt", "'GERMANY''s%'", weight=3.0)  # original PoC value
-ctx.rule("Str-Printf-Fmt", "'Y'", weight=1.0)
-ctx.rule("Str-Printf-Fmt", "'Brand#23'", weight=1.0)
 
 # --- Json-Deep: deeply nested JSON construction + extraction ---
 ctx.rule("Json-Deep",
@@ -903,8 +876,6 @@ ctx.rule("Boundary-Str", "NULL", weight=2.0)
 ctx.regex("Boundary-Str", "X'[0-9a-f]{64}'", weight=1.0)
 
 # Boundary-Float: float boundary values
-# 0.01 is the value from drh's simplified CVE-2020-13434 PoC:
-#   SELECT printf('%.*g', 2147483647, 0.01)
 ctx.rule("Boundary-Float", "0.01", weight=3.0)     # CVE-2020-13434 PoC value
 ctx.rule("Boundary-Float", "0.0", weight=2.0)
 ctx.rule("Boundary-Float", "1.0", weight=2.0)
@@ -913,3 +884,171 @@ ctx.rule("Boundary-Float", "1e308", weight=2.0)
 ctx.rule("Boundary-Float", "-1e308", weight=2.0)
 ctx.rule("Boundary-Float", "1e-308", weight=1.0)
 ctx.rule("Boundary-Float", "-0.0", weight=1.0)
+
+# ============================================================
+# LAYER 2: CVE STRUCTURAL PATTERNS (P1–P6)
+# Each pattern is self-contained: DDL creates tables, DML populates them,
+# DQL exercises the interesting code path.
+# ============================================================
+
+# --- Pattern-DDL-DQL (P1): DDL → complex SELECT ---
+# Covers CVE-2020-13435 (JOIN+window), CVE-2020-13871 (GROUP BY+window),
+# CVE-2020-15358 (INTERSECT+JOIN+VIEW), CVE-2020-9327 (genCol+JOIN)
+
+ctx.rule("Pattern-DDL-DQL",
+    "CREATE TABLE IF NOT EXISTS p(a INTEGER, b TEXT, c REAL);\n"
+    "SELECT {Result-Col-List} FROM p",
+    weight=1.5)
+ctx.rule("Pattern-DDL-DQL",
+    "CREATE TABLE IF NOT EXISTS p(a INTEGER, b TEXT);\n"
+    "CREATE TABLE IF NOT EXISTS q(x INTEGER, y TEXT);\n"
+    "SELECT {Result-Col-List} FROM p {Join-Operator} q ON p.a = q.x",
+    weight=2.0)
+ctx.rule("Pattern-DDL-DQL",
+    "CREATE TABLE IF NOT EXISTS p(a INTEGER UNIQUE, b TEXT);\n"
+    "INSERT INTO p VALUES({Int-Literal}, {Str-Literal});\n"
+    "SELECT {Result-Col-List} FROM p WHERE {Expr}",
+    weight=2.0)
+# P1+P3: DDL + self-JOIN + window (covers CVE-2020-13435 structure)
+ctx.rule("Pattern-DDL-DQL",
+    "CREATE TABLE IF NOT EXISTS p(a UNIQUE);\n"
+    "SELECT p.a FROM p JOIN p q ON 3 = p.a NATURAL JOIN p "
+    "WHERE p.a IN((SELECT(SELECT coalesce(lead(2) OVER(), SUM(a))) FROM p d WHERE p.a))",
+    weight=2.0)
+# P1+P4: DDL + VIEW + JOIN + INTERSECT (covers CVE-2020-15358 structure)
+ctx.rule("Pattern-DDL-DQL",
+    "CREATE TABLE IF NOT EXISTS p(a INTEGER);\n"
+    "CREATE TABLE IF NOT EXISTS q(b INTEGER);\n"
+    "CREATE VIEW IF NOT EXISTS vp AS SELECT a FROM p ORDER BY a;\n"
+    "SELECT {Result-Col-List} FROM p, q "
+    "WHERE p.a = (SELECT {Int-Literal} INTERSECT SELECT b FROM vp) AND p.a = {Int-Literal}",
+    weight=2.0)
+# P1+P3: DDL + GROUP BY + HAVING + two window exprs (covers CVE-2020-13871 structure)
+ctx.rule("Pattern-DDL-DQL",
+    "CREATE TABLE IF NOT EXISTS p(b);\n"
+    "SELECT(SELECT b FROM p GROUP BY b HAVING(NULL AND b IN(\n"
+    "  (SELECT COUNT() OVER(ORDER BY b) = lead(b) OVER(\n"
+    "    ORDER BY SUM(DISTINCT CASE WHEN b > 0 THEN b*b ELSE 0 END) / {Int-Literal}\n"
+    "  ))\n"
+    "))) FROM p EXCEPT SELECT b FROM p ORDER BY b",
+    weight=1.5)
+# P1+P5: DDL + three-table DDL + JOIN + complex WHERE (covers CVE-2020-9327 structure)
+ctx.rule("Pattern-DDL-DQL",
+    "CREATE TABLE IF NOT EXISTS v0(v3, v1 GENERATED ALWAYS AS (v3) UNIQUE);\n"
+    "CREATE TABLE IF NOT EXISTS v5(v6 UNIQUE, v7 UNIQUE);\n"
+    "CREATE VIEW IF NOT EXISTS v8 AS SELECT coalesce(v3, v1) AS v9 FROM v0 "
+    "WHERE v1 IN({Str-Literal});\n"
+    "SELECT * FROM v8 JOIN v5 WHERE 0 > v7 AND v9 OR v6 = {Str-Literal}",
+    weight=1.5)
+
+# --- Pattern-GenCol-Op (P2): generated column → operation ---
+# Covers CVE-2020-9327 (generated col + UNIQUE + JOIN),
+# CVE-2019-19646 (generated col + PRAGMA integrity_check)
+
+ctx.rule("Pattern-GenCol-Op",
+    "CREATE TABLE IF NOT EXISTS p(a, b GENERATED ALWAYS AS (a) VIRTUAL);\n"
+    "SELECT {Result-Col-List} FROM p",
+    weight=2.0)
+ctx.rule("Pattern-GenCol-Op",
+    "CREATE TABLE IF NOT EXISTS p(a, b GENERATED ALWAYS AS ({GenCol-Expr}) UNIQUE);\n"
+    "CREATE TABLE IF NOT EXISTS q(x UNIQUE, y UNIQUE);\n"
+    "SELECT {Result-Col-List} FROM p JOIN q ON p.a = q.x",
+    weight=2.0)
+# Covers CVE-2019-19646 exactly: NOT NULL generated col + INSERT + PRAGMA
+ctx.rule("Pattern-GenCol-Op",
+    "CREATE TABLE IF NOT EXISTS p(a, b NOT NULL GENERATED ALWAYS AS ({GenCol-Expr}));\n"
+    "INSERT INTO p(a) VALUES({Int-Literal});\n"
+    "PRAGMA integrity_check",
+    weight=2.5)
+ctx.rule("Pattern-GenCol-Op",
+    "CREATE TABLE IF NOT EXISTS p(a, b NOT NULL GENERATED ALWAYS AS ({GenCol-Expr}));\n"
+    "INSERT INTO p(a) VALUES({Int-Literal});\n"
+    "PRAGMA quick_check",
+    weight=1.5)
+ctx.rule("Pattern-GenCol-Op",
+    "CREATE TABLE IF NOT EXISTS p(a {Type-Name}, b GENERATED ALWAYS AS ({GenCol-Expr}) STORED);\n"
+    "INSERT INTO p(a) VALUES({Literal}),({Literal});\n"
+    "SELECT {Result-Col-List} FROM p WHERE {Expr}",
+    weight=1.5)
+
+ctx.rule("GenCol-Expr", "a", weight=3.0)
+ctx.rule("GenCol-Expr", "a + {Int-Literal}", weight=2.0)
+ctx.rule("GenCol-Expr", "coalesce(a, b)", weight=2.0)
+ctx.rule("GenCol-Expr", "a = {Int-Literal}", weight=2.0)
+ctx.rule("GenCol-Expr", "a IS NULL", weight=1.0)
+ctx.rule("GenCol-Expr", "a * a", weight=1.0)
+ctx.rule("GenCol-Expr", "a || b", weight=1.0)
+
+# --- Pattern-Compound (P4): INTERSECT/EXCEPT compound operators ---
+# Covers CVE-2020-13871 (EXCEPT), CVE-2020-15358 (INTERSECT)
+
+ctx.rule("Pattern-Compound",
+    "CREATE TABLE IF NOT EXISTS p(a INTEGER, b TEXT);\n"
+    "INSERT INTO p VALUES({Int-Literal}, {Str-Literal}),({Int-Literal}, {Str-Literal});\n"
+    "SELECT a FROM p {Compound-Op-Set} SELECT a FROM p",
+    weight=2.5)
+ctx.rule("Pattern-Compound",
+    "CREATE TABLE IF NOT EXISTS p(a INTEGER);\n"
+    "CREATE TABLE IF NOT EXISTS q(b INTEGER);\n"
+    "INSERT INTO p VALUES({Int-Literal}),({Int-Literal});\n"
+    "INSERT INTO q VALUES({Int-Literal}),({Int-Literal});\n"
+    "SELECT a FROM p {Compound-Op-Set} SELECT b FROM q",
+    weight=2.0)
+# Window with compound op in PARTITION BY (covers CVE-2020-15358 window variant)
+ctx.rule("Pattern-Compound",
+    "CREATE TABLE IF NOT EXISTS p(a INTEGER);\n"
+    "INSERT INTO p VALUES({Int-Literal}),({Int-Literal}),({Int-Literal});\n"
+    "SELECT {Win-Func-Expr} OVER "
+    "(PARTITION BY (SELECT {Int-Literal} {Compound-Op-Set} SELECT a FROM p) {Win-Order}) "
+    "FROM p",
+    weight=1.5)
+# Compound op in subquery within WHERE
+ctx.rule("Pattern-Compound",
+    "CREATE TABLE IF NOT EXISTS p(a INTEGER, b TEXT);\n"
+    "CREATE TABLE IF NOT EXISTS q(c INTEGER);\n"
+    "INSERT INTO p VALUES({Int-Literal}, {Str-Literal});\n"
+    "INSERT INTO q VALUES({Int-Literal}),({Int-Literal});\n"
+    "SELECT {Result-Col-List} FROM p WHERE a IN "
+    "(SELECT a FROM p {Compound-Op-Set} SELECT c FROM q)",
+    weight=2.0)
+
+ctx.rule("Compound-Op-Set", "INTERSECT", weight=2.0)
+ctx.rule("Compound-Op-Set", "EXCEPT", weight=2.0)
+ctx.rule("Compound-Op-Set", "UNION ALL", weight=1.0)
+
+# --- Pattern-Schema-Pragma (P6): DDL → DML → PRAGMA integrity_check ---
+# Covers CVE-2019-19646: generated col with NOT NULL + PRAGMA = infinite loop
+
+ctx.rule("Pattern-Schema-Pragma",
+    "CREATE TABLE IF NOT EXISTS p(a, b NOT NULL GENERATED ALWAYS AS ({GenCol-Expr}));\n"
+    "INSERT INTO p(a) VALUES({Int-Literal});\n"
+    "PRAGMA integrity_check",
+    weight=2.5)
+ctx.rule("Pattern-Schema-Pragma",
+    "CREATE TABLE IF NOT EXISTS p(a {Type-Name}, b {Type-Name});\n"
+    "INSERT INTO p VALUES({Literal}, {Literal}),({Literal}, {Literal});\n"
+    "PRAGMA quick_check",
+    weight=2.0)
+ctx.rule("Pattern-Schema-Pragma",
+    "CREATE TABLE IF NOT EXISTS p(a INTEGER);\n"
+    "PRAGMA integrity_check",
+    weight=1.0)
+ctx.rule("Pattern-Schema-Pragma",
+    "CREATE TABLE IF NOT EXISTS p(a, b GENERATED ALWAYS AS ({GenCol-Expr}) UNIQUE);\n"
+    "INSERT INTO p(a) VALUES({Int-Literal}),({Int-Literal});\n"
+    "PRAGMA integrity_check(1)",
+    weight=1.5)
+
+# --- Window-Agg-Expr (P3+P5 inline): window + aggregate in same expression ---
+# Used inside HAVING, IN subqueries, complex WHERE expressions.
+# Covers CVE-2020-13435 (lead + SUM), CVE-2020-13871 (COUNT OVER + lead OVER)
+ctx.rule("Window-Agg-Expr", "count() OVER ({Win-Partition} {Win-Order})", weight=2.0)
+ctx.rule("Window-Agg-Expr", "sum({Col-Ref}) OVER ({Win-Order})", weight=2.0)
+ctx.rule("Window-Agg-Expr", "lead({Col-Ref}) OVER ({Win-Order})", weight=2.0)
+ctx.rule("Window-Agg-Expr", "lag({Col-Ref}) OVER ({Win-Order})", weight=2.0)
+ctx.rule("Window-Agg-Expr",
+    "SUM(DISTINCT CASE WHEN {Expr} THEN {Expr} ELSE 0 END)",
+    weight=1.5)
+ctx.rule("Window-Agg-Expr",
+    "{Agg-Func} OVER ({Win-Partition} {Win-Order})",
+    weight=1.5)

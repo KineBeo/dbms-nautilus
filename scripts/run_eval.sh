@@ -40,7 +40,10 @@ HARNESS_SUFFIX="${HARNESS_SUFFIX:-}"
 HARNESS_BIN="$ROOT/harness/sqlite_harness_${HARNESS_SUFFIX}${VERSION}"
 if [[ ! -f "$HARNESS_BIN" ]]; then
     echo "Error: harness binary not found: $HARNESS_BIN"
-    if [[ -n "$HARNESS_SUFFIX" ]]; then
+    if [[ "$HARNESS_SUFFIX" == "patterns_" ]]; then
+        echo "Build it first:"
+        echo "  cd harness && make patterns-build SQLITE=../cve_builds/${VERSION}/sqlite3.c TARGET=sqlite_harness_${HARNESS_SUFFIX}${VERSION}"
+    elif [[ -n "$HARNESS_SUFFIX" ]]; then
         echo "Build it first:"
         echo "  cd harness && make cve13434-build SQLITE=../cve_builds/${VERSION}/sqlite3.c TARGET=sqlite_harness_${HARNESS_SUFFIX}${VERSION}"
     else
