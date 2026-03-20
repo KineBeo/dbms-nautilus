@@ -47,19 +47,13 @@ ctx.rule("Sql-Stmt", "{Drop-Stmt}", weight=0.2)
 ctx.rule("Sql-Stmt", "{Alter-Table-Stmt}", weight=0.3)
 ctx.rule("Sql-Stmt", "{Pragma-Stmt}", weight=0.3)
 ctx.rule("Sql-Stmt", "{Analyze-Stmt}", weight=0.2)
-ctx.rule("Sql-Stmt", "{Vacuum-Stmt}", weight=0.1)
 ctx.rule("Sql-Stmt", "{Attach-Stmt}", weight=0.2)
-ctx.rule("Sql-Stmt", "{Reindex-Stmt}", weight=0.1)
-ctx.rule("Sql-Stmt", "{Savepoint-Stmt}", weight=0.1)
-ctx.rule("Sql-Stmt", "{Rollback-Stmt}", weight=0.1)
-ctx.rule("Sql-Stmt", "{Release-Stmt}", weight=0.1)
 # Layer 2 stress templates (elevated weights)
 ctx.rule("Sql-Stmt", "{Deep-Nested-Select}", weight=2.5)
 ctx.rule("Sql-Stmt", "{Long-Join-Chain}", weight=2.0)
 ctx.rule("Sql-Stmt", "{Recursive-CTE-Heavy}", weight=2.5)
 ctx.rule("Sql-Stmt", "{Window-Func-Complex}", weight=3.0)
-ctx.rule("Sql-Stmt", "{FTS-Stress}", weight=0.5)  # lowered: fts tables not pre-loaded in blank DB
-ctx.rule("Sql-Stmt", "{Json-Deep}", weight=2.5)
+ctx.rule("Sql-Stmt", "{Json-Deep}", weight=1.0)
 ctx.rule("Sql-Stmt", "{Aggregate-Complex}", weight=2.0)
 ctx.rule("Sql-Stmt", "{Explain-Stress}", weight=1.5)
 # P7: Boundary-value function (replaces Printf-Boundary literal PoC rules)
@@ -690,41 +684,6 @@ ctx.rule("Win-Frame", "ROWS BETWEEN CURRENT ROW AND {Int-Literal} FOLLOWING", we
 ctx.rule("Win-Frame", "ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING", weight=1.0)
 ctx.rule("Win-Frame", "RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW", weight=1.0)
 
-# --- FTS-Stress: FTS3/FTS5 auxiliary functions ---
-# Note: fts_t1/fts_t2 not pre-loaded in blank-DB harness.
-# Queries fail silently (no such table). Weight lowered to 0.5 from 3.5.
-ctx.rule("FTS-Stress",
-    "SELECT * FROM fts_t1 WHERE fts_t1 MATCH {Fts-Query}",
-    weight=3.0)
-ctx.rule("FTS-Stress",
-    "SELECT snippet(fts_t2, {Int-Literal}, {Fts-Highlight}, {Fts-Highlight}, '...', {Int-Literal}) "
-    "FROM fts_t2 WHERE fts_t2 MATCH {Fts-Query}",
-    weight=3.0)
-ctx.rule("FTS-Stress",
-    "SELECT matchinfo(fts_t2) FROM fts_t2 WHERE fts_t2 MATCH {Fts-Query}",
-    weight=2.0)
-ctx.rule("FTS-Stress",
-    "SELECT offsets(fts_t2) FROM fts_t2 WHERE fts_t2 MATCH {Fts-Query}",
-    weight=2.0)
-ctx.rule("FTS-Stress",
-    "SELECT highlight(fts_t1, 0, {Fts-Highlight}, {Fts-Highlight}) "
-    "FROM fts_t1({Fts-Query})",
-    weight=2.0)
-ctx.rule("FTS-Stress",
-    "INSERT INTO fts_t1(fts_t1, rank) VALUES('merge', {Int-Literal})",
-    weight=2.0)
-ctx.rule("FTS-Stress",
-    "INSERT INTO fts_t1(fts_t1, rank) VALUES('usermerge', {Int-Literal})",
-    weight=1.0)
-
-ctx.rule("Fts-Query", "'hello'", weight=2.0)
-ctx.rule("Fts-Query", "'hello world'", weight=2.0)
-ctx.rule("Fts-Query", "'c1'", weight=1.0)
-ctx.regex("Fts-Query", "'[a-z]+'", weight=1.0)
-ctx.rule("Fts-Highlight", "'<b>'", weight=1.0)
-ctx.rule("Fts-Highlight", "'</b>'", weight=1.0)
-ctx.rule("Fts-Highlight", "''", weight=1.0)
-
 # --- Pattern-Boundary-Func (P7): generalized boundary-value function calls ---
 # Replaces Printf-Boundary literal PoC rules.
 # Root cause of CVE-2020-13434: integer overflow in sqlite3_str_vappendf when
@@ -764,9 +723,6 @@ ctx.rule("Printf-Fmt-Spec", "'%u'", weight=1.0)
 ctx.rule("Printf-Fmt-Spec", "'%x'", weight=1.0)
 ctx.rule("Printf-Fmt-Spec", "'%f'", weight=1.0)
 ctx.rule("Printf-Fmt-Spec", "'%s'", weight=2.0)
-ctx.rule("Printf-Width-Spec", "'%10d'", weight=1.0)
-ctx.rule("Printf-Width-Spec", "'%-10s'", weight=1.0)
-ctx.rule("Printf-Width-Spec", "'%010d'", weight=1.0)
 
 # --- Json-Deep: deeply nested JSON construction + extraction ---
 ctx.rule("Json-Deep",
@@ -866,14 +822,6 @@ ctx.rule("Boundary-Int", "-9223372036854775808", weight=3.0)  # INT64_MIN
 ctx.rule("Boundary-Int", "0", weight=2.0)
 ctx.rule("Boundary-Int", "-1", weight=2.0)
 ctx.rule("Boundary-Int", "1", weight=1.0)
-
-# Boundary-Str: strings that stress string handling
-ctx.rule("Boundary-Str", "''", weight=2.0)
-ctx.rule("Boundary-Str", "' '", weight=1.0)
-ctx.regex("Boundary-Str", "'[a-z]{100}'", weight=2.0)
-ctx.regex("Boundary-Str", "'[a-z]{500}'", weight=1.0)
-ctx.rule("Boundary-Str", "NULL", weight=2.0)
-ctx.regex("Boundary-Str", "X'[0-9a-f]{64}'", weight=1.0)
 
 # Boundary-Float: float boundary values
 ctx.rule("Boundary-Float", "0.01", weight=3.0)     # CVE-2020-13434 PoC value
