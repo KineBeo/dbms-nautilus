@@ -19,8 +19,13 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-GRAMMAR="$ROOT/grammars/sqlite.py"
 OUTDIR="${1:-}"
+# Allow caller to pass the grammar path as $2; fall back to sqlite.py
+GRAMMAR="${2:-$ROOT/grammars/sqlite.py}"
+# If path is relative, resolve from ROOT
+if [[ "$GRAMMAR" != /* ]]; then
+    GRAMMAR="$ROOT/$GRAMMAR"
+fi
 
 if [ ! -f "$GRAMMAR" ]; then
     echo "Error: grammar not found at $GRAMMAR" >&2

@@ -98,7 +98,7 @@ echo "Config written to: $CONFIG"
 
 # Dump grammar weights for this run (observability)
 echo "Dumping grammar weights..."
-"$SCRIPT_DIR/weight_dump.sh" "$WORKDIR" 2>&1
+"$SCRIPT_DIR/weight_dump.sh" "$WORKDIR" "$GRAMMAR" 2>&1
 
 echo "Starting fuzzer... (Ctrl+C to stop)"
 echo ""
