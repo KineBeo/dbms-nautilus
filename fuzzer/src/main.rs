@@ -57,7 +57,13 @@ fn process_input(
             let end_index = start_index + 200;
 
             if state.minimize(inp, start_index, end_index)? {
-                inp.state = InputState::Det((0, 0));
+                if config.rl_enabled {
+                    // Skip Det when RL controls strategy selection —
+                    // the DQN can choose Det as action=3 in Random mode.
+                    inp.state = InputState::Random;
+                } else {
+                    inp.state = InputState::Det((0, 0));
+                }
             } else {
                 inp.state = InputState::Init(end_index);
             }
@@ -65,20 +71,6 @@ fn process_input(
         InputState::Det((cycle, start_index)) => {
             // RL does not control the Det stage — keep existing behaviour.
             let end_index = start_index + 1;
-
-            // Snapshot pre-mutation signals for RL logging in Det stage.
-            let (bits_det_before, crashes_det_before, queue_sz_det, total_cov_det_before) = {
-                let gs = global_state.lock().expect("P2-det_before_lock");
-                let bits = gs.bits_found_by_havoc
-                    + gs.bits_found_by_havoc_rec
-                    + gs.bits_found_by_splice
-                    + gs.bits_found_by_det
-                    + gs.bits_found_by_gen;
-                let crashes = gs.total_found_asan + gs.total_found_sig + gs.total_found_ubsan;
-                (bits, crashes, gs.queue.len(), gs.bitmaps.get(&false)
-                    .map_or(0, |b| b.iter().filter(|&&x| x != 0).count()))
-            };
-
             if state.deterministic_tree_mutation(inp, start_index, end_index)? {
                 if cycle == config.number_of_deterministic_mutations {
                     inp.state = InputState::Random;
@@ -91,47 +83,6 @@ fn process_input(
             state.splice(inp)?;
             state.havoc(inp)?;
             state.havoc_recursion(inp)?;
-
-            // Feed RL select_action+observe in Det stage to populate the replay buffer and CSV.
-            // select_action must precede observe so that last_state is populated in DqnPolicy.
-            let ctx_det_before = PolicyContext {
-                coverage_delta: 0,
-                is_crash: false,
-                is_timeout: false,
-                total_coverage: total_cov_det_before,
-                exec_count: state.fuzzer.execution_count,
-                queue_size: queue_sz_det,
-                strategy_emas: [0.0f32; 5],
-                last_action: None,
-            };
-            // select_action sets last_state; ignore the returned action since Det already ran.
-            let _det_action = policy.select_action(&ctx_det_before);
-
-            let (bits_det_after, crashes_det_after, queue_sz_det_after, total_cov_det_after) = {
-                let gs = global_state.lock().expect("P2-det_after_lock");
-                let bits = gs.bits_found_by_havoc
-                    + gs.bits_found_by_havoc_rec
-                    + gs.bits_found_by_splice
-                    + gs.bits_found_by_det
-                    + gs.bits_found_by_gen;
-                let crashes = gs.total_found_asan + gs.total_found_sig + gs.total_found_ubsan;
-                (bits, crashes, gs.queue.len(), gs.bitmaps.get(&false)
-                    .map_or(0, |b| b.iter().filter(|&&x| x != 0).count()))
-            };
-            let coverage_delta_det = bits_det_after.saturating_sub(bits_det_before) as usize;
-            let is_crash_det = crashes_det_after > crashes_det_before;
-            let ctx_det_after = PolicyContext {
-                coverage_delta: coverage_delta_det,
-                is_crash: is_crash_det,
-                is_timeout: false,
-                total_coverage: total_cov_det_after,
-                exec_count: state.fuzzer.execution_count,
-                queue_size: queue_sz_det_after,
-                strategy_emas: [0.0f32; 5],
-                last_action: Some(3),
-            };
-            // Use action=3 (Det) as the logged action for this step.
-            policy.observe(3, &ctx_det_after);
         }
         InputState::Random => {
             // Snapshot pre-mutation signals from GlobalSharedState
