@@ -84,3 +84,48 @@ def _serialize_payload(payload: dict) -> str:
     """
     raw = json.dumps(payload, ensure_ascii=True, separators=(",", ":"))
     return raw.replace("</", "<\\/")
+
+
+_HTML_TEMPLATE = """<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>cve2grammar — Manuel Rigger DBMS bugs</title>
+<style>
+body { font-family: ui-monospace, monospace; background: #0a0a0a; color: #ddd; margin: 0; }
+#app { padding: 16px; }
+.loading { color: #888; }
+</style>
+</head>
+<body>
+<div id="app"><div class="loading">Loading bugs...</div></div>
+<script id="bugs-data" type="application/json">__BUGS_DATA_JSON__</script>
+<script>
+// Placeholder — real dashboard JS is added in later tasks.
+document.addEventListener("DOMContentLoaded", function () {
+  var raw = document.getElementById("bugs-data").textContent;
+  var payload = JSON.parse(raw);
+  var app = document.getElementById("app");
+  app.textContent = "Loaded " + payload.bugs.length + " bugs (dashboard UI not yet rendered).";
+});
+</script>
+</body>
+</html>
+"""
+
+
+def emit_dashboard(bugs: list[Bug]) -> str:
+    """Render the given bugs as a self-contained HTML dashboard document.
+
+    Args:
+        bugs: Bug records to display. Order is preserved by (section, number)
+            during serialization.
+
+    Returns:
+        A complete HTML document (``<!doctype html>...``) ready to write to a
+        ``.html`` file. No external resources are referenced; the file opens
+        correctly from the local filesystem.
+    """
+    payload = _build_payload(bugs)
+    serialized = _serialize_payload(payload)
+    return _HTML_TEMPLATE.replace("__BUGS_DATA_JSON__", serialized)

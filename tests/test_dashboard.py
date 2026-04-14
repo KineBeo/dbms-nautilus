@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 import json
+import re
 
 from cve2grammar.config import SUPPORTED_DBMS
-from cve2grammar.dashboard import _bug_to_dict, _build_payload, _serialize_payload
+from cve2grammar.dashboard import _bug_to_dict, _build_payload, _serialize_payload, emit_dashboard
 from cve2grammar.models import Bug
 
 
@@ -158,3 +159,66 @@ class TestSerializePayload:
         payload = {"bugs": [{"id": "A"}, {"id": "B"}]}
         out = _serialize_payload(payload)
         assert "\n" not in out
+
+
+def _extract_embedded_json(html: str) -> dict:
+    """Pull the JSON payload out of the <script id="bugs-data"> tag."""
+    match = re.search(
+        r'<script id="bugs-data" type="application/json">(.*?)</script>',
+        html,
+        re.DOTALL,
+    )
+    assert match is not None, "bugs-data script tag not found"
+    raw = match.group(1)
+    # Reverse the "</" → "<\/" escape before parsing.
+    return json.loads(raw.replace("<\\/", "</"))
+
+
+class TestEmitDashboard:
+    def test_output_is_full_html_document(self) -> None:
+        html = emit_dashboard([])
+        assert html.startswith("<!doctype html>") or html.startswith("<!DOCTYPE html>")
+        assert "<html" in html
+        assert "</html>" in html
+
+    def test_contains_bugs_data_script_tag(self) -> None:
+        html = emit_dashboard([])
+        assert '<script id="bugs-data" type="application/json">' in html
+
+    def test_embedded_payload_is_valid_json(self) -> None:
+        html = emit_dashboard([_make_bug(id="A", number=1)])
+        payload = _extract_embedded_json(html)
+        assert payload["facets"]["dbms"][0] == "sqlite"
+        assert len(payload["bugs"]) == 1
+        assert payload["bugs"][0]["id"] == "A"
+
+    def test_empty_bugs_list_emits_valid_document(self) -> None:
+        html = emit_dashboard([])
+        payload = _extract_embedded_json(html)
+        assert payload["bugs"] == []
+        # And the document is still well-formed enough to contain the marker.
+        assert "</html>" in html
+
+    def test_script_tag_not_terminated_by_bug_content(self) -> None:
+        # A bug whose SQL contains "</script>" must not break the embedding.
+        bug = _make_bug(sql="SELECT 1; -- </script><script>alert(1)</script>")
+        html = emit_dashboard([bug])
+        # The raw HTML should contain exactly one </script> per <script> tag.
+        # Specifically, the JSON payload region must not have a "</" in it.
+        match = re.search(
+            r'<script id="bugs-data" type="application/json">(.*?)</script>',
+            html,
+            re.DOTALL,
+        )
+        assert match is not None
+        assert "</" not in match.group(1)
+        payload = _extract_embedded_json(html)
+        assert payload["bugs"][0]["sql"] == (
+            "SELECT 1; -- </script><script>alert(1)</script>"
+        )
+
+    def test_unicode_bug_title_roundtrips(self) -> None:
+        bug = _make_bug(title="café — bug")
+        html = emit_dashboard([bug])
+        payload = _extract_embedded_json(html)
+        assert payload["bugs"][0]["title"] == "café — bug"
