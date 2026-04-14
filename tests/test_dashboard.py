@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import json
+
 from cve2grammar.config import SUPPORTED_DBMS
-from cve2grammar.dashboard import _bug_to_dict, _build_payload
+from cve2grammar.dashboard import _bug_to_dict, _build_payload, _serialize_payload
 from cve2grammar.models import Bug
 
 
@@ -117,3 +119,42 @@ class TestBuildPayload:
     def test_empty_bugs_list(self) -> None:
         out = _build_payload([])
         assert out["bugs"] == []
+
+
+class TestSerializePayload:
+    def test_roundtrip_simple_payload(self) -> None:
+        payload = {"bugs": [{"id": "X", "sql": "SELECT 1;"}]}
+        out = _serialize_payload(payload)
+        assert json.loads(out) == payload
+
+    def test_close_script_substring_is_escaped(self) -> None:
+        payload = {"bugs": [{"sql": "x </script> y"}]}
+        out = _serialize_payload(payload)
+        # The raw serialized string must not contain "</" at all — that is
+        # what protects the <script type="application/json"> tag.
+        assert "</" not in out
+        # But the original bug data must round-trip through json.loads.
+        assert json.loads(out)["bugs"][0]["sql"] == "x </script> y"
+
+    def test_close_tag_case_insensitive_substring_also_escaped(self) -> None:
+        # Defensive: if someone ever switches the container tag case, we still
+        # don't want any "</" anywhere in the serialized output.
+        payload = {"bugs": [{"sql": "abc </SCRIPT> def", "title": "</a>"}]}
+        out = _serialize_payload(payload)
+        assert "</" not in out
+        assert json.loads(out)["bugs"][0]["sql"] == "abc </SCRIPT> def"
+        assert json.loads(out)["bugs"][0]["title"] == "</a>"
+
+    def test_unicode_ascii_escaped(self) -> None:
+        payload = {"bugs": [{"title": "café — é"}]}
+        out = _serialize_payload(payload)
+        # ensure_ascii=True → every non-ASCII char becomes \uXXXX
+        assert "\\u00e9" in out  # é
+        assert json.loads(out)["bugs"][0]["title"] == "café — é"
+
+    def test_no_line_breaks_inside_serialized_payload(self) -> None:
+        # Compact output (no indent) keeps the <script> tag on as few lines
+        # as possible and avoids surprising the JS parser.
+        payload = {"bugs": [{"id": "A"}, {"id": "B"}]}
+        out = _serialize_payload(payload)
+        assert "\n" not in out

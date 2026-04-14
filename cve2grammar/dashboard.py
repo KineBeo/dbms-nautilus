@@ -15,6 +15,7 @@ against arbitrary bug content.
 
 from __future__ import annotations
 
+import json
 from datetime import datetime, timezone
 
 from cve2grammar.config import SUPPORTED_DBMS
@@ -67,3 +68,19 @@ def _build_payload(bugs: list[Bug]) -> dict:
         },
         "bugs": [_bug_to_dict(b) for b in sorted_bugs],
     }
+
+
+def _serialize_payload(payload: dict) -> str:
+    """Serialize payload to JSON safe to embed inside <script type="application/json">.
+
+    Two rules, both non-negotiable:
+
+    1. ``ensure_ascii=True`` — every non-ASCII character is \\uXXXX-escaped,
+       neutralizing Unicode attack surface and keeping the output portable
+       across any viewer encoding.
+    2. ``</`` → ``<\\/`` — prevents literal ``</script>`` substrings in bug
+       data from terminating the embedding tag. This is the standard
+       mitigation for JSON-in-script-tag injection.
+    """
+    raw = json.dumps(payload, ensure_ascii=True, separators=(",", ":"))
+    return raw.replace("</", "<\\/")
