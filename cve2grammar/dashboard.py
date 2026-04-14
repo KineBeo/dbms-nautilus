@@ -225,4 +225,373 @@ def emit_dashboard(bugs: list[Bug]) -> str:
     return html
 
 
-_DASHBOARD_JS = ""  # Populated in Task 6.
+_DASHBOARD_JS = r"""
+<script>
+(function () {
+  "use strict";
+  var payload = window.__PAYLOAD__;
+  var bugs = payload.bugs;
+  var DBMS = payload.facets.dbms;
+  var ORACLES = payload.facets.oracles;
+
+  // Filter state — single source of truth.
+  var state = {
+    dbms: null,
+    oracles: new Set(["crash"]),
+    dateRange: null,
+    search: "",
+    sortBy: "id",
+    sortDir: "asc",
+    expandedId: null
+  };
+
+  // Pre-compute all months present in dataset, sorted.
+  var MONTHS = (function () {
+    var set = new Set();
+    bugs.forEach(function (b) { if (b.month) set.add(b.month); });
+    return Array.from(set).sort();
+  })();
+
+  // --- Filtering -----------------------------------------------------------
+
+  function matchesExcept(b, skip) {
+    if (skip !== "dbms" && state.dbms && b.dbms !== state.dbms) return false;
+    if (skip !== "oracle" && state.oracles.size > 0 && !state.oracles.has(b.oracle)) return false;
+    if (skip !== "date" && state.dateRange) {
+      if (!b.month) return false;
+      if (b.month < state.dateRange.start || b.month > state.dateRange.end) return false;
+    }
+    if (state.search) {
+      var q = state.search.toLowerCase();
+      if (
+        b.id.toLowerCase().indexOf(q) === -1 &&
+        b.title.toLowerCase().indexOf(q) === -1 &&
+        b.sql.toLowerCase().indexOf(q) === -1
+      ) return false;
+    }
+    return true;
+  }
+
+  function visibleBugs() { return bugs.filter(function (b) { return matchesExcept(b, null); }); }
+  function forDbmsCounts() { return bugs.filter(function (b) { return matchesExcept(b, "dbms"); }); }
+  function forOracleCounts() { return bugs.filter(function (b) { return matchesExcept(b, "oracle"); }); }
+  function forDateCounts() { return bugs.filter(function (b) { return matchesExcept(b, "date"); }); }
+
+  // --- Rendering helpers ---------------------------------------------------
+
+  function el(tag, attrs, text) {
+    var node = document.createElement(tag);
+    if (attrs) Object.keys(attrs).forEach(function (k) {
+      if (k === "class") node.className = attrs[k];
+      else if (k === "onclick") node.onclick = attrs[k];
+      else node.setAttribute(k, attrs[k]);
+    });
+    if (text != null) node.textContent = text;
+    return node;
+  }
+
+  function clear(node) { while (node.firstChild) node.removeChild(node.firstChild); }
+
+  // --- Chart: DBMS ---------------------------------------------------------
+
+  function renderDbmsChart() {
+    var container = document.getElementById("chart-dbms");
+    clear(container);
+    var counted = forDbmsCounts();
+    var counts = {};
+    DBMS.forEach(function (d) { counts[d] = 0; });
+    counted.forEach(function (b) { if (counts[b.dbms] != null) counts[b.dbms]++; });
+    var max = Math.max.apply(null, Object.values(counts).concat([1]));
+    // Sort descending by count.
+    var ordered = DBMS.slice().sort(function (a, b) { return counts[b] - counts[a]; });
+    ordered.forEach(function (d) {
+      var row = el("div", { class: "bar-row" + (state.dbms === d ? " selected" : "") + (counts[d] === 0 ? " inactive" : "") });
+      row.appendChild(el("div", { class: "bar-label" }, d));
+      var track = el("div", { class: "bar-track" });
+      var fill = el("div", { class: "bar-fill" });
+      fill.style.width = (counts[d] / max * 100) + "%";
+      track.appendChild(fill);
+      row.appendChild(track);
+      row.appendChild(el("div", { class: "bar-count" }, String(counts[d])));
+      row.onclick = function () { state.dbms = (state.dbms === d ? null : d); renderAll(); };
+      container.appendChild(row);
+    });
+  }
+
+  // --- Chart: Oracle -------------------------------------------------------
+
+  function renderOracleChart() {
+    var container = document.getElementById("chart-oracle");
+    clear(container);
+    var hint = document.getElementById("oracle-hint");
+    if (state.oracles.size > 0) hint.textContent = "· " + Array.from(state.oracles).join(", ") + " selected";
+    else hint.textContent = "";
+    var counted = forOracleCounts();
+    var counts = {};
+    ORACLES.forEach(function (o) { counts[o] = 0; });
+    counted.forEach(function (b) {
+      var key = (b.oracle == null ? "" : b.oracle);
+      if (counts[key] != null) counts[key]++;
+    });
+    var max = Math.max.apply(null, Object.values(counts).concat([1]));
+    ORACLES.forEach(function (o) {
+      var label = o === "" ? "(none)" : o;
+      var selected = state.oracles.has(o);
+      var row = el("div", { class: "bar-row" + (selected ? " selected" : "") + (counts[o] === 0 ? " inactive" : "") });
+      row.appendChild(el("div", { class: "bar-label" }, label));
+      var track = el("div", { class: "bar-track" });
+      var fill = el("div", { class: "bar-fill" });
+      fill.style.width = (counts[o] / max * 100) + "%";
+      track.appendChild(fill);
+      row.appendChild(track);
+      row.appendChild(el("div", { class: "bar-count" }, String(counts[o])));
+      row.onclick = function () {
+        if (state.oracles.has(o)) state.oracles.delete(o);
+        else state.oracles.add(o);
+        renderAll();
+      };
+      container.appendChild(row);
+    });
+  }
+
+  // --- Chart: Date histogram ----------------------------------------------
+
+  var histDragState = null; // {startIdx, endIdx}
+
+  function renderHistogram() {
+    var container = document.getElementById("chart-histogram");
+    clear(container);
+    var counted = forDateCounts();
+    var counts = {};
+    MONTHS.forEach(function (m) { counts[m] = 0; });
+    counted.forEach(function (b) {
+      if (b.month && counts[b.month] != null) counts[b.month]++;
+    });
+    var max = Math.max.apply(null, Object.values(counts).concat([1]));
+    MONTHS.forEach(function (m) {
+      var bar = el("div", { class: "hbar" });
+      bar.style.height = (counts[m] / max * 100) + "%";
+      bar.title = m + ": " + counts[m];
+      bar.dataset.month = m;
+      if (state.dateRange && m >= state.dateRange.start && m <= state.dateRange.end) {
+        bar.classList.add("in-range");
+      }
+      container.appendChild(bar);
+    });
+    // Render axis: first year of each year transition.
+    var axis = document.getElementById("histogram-axis");
+    clear(axis);
+    var years = new Set();
+    MONTHS.forEach(function (m) { years.add(m.slice(0, 4)); });
+    Array.from(years).sort().forEach(function (y) {
+      axis.appendChild(el("span", null, y));
+    });
+
+    // Drag handlers.
+    container.onmousedown = function (e) {
+      if (!e.target.classList.contains("hbar")) return;
+      histDragState = { startIdx: MONTHS.indexOf(e.target.dataset.month), endIdx: -1 };
+      e.preventDefault();
+    };
+    container.onmousemove = function (e) {
+      if (!histDragState || !e.target.classList.contains("hbar")) return;
+      histDragState.endIdx = MONTHS.indexOf(e.target.dataset.month);
+    };
+    container.onmouseup = function (e) {
+      if (!histDragState) return;
+      var endIdx = histDragState.endIdx;
+      var startIdx = histDragState.startIdx;
+      if (endIdx === -1 || endIdx === startIdx) {
+        // Click without drag → clear filter.
+        state.dateRange = null;
+      } else {
+        var lo = Math.min(startIdx, endIdx);
+        var hi = Math.max(startIdx, endIdx);
+        state.dateRange = { start: MONTHS[lo], end: MONTHS[hi] };
+      }
+      histDragState = null;
+      renderAll();
+    };
+    container.onmouseleave = function () { histDragState = null; };
+  }
+
+  // --- Active filter pills --------------------------------------------------
+
+  function renderPills() {
+    var pills = document.getElementById("pills");
+    clear(pills);
+    if (state.dbms) {
+      var p = el("div", { class: "pill" }, "dbms: " + state.dbms + " ×");
+      p.onclick = function () { state.dbms = null; renderAll(); };
+      pills.appendChild(p);
+    }
+    state.oracles.forEach(function (o) {
+      var p = el("div", { class: "pill" }, "oracle: " + (o || "(none)") + " ×");
+      p.onclick = function () { state.oracles.delete(o); renderAll(); };
+      pills.appendChild(p);
+    });
+    if (state.dateRange) {
+      var p2 = el("div", { class: "pill" }, "date: " + state.dateRange.start + "—" + state.dateRange.end + " ×");
+      p2.onclick = function () { state.dateRange = null; renderAll(); };
+      pills.appendChild(p2);
+    }
+    if (state.search) {
+      var p3 = el("div", { class: "pill" }, 'search: "' + state.search + '" ×');
+      p3.onclick = function () { state.search = ""; document.getElementById("search").value = ""; renderAll(); };
+      pills.appendChild(p3);
+    }
+  }
+
+  // --- Table ----------------------------------------------------------------
+
+  var COLUMNS = [
+    { key: "id", label: "ID", cls: "col-id" },
+    { key: "dbms", label: "DBMS", cls: "" },
+    { key: "section", label: "Section", cls: "" },
+    { key: "oracle", label: "Oracle", cls: "" },
+    { key: "status", label: "Status", cls: "" },
+    { key: "date", label: "Date", cls: "" },
+    { key: "title", label: "Title", cls: "col-title" }
+  ];
+
+  function sortVisible(rows) {
+    var k = state.sortBy;
+    var dir = state.sortDir === "asc" ? 1 : -1;
+    return rows.slice().sort(function (a, b) {
+      var av = a[k] == null ? "" : String(a[k]);
+      var bv = b[k] == null ? "" : String(b[k]);
+      if (av < bv) return -1 * dir;
+      if (av > bv) return 1 * dir;
+      return 0;
+    });
+  }
+
+  function renderTable() {
+    var container = document.getElementById("table");
+    clear(container);
+    // Header.
+    var head = el("div", { class: "tr head" });
+    COLUMNS.forEach(function (c) {
+      var cls = "col";
+      if (c.key === state.sortBy) cls += " sorted" + (state.sortDir === "desc" ? " desc" : "");
+      var th = el("div", { class: cls }, c.label);
+      th.onclick = function () {
+        if (state.sortBy === c.key) {
+          state.sortDir = state.sortDir === "asc" ? "desc" : "asc";
+        } else {
+          state.sortBy = c.key;
+          state.sortDir = "asc";
+        }
+        renderAll();
+      };
+      head.appendChild(th);
+    });
+    container.appendChild(head);
+
+    var rows = sortVisible(visibleBugs());
+    if (rows.length === 0) {
+      container.appendChild(el("div", { class: "empty" }, "No bugs match these filters."));
+      return;
+    }
+
+    rows.forEach(function (b) {
+      var tr = el("div", { class: "tr" + (state.expandedId === b.id ? " expanded" : "") });
+      COLUMNS.forEach(function (c) {
+        var val = b[c.key];
+        var cls = c.cls;
+        if (c.key === "oracle" && b.oracle === "crash") cls += " col-oracle crash";
+        var cell = el("div", { class: cls }, val == null ? "" : String(val));
+        tr.appendChild(cell);
+      });
+      tr.onclick = function () {
+        state.expandedId = (state.expandedId === b.id ? null : b.id);
+        renderAll();
+      };
+      container.appendChild(tr);
+
+      if (state.expandedId === b.id) {
+        var detail = el("div", { class: "detail" });
+        var dh = el("div", { class: "detail-head" });
+        dh.appendChild(el("div", { class: "detail-label" }, "Test case · " + b.id));
+        var copyBtn = el("button", { class: "btn" }, "📋 Copy SQL");
+        copyBtn.onclick = function (e) {
+          e.stopPropagation();
+          navigator.clipboard.writeText(b.sql).then(
+            function () { copyBtn.textContent = "✓ Copied"; setTimeout(function () { copyBtn.textContent = "📋 Copy SQL"; }, 1200); },
+            function () { copyBtn.textContent = "⚠ Failed"; }
+          );
+        };
+        dh.appendChild(copyBtn);
+        detail.appendChild(dh);
+        var pre = el("pre");
+        pre.textContent = b.sql;
+        detail.appendChild(pre);
+        var linksDiv = el("div", { class: "links" });
+        ["bugtracker", "email", "fix"].forEach(function (k) {
+          var url = b.links[k];
+          if (!url) return;
+          var a = el("a", { href: url, target: "_blank", rel: "noopener" }, k);
+          linksDiv.appendChild(a);
+        });
+        detail.appendChild(linksDiv);
+        // stop expanding row click from collapsing when clicking inside detail
+        detail.onclick = function (e) { e.stopPropagation(); };
+        container.appendChild(detail);
+      }
+    });
+  }
+
+  // --- Top bar --------------------------------------------------------------
+
+  function renderMeta() {
+    var meta = document.getElementById("meta");
+    var total = bugs.length;
+    var visible = visibleBugs().length;
+    meta.textContent = total + " bugs · " + DBMS.length + " DBMS · generated " + payload.generated;
+    var count = document.getElementById("count");
+    clear(count);
+    count.appendChild(document.createTextNode("Showing "));
+    var strong = el("b", null, String(visible));
+    count.appendChild(strong);
+    count.appendChild(document.createTextNode(" of " + total + " bugs"));
+  }
+
+  // --- Full re-render -------------------------------------------------------
+
+  function renderAll() {
+    renderDbmsChart();
+    renderOracleChart();
+    renderHistogram();
+    renderPills();
+    renderTable();
+    renderMeta();
+  }
+
+  // --- Wiring ---------------------------------------------------------------
+
+  var searchInput = document.getElementById("search");
+  var searchTimer = null;
+  searchInput.oninput = function () {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(function () {
+      state.search = searchInput.value;
+      renderAll();
+    }, 100);
+  };
+
+  document.getElementById("reset").onclick = function () {
+    state.dbms = null;
+    state.oracles = new Set();
+    state.dateRange = null;
+    state.search = "";
+    state.sortBy = "id";
+    state.sortDir = "asc";
+    state.expandedId = null;
+    searchInput.value = "";
+    renderAll();
+  };
+
+  renderAll();
+})();
+</script>
+"""
