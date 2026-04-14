@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from cve2grammar.dashboard import _bug_to_dict
+from cve2grammar.config import SUPPORTED_DBMS
+from cve2grammar.dashboard import _bug_to_dict, _build_payload
 from cve2grammar.models import Bug
 
 
@@ -62,3 +63,57 @@ class TestBugToDict:
             "email": "",
             "fix": "https://fix/1",
         }
+
+
+class TestBuildPayload:
+    def test_generated_timestamp_is_iso_utc(self) -> None:
+        out = _build_payload([])
+        # Strict ISO-8601 UTC: "YYYY-MM-DDTHH:MM:SSZ"
+        assert len(out["generated"]) == 20
+        assert out["generated"].endswith("Z")
+        assert out["generated"][4] == "-" and out["generated"][7] == "-"
+        assert out["generated"][10] == "T"
+
+    def test_source_url(self) -> None:
+        out = _build_payload([])
+        assert out["source"] == "https://www.manuelrigger.at/dbms-bugs/"
+
+    def test_facets_dbms_matches_config(self) -> None:
+        out = _build_payload([])
+        assert out["facets"]["dbms"] == list(SUPPORTED_DBMS)
+
+    def test_facets_oracles_in_priority_order(self) -> None:
+        out = _build_payload([])
+        # crash first (memory-safety priority), then hang, error, logic oracles,
+        # empty-oracle bucket last.
+        assert out["facets"]["oracles"] == [
+            "crash", "hang", "error", "PQS", "NoREC", "TLP", "",
+        ]
+
+    def test_facets_sections(self) -> None:
+        out = _build_payload([])
+        assert out["facets"]["sections"] == [
+            "fixed", "confirmed", "open", "closed",
+        ]
+
+    def test_bugs_present_as_dicts(self) -> None:
+        bugs = [_make_bug(id="A", number=1), _make_bug(id="B", number=2)]
+        out = _build_payload(bugs)
+        assert len(out["bugs"]) == 2
+        assert out["bugs"][0]["id"] == "A"
+        assert out["bugs"][1]["id"] == "B"
+
+    def test_bugs_sorted_by_section_then_number(self) -> None:
+        bugs = [
+            _make_bug(id="X", section="fixed", number=2),
+            _make_bug(id="Y", section="confirmed", number=1),
+            _make_bug(id="Z", section="fixed", number=1),
+        ]
+        out = _build_payload(bugs)
+        ids = [b["id"] for b in out["bugs"]]
+        # confirmed < fixed alphabetically; within section, ascending number
+        assert ids == ["Y", "Z", "X"]
+
+    def test_empty_bugs_list(self) -> None:
+        out = _build_payload([])
+        assert out["bugs"] == []

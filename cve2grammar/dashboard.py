@@ -15,7 +15,22 @@ against arbitrary bug content.
 
 from __future__ import annotations
 
+from datetime import datetime, timezone
+
+from cve2grammar.config import SUPPORTED_DBMS
 from cve2grammar.models import Bug
+
+_SOURCE_URL = "https://www.manuelrigger.at/dbms-bugs/"
+
+# Ordered for UI display: crash first (memory-safety priority), then hang,
+# error, logic oracles, empty-oracle bucket last. Pinned independently of
+# config.ORACLE_WEIGHTS because the dashboard is about display order, not
+# grammar-sampling weights.
+_ORACLE_ORDER: tuple[str, ...] = (
+    "crash", "hang", "error", "PQS", "NoREC", "TLP", "",
+)
+
+_SECTION_ORDER: tuple[str, ...] = ("fixed", "confirmed", "open", "closed")
 
 
 def _bug_to_dict(bug: Bug) -> dict:
@@ -36,4 +51,19 @@ def _bug_to_dict(bug: Bug) -> dict:
             "email": bug.email_url,
             "fix": bug.fix_url,
         },
+    }
+
+
+def _build_payload(bugs: list[Bug]) -> dict:
+    """Build the full JSON-serializable payload embedded in the HTML."""
+    sorted_bugs = sorted(bugs, key=lambda b: (b.section, b.number))
+    return {
+        "generated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "source": _SOURCE_URL,
+        "facets": {
+            "dbms": list(SUPPORTED_DBMS),
+            "oracles": list(_ORACLE_ORDER),
+            "sections": list(_SECTION_ORDER),
+        },
+        "bugs": [_bug_to_dict(b) for b in sorted_bugs],
     }
