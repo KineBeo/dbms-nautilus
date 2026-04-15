@@ -1,11 +1,15 @@
 """CLI for cve2grammar.
 
-One command does the whole job:
+Two commands:
 
-    cve2grammar fetch --dbms sqlite -o sqlite_grammar.py
+    cve2grammar fetch     --dbms sqlite -o sqlite_grammar.py
+    cve2grammar dashboard                -o dashboard.html
 
-Scrapes Manuel Rigger's DBMS bugs page, filters to one DBMS (and one section),
-and emits a Nautilus-compatible grammar file.
+`fetch` scrapes Manuel Rigger's DBMS bugs page, filters to one DBMS (and one
+section), and emits a Nautilus-compatible grammar file.
+
+`dashboard` scrapes the same page, keeps all DBMS, and emits a single
+self-contained HTML file for triaging bugs.
 """
 
 from __future__ import annotations
@@ -15,6 +19,7 @@ import sys
 from pathlib import Path
 
 from cve2grammar.config import SUPPORTED_DBMS, SUPPORTED_SECTIONS
+from cve2grammar.dashboard import emit_dashboard
 from cve2grammar.emitter import emit_nautilus
 from cve2grammar.scraper.manuelrigger import fetch
 
@@ -25,6 +30,8 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.cmd == "fetch":
         return _cmd_fetch(args)
+    if args.cmd == "dashboard":
+        return _cmd_dashboard(args)
 
     parser.print_help()
     return 1
@@ -33,7 +40,7 @@ def main(argv: list[str] | None = None) -> int:
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="cve2grammar",
-        description="Scrape Manuel Rigger DBMS bugs and emit Nautilus grammar.",
+        description="Scrape Manuel Rigger DBMS bugs; emit Nautilus grammar or HTML dashboard.",
     )
     sub = parser.add_subparsers(dest="cmd", required=True)
 
@@ -56,6 +63,24 @@ def _build_parser() -> argparse.ArgumentParser:
         "--html", type=Path, default=None,
         help="Optional path to a pre-fetched HTML file (skips network).",
     )
+
+    dash_p = sub.add_parser(
+        "dashboard",
+        help="Scrape MR bugs page and emit a single-file HTML triage dashboard.",
+    )
+    dash_p.add_argument(
+        "--section", default="fixed", choices=SUPPORTED_SECTIONS,
+        help="MR section to include (default: fixed).",
+    )
+    dash_p.add_argument(
+        "--output", "-o", type=Path, required=True,
+        help="Path to write the generated .html dashboard.",
+    )
+    dash_p.add_argument(
+        "--html", type=Path, default=None,
+        help="Optional path to a pre-fetched HTML file (skips network).",
+    )
+
     return parser
 
 
@@ -79,6 +104,28 @@ def _cmd_fetch(args: argparse.Namespace) -> int:
     args.output.write_text(output, encoding="utf-8")
 
     print(f"Wrote {len(bugs)} bugs ({args.dbms}/{args.section}) → {args.output}")
+    return 0
+
+
+def _cmd_dashboard(args: argparse.Namespace) -> int:
+    html = args.html.read_text(encoding="utf-8") if args.html else None
+    bugs = fetch(html=html)
+
+    if args.section != "all":
+        bugs = [b for b in bugs if b.section == args.section]
+
+    if not bugs:
+        print(
+            f"No bugs found for section={args.section}",
+            file=sys.stderr,
+        )
+        return 1
+
+    output = emit_dashboard(bugs)
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    args.output.write_text(output, encoding="utf-8")
+
+    print(f"Wrote {len(bugs)} bugs (all DBMS / {args.section}) → {args.output}")
     return 0
 
 
