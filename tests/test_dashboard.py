@@ -85,13 +85,45 @@ class TestBuildPayload:
         out = _build_payload([])
         assert out["facets"]["dbms"] == list(SUPPORTED_DBMS)
 
-    def test_facets_oracles_in_priority_order(self) -> None:
+    def test_facets_oracles_priority_prefix_always_present(self) -> None:
+        # With no bugs, crash/hang/error are still emitted so the pre-selected
+        # crash filter always has a bar to render (even at count 0).
         out = _build_payload([])
-        # crash first (memory-safety priority), then hang, error, logic oracles,
-        # empty-oracle bucket last.
-        assert out["facets"]["oracles"] == [
-            "crash", "hang", "error", "PQS", "NoREC", "TLP", "",
+        assert out["facets"]["oracles"] == ["crash", "hang", "error"]
+
+    def test_facets_oracles_include_data_variants(self) -> None:
+        # Oracle values found in the data are appended after the priority
+        # prefix, sorted alphabetically. Duplicates are deduplicated.
+        bugs = [
+            _make_bug(id="A", oracle="PQS"),
+            _make_bug(id="B", oracle="TLP (WHERE)"),
+            _make_bug(id="C", oracle="TLP (aggregate)"),
+            _make_bug(id="D", oracle="NoREC"),
+            _make_bug(id="E", oracle="PQS"),  # dup, must not double
         ]
+        out = _build_payload(bugs)
+        assert out["facets"]["oracles"] == [
+            "crash", "hang", "error",
+            "NoREC", "PQS", "TLP (WHERE)", "TLP (aggregate)",
+        ]
+
+    def test_facets_oracles_empty_bucket_only_when_present(self) -> None:
+        # Empty-string oracle is a real category in the data — include it at
+        # the end only if at least one bug has an empty oracle.
+        bugs_without_empty = [_make_bug(id="A", oracle="crash")]
+        out = _build_payload(bugs_without_empty)
+        assert "" not in out["facets"]["oracles"]
+
+        bugs_with_empty = [_make_bug(id="B", oracle="")]
+        out2 = _build_payload(bugs_with_empty)
+        assert out2["facets"]["oracles"][-1] == ""
+
+    def test_facets_oracles_priority_oracle_in_data_not_duplicated(self) -> None:
+        # If the data contains "crash", it must not appear twice just because
+        # it is also in the priority prefix.
+        bugs = [_make_bug(id="A", oracle="crash"), _make_bug(id="B", oracle="NoREC")]
+        out = _build_payload(bugs)
+        assert out["facets"]["oracles"] == ["crash", "hang", "error", "NoREC"]
 
     def test_facets_sections(self) -> None:
         out = _build_payload([])

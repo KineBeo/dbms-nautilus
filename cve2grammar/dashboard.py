@@ -23,15 +23,29 @@ from cve2grammar.models import Bug
 
 _SOURCE_URL = "https://www.manuelrigger.at/dbms-bugs/"
 
-# Ordered for UI display: crash first (memory-safety priority), then hang,
-# error, logic oracles, empty-oracle bucket last. Pinned independently of
-# config.ORACLE_WEIGHTS because the dashboard is about display order, not
-# grammar-sampling weights.
-_ORACLE_ORDER: tuple[str, ...] = (
-    "crash", "hang", "error", "PQS", "NoREC", "TLP", "",
-)
+# Priority oracles always rendered in the facet list so the pre-selected
+# crash filter has a bar even when the current data has zero crashes.
+# Ordering within the prefix is memory-safety first (crash, hang) then
+# unexpected error. All other oracle values found in the data are appended
+# alphabetically, and the empty-oracle bucket (if present) goes last.
+_ORACLE_PRIORITY: tuple[str, ...] = ("crash", "hang", "error")
 
 _SECTION_ORDER: tuple[str, ...] = ("fixed", "confirmed", "open", "closed")
+
+
+def _oracle_facet(bugs: list[Bug]) -> list[str]:
+    """Build the ordered oracle facet list from the dataset.
+
+    Always starts with the priority prefix (crash, hang, error) so the
+    pre-selected crash filter renders even when the data has zero crashes.
+    Remaining oracle values found in the data are appended alphabetically,
+    with the empty-string bucket (if any bug has no oracle) at the very end.
+    """
+    seen = {b.oracle for b in bugs}
+    priority = list(_ORACLE_PRIORITY)
+    extras = sorted(o for o in seen if o and o not in _ORACLE_PRIORITY)
+    tail = [""] if "" in seen else []
+    return priority + extras + tail
 
 
 def _bug_to_dict(bug: Bug) -> dict:
@@ -63,7 +77,7 @@ def _build_payload(bugs: list[Bug]) -> dict:
         "source": _SOURCE_URL,
         "facets": {
             "dbms": list(SUPPORTED_DBMS),
-            "oracles": list(_ORACLE_ORDER),
+            "oracles": _oracle_facet(bugs),
             "sections": list(_SECTION_ORDER),
         },
         "bugs": [_bug_to_dict(b) for b in sorted_bugs],
