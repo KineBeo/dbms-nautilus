@@ -119,3 +119,40 @@ class TestAtomicity:
         with pytest.raises(OSError):
             cache_put("c1a5ha5ha5hc0000", _minimal_entry())
         assert not (cache_root / "c1a5ha5ha5hc0000.json").exists()
+
+
+from cve2grammar.generalizer.cache import main as cache_main
+
+
+class _StdinStub:
+    def __init__(self, text: str) -> None:
+        self._text = text
+
+    def read(self) -> str:
+        return self._text
+
+
+class TestCli:
+    def test_cli_put_then_get(
+        self, cache_root: Path, monkeypatch: pytest.MonkeyPatch,
+        capsys: pytest.CaptureFixture,
+    ) -> None:
+        payload = _minimal_entry()
+        monkeypatch.setattr("sys.stdin", _StdinStub(json.dumps(payload)))
+        assert cache_main(["put", "testkey12345678a"]) == 0
+
+        assert cache_main(["get", "testkey12345678a"]) == 0
+        out = capsys.readouterr().out
+        assert json.loads(out) == payload
+
+    def test_cli_get_miss_exits_1(
+        self, cache_root: Path, capsys: pytest.CaptureFixture,
+    ) -> None:
+        assert cache_main(["get", "missingkey000000"]) == 1
+
+    def test_cli_bad_subcommand_exits_2(
+        self, cache_root: Path, capsys: pytest.CaptureFixture,
+    ) -> None:
+        assert cache_main(["delete", "whatever"]) == 2
+        err = capsys.readouterr().err
+        assert "usage" in err.lower() or "unknown" in err.lower()
