@@ -74,3 +74,42 @@ class TestLoadWhitelist:
         g = _write_grammar(tmp_path / "custom.py", 'ctx.rule("FromEnv", "x")\n')
         monkeypatch.setenv("RL_NAUTILUS_GRAMMAR", str(g))
         assert load_whitelist(None) == ["FromEnv"]
+
+
+import json
+
+from cve2grammar.generalizer.nonterminals import main as nonterminals_main
+
+
+class TestCli:
+    def test_cli_prints_json_array(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+        capsys: pytest.CaptureFixture,
+    ) -> None:
+        g = _write_grammar(
+            tmp_path / "g.py",
+            'ctx.rule("Foo", "{Bar}")\nctx.rule("Alpha", "x")\n',
+        )
+        monkeypatch.setenv("RL_NAUTILUS_GRAMMAR", str(g))
+        code = nonterminals_main([])
+        assert code == 0
+        out = capsys.readouterr().out
+        assert json.loads(out) == ["Alpha", "Bar", "Foo"]
+
+    def test_cli_missing_file_exits_1(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+        capsys: pytest.CaptureFixture,
+    ) -> None:
+        monkeypatch.setenv("RL_NAUTILUS_GRAMMAR", str(tmp_path / "missing.py"))
+        code = nonterminals_main([])
+        assert code == 1
+        err = capsys.readouterr().err
+        assert "grammar file not found" in err.lower()
+
+    def test_cli_accepts_path_argument(
+        self, tmp_path: Path, capsys: pytest.CaptureFixture,
+    ) -> None:
+        g = _write_grammar(tmp_path / "g.py", 'ctx.rule("XFromArg", "y")\n')
+        code = nonterminals_main([str(g)])
+        assert code == 0
+        assert json.loads(capsys.readouterr().out) == ["XFromArg"]

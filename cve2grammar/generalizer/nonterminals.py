@@ -16,8 +16,10 @@ parse — robust to minor syntax drift and stdlib-only.
 
 from __future__ import annotations
 
+import json
 import os
 import re
+import sys
 from pathlib import Path
 
 _LHS_RE = re.compile(r"""ctx\.(?:rule|regex)\(\s*["']([A-Z][A-Za-z0-9-]*)["']""")
@@ -58,3 +60,29 @@ def load_whitelist(path: Path | None = None) -> list[str]:
     source = grammar_path.read_text(encoding="utf-8")
     names = set(_LHS_RE.findall(source)) | set(_RHS_RE.findall(source))
     return sorted(names)
+
+
+def main(argv: list[str] | None = None) -> int:
+    """CLI entry point. Prints the whitelist as a JSON array to stdout.
+
+    Usage:
+        python3 -m cve2grammar.generalizer.nonterminals          # use env/default
+        python3 -m cve2grammar.generalizer.nonterminals <path>   # explicit path
+
+    Exit codes:
+        0 — success, JSON array printed to stdout
+        1 — grammar file not found
+    """
+    args = list(argv) if argv is not None else sys.argv[1:]
+    explicit = Path(args[0]) if args else None
+    try:
+        whitelist = load_whitelist(explicit)
+    except FileNotFoundError as e:
+        print(f"grammar file not found: {e.filename}", file=sys.stderr)
+        return 1
+    print(json.dumps(whitelist))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
