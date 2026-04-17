@@ -7,12 +7,20 @@ __pycache__/
 venv/
 .env
 docs
-.claude
 CLAUDE.md
 
 # Editor / OS
 .DS_Store
 *.swp
 
+# Claude Code per-user state (NOT the skill, agent, or slash command — those are committed)
+.claude/settings.local.json
+
 # Superpowers brainstorm artifacts (mockup HTML, server state)
 .superpowers/
+
+# GitNexus index (regenerated locally by `npx gitnexus analyze`)
+.gitnexus
+
+# Generated grammar output — build artifact, not source
+generated/
