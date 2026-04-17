@@ -32,6 +32,8 @@ def main(argv: list[str] | None = None) -> int:
         return _cmd_fetch(args)
     if args.cmd == "dashboard":
         return _cmd_dashboard(args)
+    if args.cmd == "generalize-candidates":
+        return _cmd_generalize_candidates(args)
 
     parser.print_help()
     return 1
@@ -81,6 +83,26 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Optional path to a pre-fetched HTML file (skips network).",
     )
 
+    gc_p = sub.add_parser(
+        "generalize-candidates",
+        help=(
+            "Emit crash-oracle (or other) bugs as JSON for the generalizer "
+            "slash command to consume."
+        ),
+    )
+    gc_p.add_argument(
+        "--oracle", default="crash",
+        help="Oracle to filter by (default: crash).",
+    )
+    gc_p.add_argument(
+        "--dbms", default=None, choices=SUPPORTED_DBMS,
+        help="Optional DBMS filter (default: all).",
+    )
+    gc_p.add_argument(
+        "--html", type=Path, default=None,
+        help="Optional path to a pre-fetched HTML file (skips network).",
+    )
+
     return parser
 
 
@@ -126,6 +148,32 @@ def _cmd_dashboard(args: argparse.Namespace) -> int:
     args.output.write_text(output, encoding="utf-8")
 
     print(f"Wrote {len(bugs)} bugs (all DBMS / {args.section}) → {args.output}")
+    return 0
+
+
+def _cmd_generalize_candidates(args: argparse.Namespace) -> int:
+    """Emit bugs matching --oracle (and optionally --dbms) as JSON to stdout."""
+    import json as _json  # keep json import local to this subcommand
+
+    html = args.html.read_text(encoding="utf-8") if args.html else None
+    bugs = fetch(html=html)
+
+    bugs = [b for b in bugs if b.oracle == args.oracle]
+    if args.dbms is not None:
+        bugs = [b for b in bugs if b.dbms == args.dbms]
+
+    out = [
+        {
+            "id": b.id,
+            "sql": b.sql,
+            "title": b.title,
+            "dbms": b.dbms,
+            "oracle": b.oracle,
+            "date": b.date_found,
+        }
+        for b in bugs
+    ]
+    print(_json.dumps(out))
     return 0
 
 
