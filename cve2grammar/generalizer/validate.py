@@ -10,8 +10,12 @@ so the slash command can feed the stderr back into a retry prompt.
 
 from __future__ import annotations
 
+import json
 import re
+import sys
 from numbers import Real
+
+from cve2grammar.generalizer.nonterminals import load_whitelist
 
 
 class ValidationError(Exception):
@@ -80,3 +84,38 @@ def validate_template(payload: dict, whitelist: set[str]) -> None:
         name = match.group(1)
         if name not in whitelist:
             raise ValidationError(f"unknown non-terminal: {{{name}}}")
+
+
+def main(argv: list[str] | None = None) -> int:
+    """CLI entry point. Reads JSON from stdin, validates, exits 0 on success.
+
+    Usage:
+        python3 -m cve2grammar.generalizer.validate <<< '<payload_json>'
+
+    Exit codes:
+        0 — payload is valid, no output
+        1 — payload is invalid; one-line reason on stderr
+    """
+    raw = sys.stdin.read()
+    try:
+        payload = json.loads(raw)
+    except json.JSONDecodeError as e:
+        print(f"malformed json: {e}", file=sys.stderr)
+        return 1
+
+    try:
+        whitelist = set(load_whitelist())
+    except FileNotFoundError as e:
+        print(f"grammar file not found: {e.filename}", file=sys.stderr)
+        return 1
+
+    try:
+        validate_template(payload, whitelist)
+    except ValidationError as e:
+        print(str(e), file=sys.stderr)
+        return 1
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

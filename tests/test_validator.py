@@ -175,3 +175,64 @@ class TestEmpty:
     def test_whitespace_only_template_rejected(self) -> None:
         with pytest.raises(ValidationError, match="empty"):
             validate_template(_good_payload(template="   \n  "), _WHITELIST)
+
+
+import json
+from pathlib import Path
+
+from cve2grammar.generalizer.validate import main as validate_main
+
+
+class _StdinStub:
+    """Minimal stand-in for sys.stdin that the validator CLI can `.read()`."""
+
+    def __init__(self, text: str) -> None:
+        self._text = text
+
+    def read(self) -> str:
+        return self._text
+
+
+class TestCli:
+    def test_valid_payload_on_stdin_exits_0(
+        self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture,
+        tmp_path: Path,
+    ) -> None:
+        grammar = tmp_path / "g.py"
+        grammar.write_text(
+            'ctx.rule("Table-Name", "x")\nctx.rule("Col-Name", "x")\n',
+            encoding="utf-8",
+        )
+        monkeypatch.setenv("RL_NAUTILUS_GRAMMAR", str(grammar))
+        monkeypatch.setattr(
+            "sys.stdin",
+            _StdinStub(json.dumps(_good_payload(template="{Table-Name}"))),
+        )
+        assert validate_main([]) == 0
+
+    def test_invalid_payload_exits_1_with_stderr(
+        self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture,
+        tmp_path: Path,
+    ) -> None:
+        grammar = tmp_path / "g.py"
+        grammar.write_text('ctx.rule("Table-Name", "x")\n', encoding="utf-8")
+        monkeypatch.setenv("RL_NAUTILUS_GRAMMAR", str(grammar))
+        monkeypatch.setattr(
+            "sys.stdin",
+            _StdinStub(json.dumps(_good_payload(template="{Foo-Bar}"))),
+        )
+        assert validate_main([]) == 1
+        err = capsys.readouterr().err
+        assert "unknown non-terminal: {Foo-Bar}" in err
+
+    def test_malformed_json_on_stdin_exits_1(
+        self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture,
+        tmp_path: Path,
+    ) -> None:
+        grammar = tmp_path / "g.py"
+        grammar.write_text('ctx.rule("Table-Name", "x")\n', encoding="utf-8")
+        monkeypatch.setenv("RL_NAUTILUS_GRAMMAR", str(grammar))
+        monkeypatch.setattr("sys.stdin", _StdinStub("not even json"))
+        assert validate_main([]) == 1
+        err = capsys.readouterr().err
+        assert "malformed json" in err.lower()
