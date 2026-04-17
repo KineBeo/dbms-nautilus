@@ -2,11 +2,15 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import pytest
 
-from cve2grammar.generalizer.nonterminals import load_whitelist
+from cve2grammar.generalizer.nonterminals import (
+    load_whitelist,
+    main as nonterminals_main,
+)
 
 
 def _write_grammar(path: Path, body: str) -> Path:
@@ -74,11 +78,6 @@ class TestLoadWhitelist:
         g = _write_grammar(tmp_path / "custom.py", 'ctx.rule("FromEnv", "x")\n')
         monkeypatch.setenv("RL_NAUTILUS_GRAMMAR", str(g))
         assert load_whitelist(None) == ["FromEnv"]
-
-
-import json
-
-from cve2grammar.generalizer.nonterminals import main as nonterminals_main
 
 
 class TestCli:
