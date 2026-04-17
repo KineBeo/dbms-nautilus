@@ -129,3 +129,62 @@ class TestHeader:
     def test_header_mentions_prompt_version(self) -> None:
         out = render_grammar([])
         assert "Prompt version:" in out
+
+
+import json
+from pathlib import Path
+
+from cve2grammar.generalizer.render import main as render_main
+
+
+class _StdinStub:
+    def __init__(self, text: str) -> None:
+        self._text = text
+
+    def read(self) -> str:
+        return self._text
+
+
+class TestCli:
+    def test_cli_writes_grammar_file(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+        capsys: pytest.CaptureFixture,
+    ) -> None:
+        output = tmp_path / "generated" / "sqlite_grammar_v2.py"
+        entries = [_ok_entry(bug_id="A", feature_tag="basic_select")]
+        monkeypatch.setattr("sys.stdin", _StdinStub(json.dumps(entries)))
+        assert render_main([str(output)]) == 0
+        assert output.exists()
+        content = output.read_text(encoding="utf-8")
+        assert "ctx.rule(" in content
+        assert "basic_select" in content
+
+    def test_cli_prints_summary(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+        capsys: pytest.CaptureFixture,
+    ) -> None:
+        output = tmp_path / "out.py"
+        entries = [_ok_entry(bug_id="A"), _fallback_entry(bug_id="B")]
+        monkeypatch.setattr("sys.stdin", _StdinStub(json.dumps(entries)))
+        render_main([str(output)])
+        out = capsys.readouterr().out
+        assert "2" in out
+        assert "fallback" in out.lower()
+
+    def test_cli_creates_parent_dirs(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        output = tmp_path / "a" / "b" / "c" / "grammar.py"
+        monkeypatch.setattr("sys.stdin", _StdinStub(json.dumps([])))
+        assert render_main([str(output)]) == 0
+        assert output.exists()
+
+    def test_cli_malformed_stdin_exits_2(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+        capsys: pytest.CaptureFixture,
+    ) -> None:
+        output = tmp_path / "out.py"
+        monkeypatch.setattr("sys.stdin", _StdinStub("nope"))
+        assert render_main([str(output)]) == 2
+        err = capsys.readouterr().err
+        assert "json" in err.lower()

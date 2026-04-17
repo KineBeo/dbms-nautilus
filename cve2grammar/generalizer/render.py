@@ -16,7 +16,10 @@ from a given cache snapshot.
 
 from __future__ import annotations
 
+import json
+import sys
 from datetime import datetime, timezone
+from pathlib import Path
 
 from cve2grammar.generalizer import PROMPT_VERSION
 
@@ -109,3 +112,43 @@ def _py_literal(s: str) -> str:
     """Emit a Python double-quoted string literal with backslash+quote escaping."""
     escaped = s.replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n")
     return f'"{escaped}"'
+
+
+def main(argv: list[str] | None = None) -> int:
+    """CLI entry point. Reads accumulator JSON from stdin, writes the grammar file.
+
+    Usage:
+        python3 -m cve2grammar.generalizer.render <output_path>
+
+    Exit codes:
+        0 — success, file written
+        2 — malformed JSON on stdin, or missing output path argument
+    """
+    args = list(argv) if argv is not None else sys.argv[1:]
+    if not args:
+        print(
+            "usage: python3 -m cve2grammar.generalizer.render <output_path>",
+            file=sys.stderr,
+        )
+        return 2
+    output = Path(args[0])
+
+    raw = sys.stdin.read()
+    try:
+        entries = json.loads(raw)
+    except json.JSONDecodeError as e:
+        print(f"malformed json on stdin: {e}", file=sys.stderr)
+        return 2
+
+    source = render_grammar(entries)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(source, encoding="utf-8")
+
+    total = len(entries)
+    fallbacks = sum(1 for e in entries if e.get("status") == "fallback")
+    print(f"Wrote {output} — {total} bugs, {fallbacks} fallbacks.")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
