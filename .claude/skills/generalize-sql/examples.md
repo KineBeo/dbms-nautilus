@@ -35,7 +35,7 @@ Names are baked in. The fuzzer won't try other shapes.
 **Good rewrite:**
 ```json
 {
-  "template": "CREATE TABLE {Table-Name} ({Col-Def-List}) WITHOUT ROWID;\nCREATE INDEX {Index-Name} ON {Table-Name}({Col-Name} COLLATE NOCASE);\nINSERT INTO {Table-Name} VALUES ({Literal-Value});\nSELECT * FROM {Table-Name}",
+  "template": "CREATE TABLE {Table-Name} ({Col-Def-List}) WITHOUT ROWID;\nCREATE INDEX idx ON {Table-Name}({Col-Name} COLLATE NOCASE);\nINSERT INTO {Table-Name} VALUES ({Literal});\nSELECT * FROM {Table-Name}",
   "feature_tag": "collate_nocase_without_rowid",
   "weight": 3.0,
   "notes": "NOCASE index on WITHOUT ROWID — keep both literal keywords"
@@ -43,8 +43,9 @@ Names are baked in. The fuzzer won't try other shapes.
 ```
 
 Literal `WITHOUT ROWID` and `COLLATE NOCASE` because those *are* the
-feature. Table/column/index names abstracted. One INSERT preserved as
-representative of the DML step (the fuzzer mutates the `{Literal-Value}`).
+feature. Table and column names abstracted; index name stays literal
+(`idx` — no `{Index-Name}` non-terminal exists). One INSERT preserved as
+the DML step (the fuzzer mutates `{Literal}`).
 
 ---
 
@@ -97,15 +98,16 @@ SELECT snippet(t, '<b>', '</b>', '...', -1, -1) FROM t WHERE content MATCH 'hell
 **Good rewrite:**
 ```json
 {
-  "template": "CREATE VIRTUAL TABLE {Table-Name} USING fts4({Col-Def-List});\nINSERT INTO {Table-Name} VALUES ({Literal-Value});\nSELECT {Fts-Highlight} FROM {Table-Name} WHERE {Col-Name} MATCH {Literal-Value}",
+  "template": "CREATE VIRTUAL TABLE {Table-Name} USING fts4({Col-Def-List});\nINSERT INTO {Table-Name} VALUES ({Str-Literal});\nSELECT snippet({Table-Name}, '<b>', '</b>', '...', -1, -1) FROM {Table-Name} WHERE {Col-Name} MATCH {Str-Literal}",
   "feature_tag": "fts4_snippet",
   "weight": 3.0,
-  "notes": "FTS4 virtual table + snippet()/highlight() via {Fts-Highlight}"
+  "notes": "FTS4 virtual table + literal snippet() call; MATCH clause with string literal"
 }
 ```
 
-`USING fts4` is the feature and stays literal. `{Fts-Highlight}` is a
-non-terminal in the rl-nautilus grammar specifically for this family.
+`USING fts4`, `snippet(...)`, and `MATCH` all stay literal — no `Fts-*`
+non-terminals exist in the live grammar. Column names and string values
+abstracted via `{Col-Name}` and `{Str-Literal}`.
 
 ---
 
@@ -177,7 +179,7 @@ INSERT INTO t VALUES(1);
 **Good rewrite:**
 ```json
 {
-  "template": "CREATE TABLE {Table-Name}({Col-Def-List});\nCREATE TRIGGER {Trigger-Name} AFTER INSERT ON {Table-Name} BEGIN {Cte-Def} INSERT INTO {Table-Name} SELECT {Col-Name} FROM {Table-Name}; END;\nINSERT INTO {Table-Name} VALUES ({Literal-Value})",
+  "template": "CREATE TABLE {Table-Name}({Col-Def-List});\nCREATE TRIGGER tr AFTER INSERT ON {Table-Name} BEGIN {Cte-Def} INSERT INTO {Table-Name} SELECT {Col-Name} FROM {Table-Name}; END;\nINSERT INTO {Table-Name} VALUES ({Literal})",
   "feature_tag": "trigger_with_recursive_cte",
   "weight": 3.0,
   "notes": "Trigger body using {Cte-Def} (rl-nautilus handles RECURSIVE expansion)"
@@ -185,7 +187,8 @@ INSERT INTO t VALUES(1);
 ```
 
 `CREATE TRIGGER`, `AFTER INSERT ON`, `BEGIN`/`END` stay literal — they
-name the feature. The CTE gets expressed via `{Cte-Def}`.
+name the feature. Trigger name stays literal (`tr` — no `{Trigger-Name}`
+non-terminal). The CTE gets expressed via `{Cte-Def}`.
 
 ---
 
@@ -204,7 +207,7 @@ INSERT INTO t VALUES(1, 'y') ON CONFLICT(a) DO UPDATE SET b=excluded.b;
 **Good rewrite:**
 ```json
 {
-  "template": "CREATE TABLE {Table-Name}({Col-Def-List});\nINSERT INTO {Table-Name} VALUES ({Literal-Value});\nINSERT INTO {Table-Name} VALUES ({Literal-Value}) ON CONFLICT({Col-Name}) DO UPDATE SET {Col-Name}=excluded.{Col-Name}",
+  "template": "CREATE TABLE {Table-Name}({Col-Def-List});\nINSERT INTO {Table-Name} VALUES ({Literal});\nINSERT INTO {Table-Name} VALUES ({Literal}) ON CONFLICT({Col-Name}) DO UPDATE SET {Col-Name}=excluded.{Col-Name}",
   "feature_tag": "insert_on_conflict_do_update",
   "weight": 3.0,
   "notes": "ON CONFLICT DO UPDATE — UPSERT path"
@@ -231,7 +234,7 @@ SELECT * FROM v0;
 **Good rewrite:**
 ```json
 {
-  "template": "CREATE TABLE {Table-Name}({Col-Name}, {Col-Name} GENERATED ALWAYS AS ({Expr}) UNIQUE);\nINSERT INTO {Table-Name}({Col-Name}) VALUES ({Literal-Value});\nSELECT {Result-Col-List} FROM {Table-Name}",
+  "template": "CREATE TABLE {Table-Name}({Col-Name}, {Col-Name} GENERATED ALWAYS AS ({Expr}) UNIQUE);\nINSERT INTO {Table-Name}({Col-Name}) VALUES ({Literal});\nSELECT {Result-Col-List} FROM {Table-Name}",
   "feature_tag": "generated_column_unique",
   "weight": 3.0,
   "notes": "GENERATED ALWAYS AS (...) UNIQUE is the feature"
@@ -253,5 +256,6 @@ generated expression abstracted to diversify the downstream fuzzing.
 - When the bug is about structural depth, prefer a single `{Deep-Expr}`
   or `{Deep-Nested-Select}` over trying to replicate the tree.
 - Trust the non-terminals that exist. If a specific non-terminal for your
-  feature is in the whitelist (`{Fts-Highlight}`, `{Cte-Def}`,
-  `{Frame-Spec}`, etc.), use it.
+  feature is in the whitelist (`{Cte-Def}`, `{Frame-Spec}`, `{Deep-Expr}`,
+  etc.), use it. If one doesn't exist (e.g., no `{Fts-Highlight}` or
+  `{Index-Name}`), keep the relevant tokens literal.
