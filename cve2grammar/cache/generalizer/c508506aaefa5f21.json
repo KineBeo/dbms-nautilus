@@ -1,0 +1,12 @@
+{
+  "template": "CREATE VIRTUAL TABLE {Table-Name} USING rtree({Col-Name}, {Col-Name}, {Col-Name});\nCREATE TABLE {Table-Name}({Col-Name});\nINSERT INTO {Table-Name} VALUES ({Literal}), ({Literal});\nINSERT INTO {Table-Name}({Col-Name}) VALUES ({Literal}), ({Literal});\nCREATE VIEW {Table-Name} AS {Select-Stmt};\nSELECT {Result-Col-List} FROM {Table-Name} LEFT JOIN {Table-Name} INNER JOIN {Table-Name}",
+  "feature_tag": "rtree_virtual_table_join_corrupt",
+  "weight": 3.0,
+  "notes": "Exercises rtree virtual table with mixed LEFT/INNER JOIN including a view, which triggers the nNodeRef corruption assertion in rtreeRelease.",
+  "bug_id": "MR-SQLITE-0149",
+  "sql_sha256": "c508506aaefa5f215e78f0c57c227daa2a40e20ff2bc6ca9c2845ca50094682a",
+  "prompt_version": 1,
+  "model": "claude-sonnet-4-6",
+  "created_at": "2026-04-20T00:50:16Z",
+  "status": "ok"
+}

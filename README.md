@@ -347,6 +347,56 @@ After each queue item:
 
 ---
 
+## Grammar Pipeline (cve2grammar → generated grammar)
+
+As of 2026-04-21, phase-2 vendors `cve2grammar` as a git subtree at
+`cve2grammar/`. The pipeline transforms Manuel Rigger's DBMS bugs corpus
+into `grammars/sqlite_generated.py`, a Nautilus grammar of 42 crash-oracle
+templates.
+
+```
+scrape (manuelrigger.at/dbms-bugs) → Bug DTOs
+  → LLM-generalize (cve2grammar /generalize)
+  → cache/generalizer/*.json (42 crash templates, content-addressed)
+  → render (python3 -m cve2grammar.generalizer.render)
+  → grammars/sqlite_generated.py
+  → fuzzer (cargo run --release)
+```
+
+### Run the pipeline
+
+```bash
+make setup     # cargo build + ready cve2grammar (in-place, no pip install)
+make grammar   # render grammars/sqlite_generated.py from 42 cache entries
+make test      # cargo test + pytest cve2grammar/
+```
+
+### Grammar coexistence
+
+Two grammars live in `grammars/`:
+
+| Grammar | Origin | Rules | Status |
+|---------|--------|-------|--------|
+| `sqlite_patterns.py` | hand-crafted | ~99 non-terminals, base SQLite productions | production |
+| `sqlite_generated.py` | cve2grammar | 42 `ctx.rule("Sql-Stmt", ...)` from crash bugs | incomplete — see below |
+
+Both target the same `Sql-Stmt` top-level. Select at runtime via
+`config.ron` → `path_to_grammar`.
+
+### Known: generated grammar is not yet self-contained
+
+`sqlite_generated.py` currently defines only `Sql-Stmt` and references 24
+base non-terminals (`Table-Name`, `Col-Def`, `GenCol-Expr`, etc.) that
+live in `sqlite_patterns.py`. Nautilus loads one grammar file per run, so
+the generated file panics with `Broken Grammar` until composed with the
+base grammar.
+
+**Next step (separate task):** update `scripts/build_grammar.sh` to
+prepend `sqlite_patterns.py` to the rendered output, producing a
+self-contained ~900-line grammar file.
+
+---
+
 ## Harness Architecture
 
 ### sqlite_harness.c (General)

@@ -1,0 +1,12 @@
+{
+  "template": "CREATE TABLE {Table-Name}({Col-Name} {Type-Name}, CHECK(CASE {Col-Name} WHEN {Expr} THEN {Literal} END));\nINSERT INTO {Table-Name} VALUES({Literal})",
+  "feature_tag": "check_constraint_case_expr_type_coercion",
+  "weight": 3.0,
+  "notes": "Exercises CHECK constraint with CASE expression that triggers type-flag assertion in sqlite3VdbeExec during INSERT with type mismatch.",
+  "bug_id": "MR-SQLITE-0144",
+  "sql_sha256": "5e696891c8e915248927132ac60bf3f3b944bc7577159f9d4996385c343ae10b",
+  "prompt_version": 1,
+  "model": "claude-sonnet-4-6",
+  "created_at": "2026-04-20T00:50:16Z",
+  "status": "ok"
+}

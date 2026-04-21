@@ -363,6 +363,13 @@ ctx.rule("Col-Def", "{Col-Name} {Type-Name} CHECK ({Expr})")
 ctx.rule("Col-Def", "{Col-Name} {Type-Name} NOT NULL DEFAULT {Literal}")
 ctx.rule("Col-Def", "{Col-Name} {Type-Name} GENERATED ALWAYS AS ({Expr}) STORED")
 ctx.rule("Col-Def", "{Col-Name} {Type-Name} GENERATED ALWAYS AS ({Expr}) VIRTUAL")
+ctx.rule("Col-Def", "{Col-Name} {Type-Name} GENERATED ALWAYS AS ({Expr}) {Gen-Storage}")
+
+# Storage qualifier for GENERATED columns. Added 2026-04-21 to satisfy
+# sqlite_generated.py, which emits {Gen-Storage} (inherited from the
+# sibling rl-nautilus whitelist).
+ctx.rule("Gen-Storage", "VIRTUAL", weight=2.0)
+ctx.rule("Gen-Storage", "STORED", weight=1.5)
 
 ctx.rule("Type-Name", "INTEGER")
 ctx.rule("Type-Name", "REAL")

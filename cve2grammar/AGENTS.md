@@ -1,7 +1,7 @@
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
 
-This project is indexed by GitNexus as **rl-nautilus-phase-2** (926 symbols, 2192 relationships, 79 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
+This project is indexed by GitNexus as **cve2grammar** (400 symbols, 1111 relationships, 17 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
 
 > If any GitNexus tool warns the index is stale, run `npx gitnexus analyze` in terminal first.
 
@@ -17,7 +17,7 @@ This project is indexed by GitNexus as **rl-nautilus-phase-2** (926 symbols, 219
 
 1. `gitnexus_query({query: "<error or symptom>"})` — find execution flows related to the issue
 2. `gitnexus_context({name: "<suspect function>"})` — see all callers, callees, and process participation
-3. `READ gitnexus://repo/rl-nautilus-phase-2/process/{processName}` — trace the full execution flow step by step
+3. `READ gitnexus://repo/cve2grammar/process/{processName}` — trace the full execution flow step by step
 4. For regressions: `gitnexus_detect_changes({scope: "compare", base_ref: "main"})` — see what your branch changed
 
 ## When Refactoring
@@ -56,10 +56,10 @@ This project is indexed by GitNexus as **rl-nautilus-phase-2** (926 symbols, 219
 
 | Resource | Use for |
 |----------|---------|
-| `gitnexus://repo/rl-nautilus-phase-2/context` | Codebase overview, check index freshness |
-| `gitnexus://repo/rl-nautilus-phase-2/clusters` | All functional areas |
-| `gitnexus://repo/rl-nautilus-phase-2/processes` | All execution flows |
-| `gitnexus://repo/rl-nautilus-phase-2/process/{name}` | Step-by-step execution trace |
+| `gitnexus://repo/cve2grammar/context` | Codebase overview, check index freshness |
+| `gitnexus://repo/cve2grammar/clusters` | All functional areas |
+| `gitnexus://repo/cve2grammar/processes` | All execution flows |
+| `gitnexus://repo/cve2grammar/process/{name}` | Step-by-step execution trace |
 
 ## Self-Check Before Finishing
 
@@ -99,49 +99,3 @@ To check whether embeddings exist, inspect `.gitnexus/meta.json` — the `stats.
 | Index, status, clean, wiki CLI commands | `.claude/skills/gitnexus/gitnexus-cli/SKILL.md` |
 
 <!-- gitnexus:end -->
-
----
-
-## cve2grammar Subtree (imported 2026-04-21)
-
-`cve2grammar/` is a vendored git subtree — the grammar-building layer of the
-thesis pipeline. It is a Python package with its own `pyproject.toml`, its
-own `.claude/` directory (nested, scoped to the subtree), and its own tests.
-
-### Working inside cve2grammar/
-
-- Use the nested `.claude/` — slash commands like `/generalize` work there.
-- Run tests from inside: `cd cve2grammar/ && python3 -m pytest`.
-- Do NOT `pip install -e .` — the PEP 668 externally-managed env + multi-Python setup fights it. `pytest` works in-place via `pythonpath = ["."]` in pyproject.
-- The default grammar path in `cve2grammar/cve2grammar/generalizer/nonterminals.py:28-31` resolves to `<phase-2-root>/grammars/sqlite_patterns.py`.
-
-### Pipeline commands
-
-```bash
-make setup     # PYO3_USE_ABI3_FORWARD_COMPATIBILITY=1 cargo build --release
-make grammar   # scripts/build_grammar.sh → grammars/sqlite_generated.py
-make test      # cargo test + pytest cve2grammar/
-```
-
-### Known: generated grammar is not self-contained
-
-`grammars/sqlite_generated.py` defines only `Sql-Stmt` and references 24
-base non-terminals (`Table-Name`, `Col-Def`, `GenCol-Expr`, ...) that live
-in `grammars/sqlite_patterns.py`. Nautilus loads one grammar per run, so
-the generated file panics with `Broken Grammar` until composed with the
-base grammar.
-
-**Next step (separate spec needed):** update `scripts/build_grammar.sh` to
-prepend `sqlite_patterns.py` to the rendered output, producing a
-self-contained grammar file that the fuzzer can load directly.
-
-### Spec and plan
-
-- Spec: `cve2grammar/docs/superpowers/specs/2026-04-21-cve2grammar-phase2-merge-design.md`
-- Plan: `cve2grammar/docs/superpowers/plans/2026-04-21-cve2grammar-phase2-merge.md`
-
-### Environment facts (do not re-investigate)
-
-- Python 3.13, PyO3 0.21 requires `PYO3_USE_ABI3_FORWARD_COMPATIBILITY=1` for Rust builds.
-- Harness binaries use `sqlite_harness_patterns_<version>` naming (not `sqlite_harness_<version>`).
-- The `Gen-Storage` non-terminal was added to `sqlite_patterns.py` on 2026-04-21 to satisfy the generated grammar's imports. The pre-existing inlined `Col-Def` STORED/VIRTUAL alternates are preserved.

@@ -1,0 +1,12 @@
+{
+  "template": "CREATE TABLE {Table-Name}({Col-Def});\nCREATE INDEX {Table-Name} ON {Table-Name}(({Expr}) COLLATE BINARY);\nSELECT {Result-Col-List} FROM {Table-Name} WHERE ({Expr}) COLLATE BINARY BETWEEN {Expr} AND {Expr}",
+  "feature_tag": "collate_binary_index_between",
+  "weight": 3.0,
+  "notes": "Exercises COLLATE BINARY on indexed expression used in BETWEEN predicate, the feature path that triggered the debug assertion on pExpr->op==TK_COLLATE.",
+  "bug_id": "MR-SQLITE-0141",
+  "sql_sha256": "be40603d0bd36b97ebcc8f4c6cd1b8d56ad64897a0da56be5816dae815f02bfc",
+  "prompt_version": 1,
+  "model": "claude-sonnet-4-6",
+  "created_at": "2026-04-20T00:47:02Z",
+  "status": "ok"
+}

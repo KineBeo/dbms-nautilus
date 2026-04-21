@@ -1,0 +1,12 @@
+{
+  "template": "CREATE VIRTUAL TABLE {Table-Name} USING fts5({Col-Name});\nCREATE VIRTUAL TABLE {Table-Name} USING fts4({Col-Name});\nINSERT INTO {Table-Name}({Col-Name}) VALUES({Literal});\nBEGIN;\nUPDATE {Table-Name} SET {Col-Name} = {Expr};\nINSERT INTO {Table-Name}({Col-Name}) VALUES ({Literal}), ({Literal});\nUPDATE {Table-Name} SET {Col-Name} = {Expr};\nINSERT INTO {Table-Name}({Col-Name}) VALUES ({Literal});\nUPDATE {Table-Name} SET {Col-Name} = {Expr};\nINSERT INTO {Table-Name}({Table-Name}) VALUES({Str-Literal});\nUPDATE {Table-Name} SET {Col-Name} = {Expr};\nDROP TABLE {Table-Name}",
+  "feature_tag": "fts_transaction_savepoint_stress",
+  "weight": 3.0,
+  "notes": "Exercises fts4/fts5 virtual table interaction within a transaction with mixed DML and special command inserts that trigger savepoint assertion.",
+  "bug_id": "MR-SQLITE-0155",
+  "sql_sha256": "c0f900e8ba5e789a5ea601f6343b308021376f05015c12a4c8ab19517a20d46d",
+  "prompt_version": 1,
+  "model": "claude-sonnet-4-6",
+  "created_at": "2026-04-20T00:50:16Z",
+  "status": "ok"
+}
