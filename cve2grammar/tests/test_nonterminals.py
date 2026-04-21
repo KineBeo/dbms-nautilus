@@ -112,3 +112,20 @@ class TestCli:
         code = nonterminals_main([str(g)])
         assert code == 0
         assert json.loads(capsys.readouterr().out) == ["XFromArg"]
+
+
+def test_default_path_resolves_to_phase2_grammars(monkeypatch):
+    """After the monorepo merge, the default grammar path should point at
+    <phase-2-root>/grammars/sqlite_patterns.py."""
+    from cve2grammar.generalizer.nonterminals import _resolve_path
+
+    monkeypatch.delenv("RL_NAUTILUS_GRAMMAR", raising=False)
+
+    resolved = _resolve_path(None)
+    assert resolved.name == "sqlite_patterns.py", (
+        f"expected sqlite_patterns.py, got {resolved.name}"
+    )
+    assert resolved.parent.name == "grammars", (
+        f"expected parent 'grammars', got {resolved.parent.name}"
+    )
+    assert resolved.exists(), f"default grammar path missing: {resolved}"

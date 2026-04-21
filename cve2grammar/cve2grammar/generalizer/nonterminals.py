@@ -27,7 +27,7 @@ _RHS_RE = re.compile(r"\{([A-Z][A-Za-z0-9-]*)\}")
 
 _DEFAULT_GRAMMAR_PATH = (
     Path(__file__).resolve().parent.parent.parent.parent
-    / "rl-nautilus" / "grammars" / "sqlite_patterns_v2.py"
+    / "grammars" / "sqlite_patterns.py"
 )
 
 
