@@ -1,0 +1,12 @@
+{
+  "template": "CREATE TABLE {Table-Name}({Col-Name} CHECK(((0, 0) > (0, {Col-Ref}))));\nINSERT INTO {Table-Name}({Col-Name}) VALUES({Literal}) ON CONFLICT({Col-Name}) DO UPDATE SET {Col-Name} = {Expr}",
+  "feature_tag": "row_value_check_upsert_conflict",
+  "weight": 3.0,
+  "notes": "Exercises row-value comparison in CHECK constraint combined with ON CONFLICT DO UPDATE — the vector compare assertion path that triggered the crash.",
+  "bug_id": "MR-SQLITE-0167",
+  "sql_sha256": "383fddbbd86f98122259a5d0db70d915eb797ff7d476923a56853969878fe9ff",
+  "prompt_version": 1,
+  "model": "claude-sonnet-4-6",
+  "created_at": "2026-04-20T00:53:23Z",
+  "status": "ok"
+}

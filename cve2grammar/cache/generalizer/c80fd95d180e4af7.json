@@ -1,0 +1,12 @@
+{
+  "template": "PRAGMA foreign_keys = {Pragma-Bool};\nCREATE TABLE {Table-Name}({Col-Name} TEXT PRIMARY KEY, {Col-Name} INT UNIQUE REFERENCES {Table-Name} CHECK(CAST({Col-Ref} AS INT) BETWEEN {Boundary-Int} AND CASE WHEN {Expr} THEN {Col-Ref} END));\nREPLACE INTO {Table-Name}({Col-Name}, {Col-Name}) VALUES({Float-Literal}, {Boundary-Int}), ({Boundary-Int}, {Blob-Literal})",
+  "feature_tag": "self_ref_fk_check_cast_replace",
+  "weight": 3.0,
+  "notes": "Self-referential FK with CHECK constraint using CAST+BETWEEN+CASE triggers debug assertion on REPLACE with type-mixed VALUES",
+  "bug_id": "MR-SQLITE-0168",
+  "sql_sha256": "c80fd95d180e4af79978e42ea498a67601097222e026b3501e163d607ebb1404",
+  "prompt_version": 1,
+  "model": "claude-sonnet-4-6",
+  "created_at": "2026-04-20T00:53:23Z",
+  "status": "ok"
+}

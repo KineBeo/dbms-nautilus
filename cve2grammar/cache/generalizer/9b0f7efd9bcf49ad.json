@@ -1,0 +1,12 @@
+{
+  "template": "CREATE VIRTUAL TABLE {Table-Name} USING fts5({Col-Name}, prefix = {Boundary-Int}, tokenize = \"porter ascii\", prefix = {Boundary-Int});\nBEGIN;\nINSERT INTO {Table-Name}({Col-Name}) VALUES ({Blob-Literal});\nINSERT INTO {Table-Name}({Table-Name}) VALUES('integrity-check')",
+  "feature_tag": "fts5_integrity_check_porter_prefix",
+  "weight": 3.0,
+  "notes": "Exercises FTS5 integrity-check command with porter tokenizer and multiple prefix options, which triggered the Fts5HashScanNext debug assertion crash.",
+  "bug_id": "MR-SQLITE-0153",
+  "sql_sha256": "9b0f7efd9bcf49add0257569cb61bfa6f98e444edbda4ff9a6019f625bfa3139",
+  "prompt_version": 1,
+  "model": "claude-sonnet-4-6",
+  "created_at": "2026-04-20T00:50:16Z",
+  "status": "ok"
+}

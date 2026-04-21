@@ -1,0 +1,12 @@
+{
+  "template": "PRAGMA encoding = 'UTF16';\nCREATE TABLE {Table-Name}({Col-Name} {Type-Name}, {Col-Name});\nINSERT INTO {Table-Name}({Col-Name}) VALUES ({Str-Literal}), ({Literal});\nCREATE INDEX {Table-Name} ON {Table-Name}({Col-Name}) WHERE {Col-Ref} GLOB {Expr};\nUPDATE {Table-Name} SET {Col-Name}={Literal}",
+  "feature_tag": "partial_index_utf16_update_conflict",
+  "weight": 3.0,
+  "notes": "Exercises partial index with GLOB predicate on a UTF16-encoded database during UPDATE, which triggers the debug assertion in sqlite3VdbeMemAboutToChange.",
+  "bug_id": "MR-SQLITE-0136",
+  "sql_sha256": "a632a6b336e1c7eb5c3aec51eb115fea9196cf9d6991711b208db4c65857b217",
+  "prompt_version": 1,
+  "model": "claude-sonnet-4-6",
+  "created_at": "2026-04-20T00:47:02Z",
+  "status": "ok"
+}

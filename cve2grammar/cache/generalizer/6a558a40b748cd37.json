@@ -1,0 +1,12 @@
+{
+  "template": "CREATE TABLE {Table-Name}({Col-Name} UNIQUE);\nSELECT * FROM {Table-Name} WHERE ({Col-Ref}, {Expr}) IN(SELECT {Win-Func-Expr}, {Literal} FROM {Table-Name})",
+  "feature_tag": "window_func_in_subquery_ntile",
+  "weight": 3.0,
+  "notes": "Exercises NTILE window function in IN-subquery paired with row-value comparison against a table with UNIQUE constraint, which triggered pC!=0 assertion.",
+  "bug_id": "MR-SQLITE-0147",
+  "sql_sha256": "6a558a40b748cd37c57d5c4ffd6e167159a59a80f23e0ecd9c09a96b17031df7",
+  "prompt_version": 1,
+  "model": "claude-sonnet-4-6",
+  "created_at": "2026-04-20T00:50:16Z",
+  "status": "ok"
+}

@@ -1,0 +1,12 @@
+{
+  "template": "CREATE TABLE {Table-Name}({Col-Def-List}, {Col-Name} AS({GenCol-Expr}) NOT NULL);\nREPLACE INTO {Table-Name}({Col-Name}) VALUES(NULL)",
+  "feature_tag": "generated_col_not_null_replace_null",
+  "weight": 3.0,
+  "notes": "Exercises NOT NULL generated column with REPLACE inserting NULL into the base column that feeds the generated expression — the pattern that triggered the memIsValid debug assertion.",
+  "bug_id": "MR-SQLITE-0161",
+  "sql_sha256": "09ffdbbea6f9351381b8357880d836a058c4e77a44eee11230bbf628dc28191b",
+  "prompt_version": 1,
+  "model": "claude-sonnet-4-6",
+  "created_at": "2026-04-20T00:53:23Z",
+  "status": "ok"
+}
