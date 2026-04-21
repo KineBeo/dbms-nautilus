@@ -3,6 +3,17 @@
 All notable changes to this project are documented here. Dates are ISO-8601
 and follow the commit dates on `main` / `feat/grammar-generalizer`.
 
+## [Unreleased] — Monorepo Import (2026-04-21)
+
+### Changed
+- Default grammar path in `generalizer/nonterminals.py` now resolves to
+  `<phase-2-root>/grammars/sqlite_patterns.py` instead of the sibling
+  `../rl-nautilus/grammars/sqlite_patterns_v2.py`.
+
+### Context
+- Imported into `rl-nautilus-phase-2/cve2grammar/` as a git subtree.
+  See `docs/superpowers/specs/2026-04-21-cve2grammar-phase2-merge-design.md`.
+
 ## [Unreleased] — `feat/grammar-generalizer`
 
 ### Added

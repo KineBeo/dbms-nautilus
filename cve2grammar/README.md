@@ -1,5 +1,12 @@
 # cve2grammar
 
+> **Monorepo note (2026-04-21):** This package was imported into
+> `rl-nautilus-phase-2/cve2grammar/` via `git subtree`. The default grammar
+> path in `generalizer/nonterminals.py` now resolves to
+> `<phase-2-root>/grammars/sqlite_patterns.py`. The standalone `cve2grammar`
+> repo still exists but is no longer the authoritative source for phase-2
+> integration.
+
 Scrape Manuel Rigger's [DBMS bugs page](https://www.manuelrigger.at/dbms-bugs/)
 and emit a **Nautilus-compatible Python grammar file** that biases the fuzzer
 toward high-value test cases. Optionally rewrite each bug's POC SQL into a
