@@ -1,0 +1,12 @@
+{
+  "template": "PRAGMA locking_mode = EXCLUSIVE;\nPRAGMA journal_mode = {Journal-Mode};\nPRAGMA locking_mode = NORMAL;\nPRAGMA integrity_check;\nPRAGMA journal_mode = {Journal-Mode}",
+  "feature_tag": "locking_mode_journal_mode_transition",
+  "weight": 3.0,
+  "notes": "Crash triggered by locking mode transition (EXCLUSIVE→NORMAL) combined with journal mode switches; template generalizes journal mode choices while preserving the state-transition sequence.",
+  "bug_id": "MR-SQLITE-0159",
+  "sql_sha256": "c90633ee56724b92961e4dd74db5779424208789290823a62c13d77e6b6fadf2",
+  "prompt_version": 1,
+  "model": "claude-sonnet-4-6",
+  "created_at": "2026-04-20T00:53:23Z",
+  "status": "ok"
+}

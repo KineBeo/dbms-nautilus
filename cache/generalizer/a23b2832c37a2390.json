@@ -1,0 +1,12 @@
+{
+  "template": "PRAGMA encoding = 'UTF16';\nCREATE TABLE {Table-Name}({Col-Name} {Type-Name});\nCREATE INDEX {Col-Name} ON {Table-Name}({Expr} LIKE COALESCE({Col-Ref}, {Literal}));\nINSERT INTO {Table-Name}({Col-Name}) VALUES ({Literal}), ({Literal})",
+  "feature_tag": "index_expr_like_coalesce_utf16",
+  "weight": 3.0,
+  "notes": "Crash in debug assertion when LIKE expression over COALESCE references a column in an index expression under non-default encoding",
+  "bug_id": "MR-SQLITE-0146",
+  "sql_sha256": "a23b2832c37a2390ca0d53c1c6d2540f148d057ec3dd1346e005adc0b63d4f34",
+  "prompt_version": 1,
+  "model": "claude-sonnet-4-6",
+  "created_at": "2026-04-20T00:50:16Z",
+  "status": "ok"
+}
