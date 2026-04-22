@@ -134,3 +134,12 @@ echo "Run triage:"
 echo "  python3 triage/dedup.py $WORKDIR --harness $HARNESS_BIN --output $WORKDIR/dedup"
 echo "  python3 triage/minimize.py <crash> --harness $HARNESS_BIN"
 echo "  python3 triage/report.py $WORKDIR/dedup --harness $HARNESS_BIN --output $WORKDIR/report.md"
+
+# ----------------------------------------------------------------
+# A2: end-of-run coverage capture (per spec 2026-04-22-measurement-and-fidelity)
+# ----------------------------------------------------------------
+echo "[run_eval] capturing coverage..."
+python3 "$SCRIPT_DIR/capture_coverage.py" "$WORKDIR" \
+    --duration "$DURATION" \
+    --output "$WORKDIR/coverage.json" \
+    || echo "[run_eval] warning: coverage capture failed (non-fatal)"
