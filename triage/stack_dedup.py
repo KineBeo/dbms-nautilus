@@ -93,17 +93,27 @@ def build_clusters(crashes: list[dict]) -> list[dict]:
 
 
 def run_gdb_on_crash(harness: Path, crash_file: Path, timeout_sec: int = 20) -> list[str]:
-    """Spawn gdb --batch on the harness with the crash as stdin; return top 5 filtered frames."""
+    """Spawn gdb --batch on the harness with the crash file as argv[1]; return top 5 filtered frames.
+
+    The SQLite harnesses in this repo take the input path as argv[1] (per
+    `usage: ... <input_file>` message). They do NOT read from stdin. They
+    also refuse to run under ptrace with LeakSanitizer's default settings,
+    so we disable leak detection via ASAN_OPTIONS for the gdb subprocess.
+    """
     cmd = [
         "gdb",
         "--batch",
         "--nx",
         "--ex", "set pagination off",
-        "--ex", f"run < {crash_file}",
+        "--ex", f"run {crash_file}",
         "--ex", "bt 5",
         "--ex", "quit",
         str(harness),
     ]
+    env = os.environ.copy()
+    # LeakSanitizer aborts under ptrace by default; disable it for the replay.
+    env["ASAN_OPTIONS"] = env.get("ASAN_OPTIONS", "") + ":detect_leaks=0:abort_on_error=1"
+    env["UBSAN_OPTIONS"] = env.get("UBSAN_OPTIONS", "") + ":abort_on_error=1"
     try:
         proc = subprocess.run(
             cmd,
@@ -111,6 +121,7 @@ def run_gdb_on_crash(harness: Path, crash_file: Path, timeout_sec: int = 20) -> 
             text=True,
             timeout=timeout_sec,
             check=False,
+            env=env,
         )
     except subprocess.TimeoutExpired:
         return []
