@@ -78,17 +78,10 @@ def run_generator(grammar: Path, samples: int, tree_size: int = 100) -> list[str
     proc = subprocess.run(cmd, capture_output=True, text=True, env=env, timeout=600)
     if proc.returncode != 0:
         raise RuntimeError(f"generator failed: {proc.stderr[:500]}")
-    fragments: list[str] = []
-    buf: list[str] = []
-    for ln in proc.stdout.splitlines():
-        if ln.strip() == "" and buf:
-            fragments.append("\n".join(buf))
-            buf = []
-        else:
-            buf.append(ln)
-    if buf:
-        fragments.append("\n".join(buf))
-    return [f for f in fragments if f.strip()]
+    # Nautilus generator emits ONE tree per newline-terminated line, with
+    # all statements inside a tree ';'-joined on that line. There is no
+    # blank-line separator between trees. Each non-empty line is one sample.
+    return [ln for ln in proc.stdout.splitlines() if ln.strip()]
 
 
 def score_all_patterns(grammar: Path, samples: int) -> dict:
