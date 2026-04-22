@@ -299,6 +299,35 @@ ctx.rule("Builtin-Func-Call", "{Builtin-Func}({Expr}, {Expr})")
 ctx.rule("Builtin-Func-Call", "{Builtin-Func}({Expr}, {Expr}, {Expr})")
 
 # ============================================================
+# SECTION 5b: Tight non-terminals for B2 fidelity (measurement-and-fidelity §3.2)
+# One production each. Pattern rules in Section 6 reference these by name.
+# Composition still happens INSIDE each tight rule via shared vocabulary NTs.
+# ============================================================
+
+ctx.rule("Scalar-Subquery-CoalesceWindow",
+    "SELECT (SELECT coalesce({Window-Func-Call}, {Agg-Func-Call})) "
+    "FROM {Table-Name} {Alias} WHERE {Col-Ref}")
+
+ctx.rule("Join-Chain-NaturalPair",
+    "JOIN {Table-Name} {Alias} ON {Expr} NATURAL JOIN {Table-Name}")
+
+ctx.rule("Join-Chain-CommaJoin-Pair",
+    ", {Table-Name}")
+
+ctx.rule("GenCol-Def-SelfRef",
+    "{Col-Name} AS ({Col-Name}) UNIQUE")
+
+ctx.rule("GenCol-Def-NotNull",
+    "{Col-Name} NOT NULL GENERATED ALWAYS AS ({Boolean-Expr})")
+
+ctx.rule("View-Def-OrderedSelect",
+    "CREATE VIEW {View-Name} AS SELECT {Col-Name} FROM {Table-Name} ORDER BY {Col-Name}")
+
+ctx.rule("Scalar-Subquery-HavingWindow",
+    "SELECT {Col-Ref} FROM {Table-Name} GROUP BY {Col-Ref} HAVING ({Coalesce-Window-Expr})")
+
+
+# ============================================================
 # SECTION 6: Attack patterns (§6 catalog — 8 patterns)
 # Each pattern = one CVE (or derived). Multi-statement skeletons
 # that expand to shared non-terminals from §7.
