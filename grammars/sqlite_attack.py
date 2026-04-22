@@ -104,3 +104,95 @@ ctx.rule("Type-Name", "BLOB")
 ctx.rule("Collation-Name", "BINARY")
 ctx.rule("Collation-Name", "NOCASE")
 ctx.rule("Collation-Name", "RTRIM")
+
+# ============================================================
+# SECTION 4: Canonical SQL forms (§5)
+# One form per construct; optional sub-clauses via *-Opt non-terminals.
+# ============================================================
+
+# --- Sql-Stmt dispatch (base statements) ---
+ctx.rule("Sql-Stmt", "{Select-Stmt}")
+ctx.rule("Sql-Stmt", "{Insert-Stmt}")
+ctx.rule("Sql-Stmt", "{Update-Stmt}")
+ctx.rule("Sql-Stmt", "{Delete-Stmt}")
+ctx.rule("Sql-Stmt", "{Create-Table-Stmt}")
+ctx.rule("Sql-Stmt", "{Create-View-Stmt}")
+ctx.rule("Sql-Stmt", "{Create-Trigger-Stmt}")
+ctx.rule("Sql-Stmt", "{Pragma-Stmt}")
+
+# --- SELECT (one canonical form with optional clauses) ---
+ctx.rule("Select-Stmt",
+    "SELECT {Result-Col-List}{From-Clause-Opt}{Where-Clause-Opt}"
+    "{Group-By-Clause-Opt}{Having-Clause-Opt}{Compound-Op-Clause-Opt}"
+    "{Order-By-Clause-Opt}")
+
+ctx.rule("Result-Col-List", "*")
+ctx.rule("Result-Col-List", "{Expr}")
+ctx.rule("Result-Col-List", "{Expr} AS {Col-Name}")
+ctx.rule("Result-Col-List", "{Expr}, {Result-Col-List}")
+
+# Optional clauses: each expands to empty or the real clause.
+ctx.rule("From-Clause-Opt", "")
+ctx.rule("From-Clause-Opt", " FROM {From-Target}")
+
+ctx.rule("From-Target", "{Table-Name}")
+ctx.rule("From-Target", "{Table-Name} {Alias}")
+ctx.rule("From-Target", "{Table-Name}, {Table-Name}")
+ctx.rule("From-Target", "{Table-Name} {Join-Chain}")
+
+ctx.rule("Where-Clause-Opt", "")
+ctx.rule("Where-Clause-Opt", " WHERE {Boolean-Expr}")
+
+ctx.rule("Group-By-Clause-Opt", "")
+ctx.rule("Group-By-Clause-Opt", " GROUP BY {Expr}")
+ctx.rule("Group-By-Clause-Opt", " GROUP BY {Expr}, {Expr}")
+
+ctx.rule("Having-Clause-Opt", "")
+ctx.rule("Having-Clause-Opt", " HAVING {Boolean-Expr}")
+
+# Only INTERSECT and EXCEPT (§5).
+ctx.rule("Compound-Op-Clause-Opt", "")
+ctx.rule("Compound-Op-Clause-Opt", " {Compound-Op} SELECT {Result-Col-List}{From-Clause-Opt}{Where-Clause-Opt}")
+
+ctx.rule("Compound-Op", "INTERSECT")
+ctx.rule("Compound-Op", "EXCEPT")
+
+ctx.rule("Order-By-Clause-Opt", "")
+ctx.rule("Order-By-Clause-Opt", " {Order-By}")
+
+# --- CREATE TABLE (one canonical form) ---
+ctx.rule("Create-Table-Stmt", "CREATE TABLE {Table-Name}({Col-Def-List})")
+
+ctx.rule("Col-Def-List", "{Col-Def}")
+ctx.rule("Col-Def-List", "{Col-Def}, {Col-Def-List}")
+
+ctx.rule("Col-Def", "{Col-Name}")
+ctx.rule("Col-Def", "{Col-Name} {Type-Name}")
+ctx.rule("Col-Def", "{Col-Name} UNIQUE")
+ctx.rule("Col-Def", "{Col-Name} {Type-Name} UNIQUE")
+ctx.rule("Col-Def", "{Col-Name} UNIQUE ON CONFLICT REPLACE")
+ctx.rule("Col-Def", "{Col-Name} {Type-Name} CHECK({Boolean-Expr})")
+ctx.rule("Col-Def", "{GenCol-Def}")
+
+# --- INSERT (one canonical form; multi-row values covered) ---
+ctx.rule("Insert-Stmt", "INSERT INTO {Table-Name} VALUES ({Expr-List})")
+ctx.rule("Insert-Stmt", "INSERT INTO {Table-Name}({Col-Name}) VALUES ({Expr})")
+ctx.rule("Insert-Stmt", "INSERT INTO {Table-Name} VALUES ({Expr-List}), ({Expr-List})")
+
+# --- UPDATE (one canonical form) ---
+ctx.rule("Update-Stmt", "UPDATE {Table-Name} SET {Col-Name} = {Expr}")
+ctx.rule("Update-Stmt", "UPDATE {Table-Name} SET {Col-Name} = {Expr} WHERE {Boolean-Expr}")
+
+# --- DELETE (one canonical form) ---
+ctx.rule("Delete-Stmt", "DELETE FROM {Table-Name}")
+ctx.rule("Delete-Stmt", "DELETE FROM {Table-Name} WHERE {Boolean-Expr}")
+
+# --- PRAGMA (restricted to names with CVE/bug history, §8) ---
+ctx.rule("Pragma-Stmt", "PRAGMA {PRAGMA-Name}")
+
+# --- Create View (via shared non-terminal) ---
+ctx.rule("Create-View-Stmt", "{View-Def}")
+
+# --- Create Trigger (plain form; used by P-TRIGGER-GROUPCONCAT) ---
+ctx.rule("Create-Trigger-Stmt",
+    "CREATE TRIGGER {Col-Name} INSERT ON {Table-Name} BEGIN {Sql-Stmt}; END")
