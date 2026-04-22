@@ -1,0 +1,108 @@
+{
+  "patterns": [
+    {
+      "pattern_name": "Pattern-P15358",
+      "cve": "CVE-2020-15358",
+      "samples_generated": 2729,
+      "required_nodes": [
+        "CREATE_VIEW_with_ORDER_BY",
+        "INTERSECT_in_WHERE",
+        "SELECT_with_implicit_JOIN"
+      ],
+      "samples_with_all_required": 1,
+      "fidelity_score": 0.00036643459142543056,
+      "samples_missing_node": {
+        "CREATE_VIEW_with_ORDER_BY": 1978,
+        "INTERSECT_in_WHERE": 1981,
+        "SELECT_with_implicit_JOIN": 1980
+      }
+    },
+    {
+      "pattern_name": "Pattern-P13871",
+      "cve": "CVE-2020-13871",
+      "samples_generated": 1195,
+      "required_nodes": [
+        "EXCEPT_present",
+        "ORDER_BY_multi",
+        "Scalar_subquery"
+      ],
+      "samples_with_all_required": 36,
+      "fidelity_score": 0.0301255230125523,
+      "samples_missing_node": {
+        "EXCEPT_present": 493,
+        "ORDER_BY_multi": 1158,
+        "Scalar_subquery": 499
+      }
+    },
+    {
+      "pattern_name": "Pattern-P13435",
+      "cve": "CVE-2020-13435",
+      "samples_generated": 1238,
+      "required_nodes": [
+        "NATURAL_JOIN",
+        "coalesce_call",
+        "window_over",
+        "UNIQUE_column",
+        "IN_subquery"
+      ],
+      "samples_with_all_required": 230,
+      "fidelity_score": 0.18578352180936994,
+      "samples_missing_node": {
+        "NATURAL_JOIN": 512,
+        "coalesce_call": 500,
+        "window_over": 807,
+        "UNIQUE_column": 492,
+        "IN_subquery": 511
+      }
+    },
+    {
+      "pattern_name": "Pattern-P13434-Boundary",
+      "cve": "CVE-2020-13434",
+      "samples_generated": 511,
+      "required_nodes": [
+        "printf_call",
+        "INT32_boundary"
+      ],
+      "samples_with_all_required": 66,
+      "fidelity_score": 0.12915851272015655,
+      "samples_missing_node": {
+        "printf_call": 439,
+        "INT32_boundary": 79
+      }
+    },
+    {
+      "pattern_name": "Pattern-P9327",
+      "cve": "CVE-2020-9327",
+      "samples_generated": 2389,
+      "required_nodes": [
+        "GENERATED_column",
+        "coalesce_call",
+        "JOIN_or_commajoin",
+        "CREATE_VIEW"
+      ],
+      "samples_with_all_required": 0,
+      "fidelity_score": 0.0,
+      "samples_missing_node": {
+        "GENERATED_column": 1739,
+        "coalesce_call": 2144,
+        "JOIN_or_commajoin": 1683,
+        "CREATE_VIEW": 1735
+      }
+    },
+    {
+      "pattern_name": "Pattern-P19646",
+      "cve": "CVE-2019-19646",
+      "samples_generated": 2398,
+      "required_nodes": [
+        "GENERATED_column",
+        "PRAGMA_integrity"
+      ],
+      "samples_with_all_required": 458,
+      "fidelity_score": 0.19099249374478733,
+      "samples_missing_node": {
+        "GENERATED_column": 1466,
+        "PRAGMA_integrity": 1463
+      }
+    }
+  ]
+}
