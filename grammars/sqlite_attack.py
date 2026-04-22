@@ -91,3 +91,16 @@ ctx.rule("Literal", "{Real-Lit}")
 ctx.rule("Literal", "{Str-Lit}")
 ctx.rule("Literal", "{Blob-Lit}")
 ctx.rule("Literal", "{Null-Lit}")
+
+# ============================================================
+# SECTION 3: Types and collations (§4.3)
+# ============================================================
+
+ctx.rule("Type-Name", "INTEGER")
+ctx.rule("Type-Name", "DOUBLE")
+ctx.rule("Type-Name", "TEXT")
+ctx.rule("Type-Name", "BLOB")
+
+ctx.rule("Collation-Name", "BINARY")
+ctx.rule("Collation-Name", "NOCASE")
+ctx.rule("Collation-Name", "RTRIM")
