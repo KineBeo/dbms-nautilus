@@ -297,3 +297,80 @@ ctx.rule("Order-By", "ORDER BY {Expr}, {Expr}, {Expr}")
 ctx.rule("Builtin-Func-Call", "{Builtin-Func}({Expr})")
 ctx.rule("Builtin-Func-Call", "{Builtin-Func}({Expr}, {Expr})")
 ctx.rule("Builtin-Func-Call", "{Builtin-Func}({Expr}, {Expr}, {Expr})")
+
+# ============================================================
+# SECTION 6: Attack patterns (§6 catalog — 8 patterns)
+# Each pattern = one CVE (or derived). Multi-statement skeletons
+# that expand to shared non-terminals from §7.
+# ============================================================
+
+# Dispatch: every pattern is reachable through Sql-Stmt
+ctx.rule("Sql-Stmt", "{Pattern-P15358}")
+ctx.rule("Sql-Stmt", "{Pattern-P13871}")
+ctx.rule("Sql-Stmt", "{Pattern-P13435}")
+ctx.rule("Sql-Stmt", "{Pattern-P13434-Boundary}")
+ctx.rule("Sql-Stmt", "{Pattern-P13434-Trigger}")
+ctx.rule("Sql-Stmt", "{Pattern-P9327}")
+ctx.rule("Sql-Stmt", "{Pattern-P19646}")
+ctx.rule("Sql-Stmt", "{Pattern-Compound-Mix}")
+
+# --- CVE-2020-15358: INTERSECT + VIEW ---
+ctx.rule("Pattern-P15358",
+    "CREATE TABLE {Table-Name}({Col-Name});\n"
+    "CREATE TABLE {Table-Name}({Col-Name});\n"
+    "{View-Def};\n"
+    "SELECT * FROM {Table-Name}, {Table-Name} "
+    "WHERE {Col-Ref} = ({Scalar-Subquery} INTERSECT {Scalar-Subquery}) "
+    "AND {Col-Ref} = {Int-Lit}")
+
+# --- CVE-2020-13871: HAVING + window + EXCEPT ---
+ctx.rule("Pattern-P13871",
+    "CREATE TABLE {Table-Name}({Col-Name});\n"
+    "SELECT ({Scalar-Subquery}) FROM {Table-Name} "
+    "EXCEPT SELECT {Col-Ref} FROM {Table-Name} {Order-By}")
+
+# --- CVE-2020-13435: JOIN + NATURAL JOIN + coalesce window ---
+ctx.rule("Pattern-P13435",
+    "CREATE TABLE {Table-Name}({Col-Name} UNIQUE);\n"
+    "SELECT {Col-Ref} FROM {Table-Name} {Join-Chain} "
+    "WHERE {Col-Ref} IN (({Scalar-Subquery}))")
+
+# --- CVE-2020-13434 simplified PoC: SELECT-time boundary-int sink ---
+ctx.rule("Pattern-P13434-Boundary",
+    "SELECT {Builtin-Func}('%.*g', {Boundary-Int}, {Real-Lit})")
+ctx.rule("Pattern-P13434-Boundary",
+    "SELECT {Builtin-Func}({Boundary-Int})")
+ctx.rule("Pattern-P13434-Boundary",
+    "SELECT {Builtin-Func}({Str-Lit}, {Boundary-Int}, {Expr})")
+
+# --- CVE-2020-13434 original PoC: INSERT-time sink via trigger ---
+ctx.rule("Pattern-P13434-Trigger",
+    "CREATE TABLE {Table-Name}({Col-Name} {Type-Name} CHECK("
+    "NOT CASE WHEN {Builtin-Func}({Col-Ref}, {Col-Ref}) THEN 0 END) "
+    "UNIQUE ON CONFLICT REPLACE);\n"
+    "CREATE TRIGGER {Col-Name} INSERT ON {Table-Name} BEGIN "
+    "INSERT INTO {Table-Name} SELECT group_concat({Col-Ref}, {Boundary-Int}) "
+    "FROM {Table-Name}; END;\n"
+    "INSERT INTO {Table-Name} VALUES ({Null-Lit}), ({Int-Lit}), ({Int-Lit});\n"
+    "UPDATE {Table-Name} SET {Col-Name} = {Int-Lit}")
+
+# --- CVE-2020-9327: generated col + JOIN + coalesce ---
+ctx.rule("Pattern-P9327",
+    "CREATE TABLE {Table-Name}({Col-Name}, {GenCol-Def});\n"
+    "CREATE TABLE {Table-Name}({Col-Name} UNIQUE, {Col-Name} UNIQUE);\n"
+    "{View-Def};\n"
+    "SELECT * FROM {View-Name} {Join-Chain} WHERE {Boolean-Expr}")
+
+# --- CVE-2019-19646: generated col + integrity_check ---
+ctx.rule("Pattern-P19646",
+    "CREATE TABLE {Table-Name}({Col-Name}, {GenCol-Def});\n"
+    "INSERT INTO {Table-Name}({Col-Name}) VALUES ({Int-Lit});\n"
+    "PRAGMA integrity_check")
+
+# --- Derived: P-COMPOUND-MIX combines INTERSECT + EXCEPT usage ---
+ctx.rule("Pattern-Compound-Mix",
+    "CREATE TABLE {Table-Name}({Col-Name});\n"
+    "CREATE TABLE {Table-Name}({Col-Name});\n"
+    "SELECT {Col-Ref} FROM {Table-Name} "
+    "INTERSECT SELECT {Col-Ref} FROM {Table-Name} "
+    "EXCEPT SELECT {Col-Ref} FROM {Table-Name} {Order-By}")
