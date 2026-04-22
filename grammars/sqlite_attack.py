@@ -374,3 +374,53 @@ ctx.rule("Pattern-Compound-Mix",
     "SELECT {Col-Ref} FROM {Table-Name} "
     "INTERSECT SELECT {Col-Ref} FROM {Table-Name} "
     "EXCEPT SELECT {Col-Ref} FROM {Table-Name} {Order-By}")
+
+# ============================================================
+# SECTION 7: Target-specific symbols (§8)
+# ============================================================
+
+ctx.rule("Builtin-Func", "printf")
+ctx.rule("Builtin-Func", "format")
+ctx.rule("Builtin-Func", "zeroblob")
+ctx.rule("Builtin-Func", "hex")
+ctx.rule("Builtin-Func", "substr")
+ctx.rule("Builtin-Func", "quote")
+ctx.rule("Builtin-Func", "typeof")
+ctx.rule("Builtin-Func", "likelihood")
+ctx.rule("Builtin-Func", "ifnull")
+ctx.rule("Builtin-Func", "coalesce")
+ctx.rule("Builtin-Func", "iif")
+ctx.rule("Builtin-Func", "random")
+ctx.rule("Builtin-Func", "randomblob")
+
+ctx.rule("Agg-Func-Name", "sum")
+ctx.rule("Agg-Func-Name", "count")
+ctx.rule("Agg-Func-Name", "avg")
+ctx.rule("Agg-Func-Name", "group_concat")
+ctx.rule("Agg-Func-Name", "max")
+ctx.rule("Agg-Func-Name", "min")
+ctx.rule("Agg-Func-Name", "total")
+
+ctx.rule("Window-Func-Name", "lead")
+ctx.rule("Window-Func-Name", "lag")
+ctx.rule("Window-Func-Name", "row_number")
+ctx.rule("Window-Func-Name", "rank")
+ctx.rule("Window-Func-Name", "dense_rank")
+ctx.rule("Window-Func-Name", "first_value")
+ctx.rule("Window-Func-Name", "last_value")
+ctx.rule("Window-Func-Name", "nth_value")
+
+ctx.rule("PRAGMA-Name", "integrity_check")
+ctx.rule("PRAGMA-Name", "foreign_key_check")
+ctx.rule("PRAGMA-Name", "writable_schema")
+ctx.rule("PRAGMA-Name", "encoding")
+ctx.rule("PRAGMA-Name", "journal_mode")
+ctx.rule("PRAGMA-Name", "schema_version")
+ctx.rule("PRAGMA-Name", "cache_size")
+ctx.rule("PRAGMA-Name", "page_size")
+
+ctx.rule("Module-Name", "fts5")
+ctx.rule("Module-Name", "fts4")
+ctx.rule("Module-Name", "rtree")
+ctx.rule("Module-Name", "geopoly")
+ctx.rule("Module-Name", "zipfile")
