@@ -347,7 +347,7 @@ ctx.rule("Sql-Stmt", "{Pattern-Compound-Mix}")
 ctx.rule("Pattern-P15358",
     "CREATE TABLE {Table-Name}({Col-Name});\n"
     "CREATE TABLE {Table-Name}({Col-Name});\n"
-    "{View-Def};\n"
+    "{View-Def-OrderedSelect};\n"
     "SELECT * FROM {Table-Name}, {Table-Name} "
     "WHERE {Col-Ref} = ({Scalar-Subquery} INTERSECT {Scalar-Subquery}) "
     "AND {Col-Ref} = {Int-Lit}")
@@ -355,14 +355,14 @@ ctx.rule("Pattern-P15358",
 # --- CVE-2020-13871: HAVING + window + EXCEPT ---
 ctx.rule("Pattern-P13871",
     "CREATE TABLE {Table-Name}({Col-Name});\n"
-    "SELECT ({Scalar-Subquery}) FROM {Table-Name} "
+    "SELECT ({Scalar-Subquery-HavingWindow}) FROM {Table-Name} "
     "EXCEPT SELECT {Col-Ref} FROM {Table-Name} {Order-By}")
 
 # --- CVE-2020-13435: JOIN + NATURAL JOIN + coalesce window ---
 ctx.rule("Pattern-P13435",
     "CREATE TABLE {Table-Name}({Col-Name} UNIQUE);\n"
-    "SELECT {Col-Ref} FROM {Table-Name} {Join-Chain} "
-    "WHERE {Col-Ref} IN (({Scalar-Subquery}))")
+    "SELECT {Col-Ref} FROM {Table-Name} {Join-Chain-NaturalPair} "
+    "WHERE {Col-Ref} IN (({Scalar-Subquery-CoalesceWindow}))")
 
 # --- CVE-2020-13434 simplified PoC: SELECT-time boundary-int sink ---
 ctx.rule("Pattern-P13434-Boundary",
@@ -385,14 +385,14 @@ ctx.rule("Pattern-P13434-Trigger",
 
 # --- CVE-2020-9327: generated col + JOIN + coalesce ---
 ctx.rule("Pattern-P9327",
-    "CREATE TABLE {Table-Name}({Col-Name}, {GenCol-Def});\n"
+    "CREATE TABLE {Table-Name}({Col-Name}, {GenCol-Def-SelfRef});\n"
     "CREATE TABLE {Table-Name}({Col-Name} UNIQUE, {Col-Name} UNIQUE);\n"
     "{View-Def};\n"
-    "SELECT * FROM {View-Name} {Join-Chain} WHERE {Boolean-Expr}")
+    "SELECT * FROM {View-Name}{Join-Chain-CommaJoin-Pair} WHERE {Boolean-Expr}")
 
 # --- CVE-2019-19646: generated col + integrity_check ---
 ctx.rule("Pattern-P19646",
-    "CREATE TABLE {Table-Name}({Col-Name}, {GenCol-Def});\n"
+    "CREATE TABLE {Table-Name}({Col-Name}, {GenCol-Def-NotNull});\n"
     "INSERT INTO {Table-Name}({Col-Name}) VALUES ({Int-Lit});\n"
     "PRAGMA integrity_check")
 
