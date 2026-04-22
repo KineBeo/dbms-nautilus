@@ -196,3 +196,104 @@ ctx.rule("Create-View-Stmt", "{View-Def}")
 # --- Create Trigger (plain form; used by P-TRIGGER-GROUPCONCAT) ---
 ctx.rule("Create-Trigger-Stmt",
     "CREATE TRIGGER {Col-Name} INSERT ON {Table-Name} BEGIN {Sql-Stmt}; END")
+
+# ============================================================
+# SECTION 5: Shared non-terminals (§7)
+# The composition substrate — patterns share these so splice mutation
+# recombines sub-expressions across CVEs.
+# ============================================================
+
+# --- Expr (core, recursive, shallow — Random Recursive Mutation amplifies) ---
+ctx.rule("Expr", "{Literal}")
+ctx.rule("Expr", "{Col-Ref}")
+ctx.rule("Expr", "({Expr})")
+ctx.rule("Expr", "{Expr} {Bin-Op} {Expr}")
+ctx.rule("Expr", "({Scalar-Subquery})")
+ctx.rule("Expr", "{Case-Expr}")
+ctx.rule("Expr", "{Builtin-Func-Call}")
+ctx.rule("Expr", "{Agg-Func-Call}")
+ctx.rule("Expr", "{Coalesce-Window-Expr}")
+
+ctx.rule("Bin-Op", "+")
+ctx.rule("Bin-Op", "-")
+ctx.rule("Bin-Op", "*")
+ctx.rule("Bin-Op", "/")
+
+ctx.rule("Case-Expr", "CASE WHEN {Boolean-Expr} THEN {Expr} ELSE {Expr} END")
+
+ctx.rule("Expr-List", "{Expr}")
+ctx.rule("Expr-List", "{Expr}, {Expr-List}")
+
+# --- Col-Ref (qualified and unqualified) ---
+ctx.rule("Col-Ref", "{Col-Name}")
+ctx.rule("Col-Ref", "{Table-Name}.{Col-Name}")
+ctx.rule("Col-Ref", "{Alias}.{Col-Name}")
+
+# --- Boolean-Expr (recursive, flat logical combinators) ---
+ctx.rule("Boolean-Expr", "{Expr} {Compare-Op} {Expr}")
+ctx.rule("Boolean-Expr", "{Expr} IN ({Expr-List})")
+ctx.rule("Boolean-Expr", "{Expr} IN ({Scalar-Subquery})")
+ctx.rule("Boolean-Expr", "{Expr} LIKE {Str-Lit}")
+ctx.rule("Boolean-Expr", "{Boolean-Expr} AND {Boolean-Expr}")
+ctx.rule("Boolean-Expr", "{Boolean-Expr} OR {Boolean-Expr}")
+ctx.rule("Boolean-Expr", "NOT {Boolean-Expr}")
+ctx.rule("Boolean-Expr", "({Boolean-Expr})")
+
+ctx.rule("Compare-Op", "=")
+ctx.rule("Compare-Op", "<>")
+ctx.rule("Compare-Op", "<")
+ctx.rule("Compare-Op", ">")
+ctx.rule("Compare-Op", "<=")
+ctx.rule("Compare-Op", ">=")
+
+# --- Scalar-Subquery (recursive; the shared CVE-13435/13871 substrate) ---
+ctx.rule("Scalar-Subquery", "SELECT {Expr}")
+ctx.rule("Scalar-Subquery", "SELECT {Expr} FROM {Table-Name}")
+ctx.rule("Scalar-Subquery", "SELECT {Expr} FROM {Table-Name} WHERE {Boolean-Expr}")
+ctx.rule("Scalar-Subquery", "SELECT ({Scalar-Subquery}) FROM {Table-Name}")
+ctx.rule("Scalar-Subquery", "SELECT ({Scalar-Subquery}) FROM {Table-Name} WHERE {Boolean-Expr}")
+ctx.rule("Scalar-Subquery", "{Scalar-Subquery} INTERSECT {Scalar-Subquery}")
+
+# --- Join-Chain (recursive; one op per step) ---
+ctx.rule("Join-Chain", "{Join-Op} {Table-Name}")
+ctx.rule("Join-Chain", "{Join-Op} {Table-Name} {Alias}")
+ctx.rule("Join-Chain", "{Join-Op} {Table-Name} ON {Boolean-Expr}")
+ctx.rule("Join-Chain", "{Join-Chain} {Join-Op} {Table-Name}")
+
+ctx.rule("Join-Op", "JOIN")
+ctx.rule("Join-Op", "NATURAL JOIN")
+ctx.rule("Join-Op", ",")
+
+# --- Generated columns (§5 + spec §7) ---
+ctx.rule("GenCol-Def", "{Col-Name} AS ({Expr})")
+ctx.rule("GenCol-Def", "{Col-Name} NOT NULL GENERATED ALWAYS AS ({Expr})")
+ctx.rule("GenCol-Def", "{Col-Name} AS ({Expr}) UNIQUE")
+
+# --- View-Def (shared by P-INTERSECT-VIEW and P-GENCOL-JOIN-COALESCE) ---
+ctx.rule("View-Def", "CREATE VIEW {View-Name} AS {Select-Stmt}")
+ctx.rule("View-Def", "CREATE VIEW {View-Name}({Col-Name}) AS {Select-Stmt}")
+
+# --- Window functions (§8 source) ---
+ctx.rule("Window-Func-Call", "{Window-Func-Name}({Expr}) OVER ()")
+ctx.rule("Window-Func-Call", "{Window-Func-Name}({Expr}) OVER ({Order-By})")
+ctx.rule("Window-Func-Call", "COUNT() OVER ({Order-By})")
+
+# --- Aggregate functions (§8 source) ---
+ctx.rule("Agg-Func-Call", "{Agg-Func-Name}({Expr})")
+ctx.rule("Agg-Func-Call", "{Agg-Func-Name}(DISTINCT {Expr})")
+ctx.rule("Agg-Func-Call", "COUNT()")
+ctx.rule("Agg-Func-Call", "group_concat({Expr}, {Int-Lit})")
+
+# --- Coalesce-Window-Expr (the cross-CVE shared signal) ---
+ctx.rule("Coalesce-Window-Expr", "coalesce({Window-Func-Call}, {Agg-Func-Call})")
+ctx.rule("Coalesce-Window-Expr", "coalesce({Col-Ref}, {Window-Func-Call})")
+
+# --- Order-By (used by CVE-13871/15358) ---
+ctx.rule("Order-By", "ORDER BY {Expr}")
+ctx.rule("Order-By", "ORDER BY {Expr}, {Expr}")
+ctx.rule("Order-By", "ORDER BY {Expr}, {Expr}, {Expr}")
+
+# --- Builtin-Func-Call (§8 source) ---
+ctx.rule("Builtin-Func-Call", "{Builtin-Func}({Expr})")
+ctx.rule("Builtin-Func-Call", "{Builtin-Func}({Expr}, {Expr})")
+ctx.rule("Builtin-Func-Call", "{Builtin-Func}({Expr}, {Expr}, {Expr})")
