@@ -6,7 +6,18 @@
 **Harness:** `harness/sqlite_harness_patterns_sqlite-3.31.1`
 **Spec:** `docs/superpowers/specs/2026-04-22-attack-pattern-grammar-design.md`
 
+**TL;DR:** 15-min pilot is thesis-negative at this sample size — attack grammar
+loses on breadth (4/6 vs 6/6 CVE classes) and volume (18 vs 263 crashes). One
+clean win: CVE-2020-13434 printf-boundary (14 vs 7). Verdict is preliminary;
+a 3600s pilot with weight-annotated attack grammar is needed before drawing
+thesis conclusions.
+
 ## Headline Numbers
+
+> Exec-count rows marked N/A because the pilot scripts did not capture total
+> execution counts to the workdir log in a parseable form. This blocks the
+> crashes-per-million-execs acceptance criterion (spec §10.6). The Next Steps
+> section queues a fix so the next pilot can evaluate that criterion.
 
 | Metric | sqlite_attack.py | sqlite_patterns.py |
 |---|---|---|
@@ -78,9 +89,10 @@ mapping in `docs/cve-list.md` needs revisiting.
 - **Write a follow-up spec** at
   `docs/superpowers/specs/2026-04-??-attack-pattern-weights.md`.
   Assign higher weight to `Pattern-P13435` and `Pattern-P9327` (the missed
-  classes). This is the RL-design spec that spec §9 deferred — the 15-min
-  pilot suggests it cannot be deferred if the attack grammar is to match
-  patterns on breadth.
+  classes). This is the RL-design spec that spec §9 deferred. The 15-min
+  pilot *suggests* the deferral may need to be revisited, but n=1 at 15 min
+  cannot isolate scheduler-selection variance from grammar-design variance —
+  a longer re-pilot with and without weights is the appropriate next test.
 - **Fix the CVE-class regex classifier** with structural matching (AST /
   parse-tree pattern-match) rather than substring matching, before trusting
   any future CVE-class counts.
