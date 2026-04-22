@@ -93,8 +93,8 @@ mapping in `docs/cve-list.md` needs revisiting.
 
 ## Raw Workdir Locations
 
-- sqlite_attack pilot: `/tmp/nautilus_eval/sqlite-3.31.1_attack_pilot_1h/`
-- sqlite_patterns pilot: `/tmp/nautilus_eval/sqlite-3.31.1_patterns_pilot_1h/`
+- sqlite_attack pilot: `/tmp/nautilus_eval/sqlite-3.31.1_attack_pilot_15m/`
+- sqlite_patterns pilot: `/tmp/nautilus_eval/sqlite-3.31.1_patterns_pilot_15m/`
 
 These are ephemeral (`/tmp`) — if they need to persist, copy to a
 `docs/pilot-artifacts/YYYY-MM-DD/` directory and commit separately.
