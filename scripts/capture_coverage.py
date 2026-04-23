@@ -18,7 +18,14 @@ import re
 import sys
 from pathlib import Path
 
-_EXEC_RE = re.compile(r"Execution Count:\s*(\d+)")
+# Supports two exec.log formats observed in the wild:
+#   (A) Nautilus fuzzer event log: each line is "<exec_count>\t<EVENT>\t<sql>"
+#       where EVENT is NEW_COV, SIGNAL(n), TIMEOUT, etc. The max exec_count
+#       (the first column of the last line) is the total executions.
+#   (B) Legacy summary lines: "Execution Count: N" (kept for back-compat
+#       and for the unit tests in tests/triage/test_capture_coverage.py).
+_EXEC_RE_PHRASE = re.compile(r"Execution Count:\s*(\d+)")
+_EXEC_RE_TAB_LEADING = re.compile(r"^(\d+)\t(?:NEW_COV|SIGNAL|TIMEOUT)", re.MULTILINE)
 
 
 def parse_exec_count(log_path: Path) -> int | None:
@@ -26,10 +33,15 @@ def parse_exec_count(log_path: Path) -> int | None:
         text = log_path.read_text(errors="replace")
     except (OSError, FileNotFoundError):
         return None
-    hits = _EXEC_RE.findall(text)
-    if not hits:
+    # Prefer the tab-leading format (current Nautilus output).
+    tab_hits = _EXEC_RE_TAB_LEADING.findall(text)
+    if tab_hits:
+        return max(int(h) for h in tab_hits)
+    # Fall back to the legacy phrase format.
+    phrase_hits = _EXEC_RE_PHRASE.findall(text)
+    if not phrase_hits:
         return None
-    return int(hits[-1])
+    return int(phrase_hits[-1])
 
 
 def count_outputs(outputs_dir: Path) -> dict[str, int]:
