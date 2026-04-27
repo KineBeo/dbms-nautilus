@@ -12,7 +12,7 @@ export PYO3_USE_ABI3_FORWARD_COMPATIBILITY=1
 export LD_LIBRARY_PATH="$(python3 -c "import sysconfig; print(sysconfig.get_config_var('LIBDIR'))")${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 
 FUZZER="$ROOT/target/release/fuzzer"
-GRAMMAR="$ROOT/grammars/sqlite_patterns.py"
+GRAMMAR="$ROOT/grammars/sqlite_v3.py"
 HARNESS="$ROOT/harness/sqlite_harness_patterns_sqlite-3.31.1"
 CAMPAIGN_DURATION=90
 

@@ -42,8 +42,8 @@ HARNESS="$ROOT/harness/sqlite_harness_patterns_${TARGET}"
 declare -A VARIANTS=(
     [attack_v1]="/tmp/sqlite_attack_v1.py"
     [attack_v2]="$ROOT/grammars/sqlite_attack.py"
-    [patterns]="$ROOT/grammars/sqlite_patterns.py"
-    [uniform]="$ROOT/grammars/sqlite_patterns_uniform.py"
+    [patterns]="$ROOT/grammars/legacy/sqlite_patterns.py"
+    [uniform]="$ROOT/grammars/legacy/sqlite_patterns_uniform.py"
 )
 
 for VARIANT in attack_v1 attack_v2 patterns uniform; do
