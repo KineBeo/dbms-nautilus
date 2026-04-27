@@ -16,6 +16,7 @@ use forksrv::exitreason::ExitReason;
 use forksrv::newtypes::SubprocessError;
 use forksrv::ForkServer;
 use grammartec::context::Context;
+use grammartec::newtypes::NodeID;
 use grammartec::tree::TreeLike;
 use shared_state::GlobalSharedState;
 
@@ -27,6 +28,18 @@ pub enum ExecutionReason {
     Splice,
     Det,
     Gen,
+}
+
+fn reason_label(r: &ExecutionReason) -> &'static str {
+    match r {
+        ExecutionReason::Havoc => "Havoc",
+        ExecutionReason::HavocRec => "HavocRec",
+        ExecutionReason::Min => "Min",
+        ExecutionReason::MinRec => "MinRec",
+        ExecutionReason::Splice => "Splice",
+        ExecutionReason::Det => "Det",
+        ExecutionReason::Gen => "Gen",
+    }
 }
 
 // Logs interesting events (crashes, timeouts, new coverage) to workdir/exec.log.
@@ -55,10 +68,10 @@ impl ExecLogger {
         }
     }
 
-    fn log(&mut self, exec_count: u64, exit_reason: &str, sql: &[u8]) {
+    fn log(&mut self, exec_count: u64, exit_reason: &str, rule_id: &str, sql: &[u8]) {
         let snippet = String::from_utf8_lossy(&sql[..sql.len().min(200)]);
         let snippet = snippet.replace('\n', " ").replace('\r', "");
-        let line = format!("{}\t{}\t{}\n", exec_count, exit_reason, snippet);
+        let line = format!("{}\t{}\t{}\t{}\n", exec_count, exit_reason, rule_id, snippet);
         let line_bytes = line.len() as u64;
 
         if self.bytes_written + line_bytes > EXEC_LOG_SIZE_LIMIT {
@@ -185,7 +198,8 @@ impl Fuzzer {
         exec_reason: ExecutionReason,
         ctx: &Context,
     ) -> Result<(), SubprocessError> {
-        let (new_bits, term_sig) = self.exec(code, tree, ctx)?;
+        let strategy = reason_label(&exec_reason);
+        let (new_bits, term_sig) = self.exec(code, tree, ctx, strategy)?;
         match term_sig {
             ExitReason::Normal(223) => {
                 if new_bits.is_some() {
@@ -353,8 +367,18 @@ impl Fuzzer {
         code: &[u8],
         tree_like: &T,
         ctx: &Context,
+        strategy: &str,
     ) -> Result<(Option<Vec<usize>>, ExitReason), SubprocessError> {
         let (exitreason, execution_time) = self.exec_raw(&code)?;
+
+        let tree_size = tree_like.size();
+        let rule_tag = if tree_size > 2 {
+            let stmt_rule: usize = tree_like.get_rule_id(NodeID::from(2)).into();
+            format!("R{}", stmt_rule)
+        } else {
+            let root_rule: usize = tree_like.get_rule_id(NodeID::from(0)).into();
+            format!("R{}", root_rule)
+        };
 
         let is_crash = match exitreason {
             ExitReason::Normal(223) => true,   // ASan
@@ -363,20 +387,22 @@ impl Fuzzer {
             _ => false,
         };
 
-        // Log crashes and timeouts immediately (always interesting)
         match exitreason {
             ExitReason::Normal(223) => {
-                self.exec_logger.log(self.execution_count, "ASAN(223)", code);
+                let label = format!("{}:ASAN(223)", strategy);
+                self.exec_logger.log(self.execution_count, &label, &rule_tag, code);
             }
             ExitReason::Normal(1) => {
-                self.exec_logger.log(self.execution_count, "UBSAN(1)", code);
+                let label = format!("{}:UBSAN(1)", strategy);
+                self.exec_logger.log(self.execution_count, &label, &rule_tag, code);
             }
             ExitReason::Signaled(sig) => {
-                let label = format!("SIGNAL({:?})", sig);
-                self.exec_logger.log(self.execution_count, &label, code);
+                let label = format!("{}:SIGNAL({:?})", strategy, sig);
+                self.exec_logger.log(self.execution_count, &label, &rule_tag, code);
             }
             ExitReason::Timeouted => {
-                self.exec_logger.log(self.execution_count, "TIMEOUT", code);
+                let label = format!("{}:TIMEOUT", strategy);
+                self.exec_logger.log(self.execution_count, &label, &rule_tag, code);
             }
             _ => {}
         }
@@ -391,8 +417,8 @@ impl Fuzzer {
                 if new_bits.len() > 0 {
                     final_bits = Some(new_bits);
                     let tree = tree_like.to_tree(ctx);
-                    // Log new coverage events
-                    self.exec_logger.log(self.execution_count, "NEW_COV", code);
+                    let cov_label = format!("{}:NEW_COV", strategy);
+                    self.exec_logger.log(self.execution_count, &cov_label, &rule_tag, code);
                     self.global_state
                         .lock()
                         .expect("RAND_2835014626")
