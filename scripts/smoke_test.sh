@@ -13,7 +13,7 @@ export LD_LIBRARY_PATH="$(python3 -c "import sysconfig; print(sysconfig.get_conf
 
 GENERATOR="$ROOT/target/release/generator"
 FUZZER="$ROOT/target/release/fuzzer"
-GRAMMAR="$ROOT/grammars/sqlite_v3.py"
+GRAMMAR="$ROOT/grammars/active/sqlite_v3.py"
 HARNESS="$ROOT/harness/sqlite_harness_patterns_sqlite-3.31.1"
 
 TMPDIR=$(mktemp -d /tmp/smoke_XXXXXX)
