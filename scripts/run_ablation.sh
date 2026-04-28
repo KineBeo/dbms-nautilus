@@ -28,6 +28,8 @@ cd "$ROOT"
 DURATION="${DURATION:-3600}"
 RUNS="${RUNS:-3}"
 TARGET="${TARGET:-sqlite-3.31.1}"
+GRAMMAR_VERSION="${GRAMMAR_VERSION:-}"
+EXPERIMENT_TAG="${EXPERIMENT_TAG:-}"
 
 export PYO3_USE_ABI3_FORWARD_COMPATIBILITY=1
 export LD_LIBRARY_PATH="${LD_LIBRARY_PATH:-/home/linuxbrew/.linuxbrew/lib}"
@@ -57,6 +59,8 @@ for VARIANT in attack_v1 attack_v2 patterns uniform; do
         echo "========================================"
         DURATION="$DURATION" \
         GRAMMAR="$GRAMMAR" \
+        GRAMMAR_VERSION="$GRAMMAR_VERSION" \
+        EXPERIMENT_TAG="$EXPERIMENT_TAG" \
         HARNESS_SUFFIX=patterns_ \
         "$SCRIPT_DIR/run_eval.sh" "$TARGET" "$RUN_ID"
 
