@@ -21,6 +21,8 @@
 #   HARNESS_SUFFIX  prefix before version in harness binary name
 #                   default: "" → sqlite_harness_<version>
 #                   "cve13434_" → sqlite_harness_cve13434_<version>
+#   GRAMMAR_VERSION grammar version tag for archiving (e.g., "v3.0")
+#                   If set, campaign results are archived to results/campaigns/
 
 set -euo pipefail
 
@@ -58,6 +60,7 @@ MAX_TREE_SIZE="${MAX_TREE_SIZE:-300}"
 TIMEOUT_MS="${TIMEOUT_MS:-500}"
 THREADS="${THREADS:-1}"
 DURATION="${DURATION:-86400}"
+GRAMMAR_VERSION="${GRAMMAR_VERSION:-}"
 
 WORKDIR="$WORKDIR_BASE/${VERSION}_${RUN_ID}"
 mkdir -p "$WORKDIR"
@@ -73,6 +76,10 @@ echo " Grammar:      $GRAMMAR"
 echo " max_tree_size: $MAX_TREE_SIZE"
 echo " Timeout:      ${TIMEOUT_MS}ms"
 echo " Duration:     ${DURATION}s"
+if [[ -n "$GRAMMAR_VERSION" ]]; then
+    echo " Grammar Ver:  $GRAMMAR_VERSION"
+    echo " Auto-archive: ON"
+fi
 echo "=============================================="
 
 # Write a config.ron for this run
@@ -143,3 +150,22 @@ python3 "$SCRIPT_DIR/capture_coverage.py" "$WORKDIR" \
     --duration "$DURATION" \
     --output "$WORKDIR/coverage.json" \
     || echo "[run_eval] warning: coverage capture failed (non-fatal)"
+
+# ----------------------------------------------------------------
+# Auto-archive: save campaign results to results/campaigns/
+# ----------------------------------------------------------------
+if [[ -n "$GRAMMAR_VERSION" ]]; then
+    echo "[run_eval] archiving campaign..."
+    ARCHIVE_ARGS=(
+        --workdir "$WORKDIR"
+        --grammar-version "$GRAMMAR_VERSION"
+        --target "$VERSION"
+        --duration "$DURATION"
+        --run-id "$RUN_ID"
+    )
+    if [[ -n "${EXPERIMENT_TAG:-}" ]]; then
+        ARCHIVE_ARGS+=(--tag "$EXPERIMENT_TAG")
+    fi
+    "$SCRIPT_DIR/archive_campaign.sh" "${ARCHIVE_ARGS[@]}" \
+        || echo "[run_eval] warning: archiving failed (non-fatal)"
+fi
