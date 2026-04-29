@@ -62,7 +62,7 @@ def render_markdown(tag: str, experiment: dict, campaigns: list[dict]) -> str:
         c.get("results", {}).get("crash_classification") for c in campaigns
     )
 
-    headers = ["Campaign", "Grammar", "Target", "Duration", "Crashes", "Queue", "Unique RC"]
+    headers = ["Campaign", "Grammar", "Target", "Duration", "Crashes", "Queue", "Executions", "Unique RC"]
     if has_classification:
         headers += ["ASan", "UBSan", "Assert", "Signal"]
     lines.append("| " + " | ".join(headers) + " |")
@@ -77,6 +77,7 @@ def render_markdown(tag: str, experiment: dict, campaigns: list[dict]) -> str:
             format_duration(c.get("duration_seconds", 0)),
             str(r.get("crashes", "?")),
             str(r.get("queue_paths", "?")),
+            str(r.get("total_executions", "?") or "?"),
             str(r.get("unique_root_causes", "?") or "?"),
         ]
         if has_classification:
@@ -107,14 +108,14 @@ def render_latex(tag: str, experiment: dict, campaigns: list[dict]) -> str:
         c.get("results", {}).get("crash_classification") for c in campaigns
     )
 
-    col_spec = "lllrrrr" + ("rrrr" if has_classification else "")
+    col_spec = "lllrrrrr" + ("rrrr" if has_classification else "")
     lines.append("\\begin{table}[h]")
     lines.append("\\centering")
     lines.append(f"\\caption{{Experiment: {tag}}}")
     lines.append(f"\\begin{{tabular}}{{{col_spec}}}")
     lines.append("\\toprule")
 
-    header = "Campaign & Grammar & Target & Duration & Crashes & Queue & Unique RC"
+    header = "Campaign & Grammar & Target & Duration & Crashes & Queue & Executions & Unique RC"
     if has_classification:
         header += " & ASan & UBSan & Assert & Signal"
     lines.append(header + " \\\\")
@@ -129,6 +130,7 @@ def render_latex(tag: str, experiment: dict, campaigns: list[dict]) -> str:
             format_duration(c.get("duration_seconds", 0)),
             str(r.get("crashes", "?")),
             str(r.get("queue_paths", "?")),
+            str(r.get("total_executions", "?") or "?"),
             str(r.get("unique_root_causes", "?") or "?"),
         ]
         if has_classification:
