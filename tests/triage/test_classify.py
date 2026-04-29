@@ -225,3 +225,78 @@ class TestEnrichCampaignJson:
             assert data["results"]["crash_classification"]["asan"] == 5
         finally:
             tmp.unlink(missing_ok=True)
+
+
+class TestTriageIntegration:
+    """Integration test with a mock workdir (no real harness needed)."""
+
+    def test_full_triage_with_mocked_crashes(self, tmp_path: Path, monkeypatch) -> None:
+        signaled = tmp_path / "outputs" / "signaled"
+        signaled.mkdir(parents=True)
+        (signaled / "sig_001").write_text("SELECT printf('%d', 2147483647);")
+        (signaled / "sig_002").write_text("SELECT printf('%d', -2147483648);")
+        (signaled / "sig_003").write_text("CREATE VIRTUAL TABLE fts USING fts5(a);")
+
+        call_count = 0
+
+        def mock_run_crash(harness: str, crash_file: str, timeout: int = 5) -> tuple[int, str]:
+            nonlocal call_count
+            call_count += 1
+            if "sig_003" in crash_file:
+                return 0, ""
+            return 1, "sqlite3.c:28528:15: runtime error: signed integer overflow\n    #0 0xdead in sqlite3_str_vappendf sqlite3.c:28528\n"
+
+        import triage.classify
+        monkeypatch.setattr(triage.classify, "run_crash", mock_run_crash)
+
+        from triage.classify import triage as run_triage
+        result = run_triage(
+            workdir=str(tmp_path),
+            harness="/fake/harness",
+            output=str(tmp_path / "triage.json"),
+            dedup_dir=str(tmp_path / "dedup"),
+            report=str(tmp_path / "triage_report.md"),
+        )
+
+        assert result["total_crashes"] == 3
+        assert result["unique_crashes"] == 2
+        assert result["summary"]["ubsan"] == 1
+        assert result["summary"]["debug_assert"] == 1
+
+        assert (tmp_path / "triage.json").exists()
+        assert (tmp_path / "dedup").exists()
+        assert (tmp_path / "triage_report.md").exists()
+        assert len(list((tmp_path / "dedup").iterdir())) == 2
+
+        data = json.loads((tmp_path / "triage.json").read_text())
+        ubsan_crash = next(c for c in data["crashes"] if c["type"] == "ubsan")
+        assert ubsan_crash["count"] == 2
+        assert ubsan_crash["subtype"] == "integer-overflow"
+
+    def test_enrich_campaign_json_via_triage(self, tmp_path: Path, monkeypatch) -> None:
+        signaled = tmp_path / "outputs" / "signaled"
+        signaled.mkdir(parents=True)
+        (signaled / "sig_001").write_text("SELECT 1;")
+
+        def mock_run_crash(harness: str, crash_file: str, timeout: int = 5) -> tuple[int, str]:
+            return 223, "==1==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x...\n    #0 0xdead in func_a file.c:1\n"
+
+        import triage.classify
+        monkeypatch.setattr(triage.classify, "run_crash", mock_run_crash)
+
+        campaign_json = tmp_path / "campaign.json"
+        campaign_json.write_text(json.dumps({"id": "test", "results": {"crashes": 1}}))
+
+        from triage.classify import triage as run_triage
+        run_triage(
+            workdir=str(tmp_path),
+            harness="/fake/harness",
+            output=str(tmp_path / "triage.json"),
+            dedup_dir=str(tmp_path / "dedup"),
+            report=str(tmp_path / "triage_report.md"),
+            enrich=str(campaign_json),
+        )
+
+        data = json.loads(campaign_json.read_text())
+        assert data["results"]["crash_classification"]["asan"] == 1
+        assert data["results"]["crash_classification"]["unique_crash_sites"] == 1
