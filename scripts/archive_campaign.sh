@@ -134,6 +134,31 @@ cat > "$ARCHIVE_DIR/campaign.json" <<ENDJSON
 }
 ENDJSON
 
+# Merge crash classification from triage.json if present
+if [[ -f "$WORKDIR/triage.json" ]]; then
+    python3 -c "
+import json, sys
+with open('$ARCHIVE_DIR/campaign.json') as f:
+    campaign = json.load(f)
+with open('$WORKDIR/triage.json') as f:
+    triage = json.load(f)
+totals = {'asan': 0, 'ubsan': 0, 'debug_assert': 0, 'signal': 0, 'timeout': 0}
+for c in triage.get('crashes', []):
+    key = c['type'] if c['type'] in totals else 'signal'
+    totals[key] += c['count']
+campaign['results']['crash_classification'] = {
+    'unique_crash_sites': triage['unique_crashes'],
+    **totals,
+}
+with open('$ARCHIVE_DIR/campaign.json', 'w') as f:
+    json.dump(campaign, f, indent=2)
+print(f'[archive] merged crash classification into campaign.json')
+" || echo "[archive] warning: triage merge failed (non-fatal)"
+    # Copy triage.json and report to archive
+    cp "$WORKDIR/triage.json" "$ARCHIVE_DIR/triage.json" 2>/dev/null || true
+    cp "$WORKDIR/triage_report.md" "$ARCHIVE_DIR/triage_report.md" 2>/dev/null || true
+fi
+
 # Copy dedup.json if present
 if [[ -f "$WORKDIR/dedup.json" ]]; then
     cp "$WORKDIR/dedup.json" "$ARCHIVE_DIR/dedup.json"
