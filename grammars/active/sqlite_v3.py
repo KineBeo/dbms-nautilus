@@ -1,5 +1,5 @@
 # sqlite_v3.py — Structural Primitives grammar for Nautilus SQLite fuzzing
-# Use with: sqlite_harness_patterns_<version> (blank DB)
+# Use with: sqlite_harness_<version> (blank DB)
 #
 # DESIGN: Variant 3 — decomposes DDL+DQL into separate non-terminals
 # (Schema-Setup, Stress-Query, Validation-Op) to maximize Splice mutation

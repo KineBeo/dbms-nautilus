@@ -39,7 +39,7 @@ if [[ ! -f /tmp/sqlite_attack_v1.py ]]; then
     git show attack-v1-frozen:grammars/sqlite_attack.py > /tmp/sqlite_attack_v1.py
 fi
 
-HARNESS="$ROOT/harness/sqlite_harness_patterns_${TARGET}"
+HARNESS="$ROOT/harness/sqlite_harness_${TARGET}"
 
 declare -A VARIANTS=(
     [attack_v1]="/tmp/sqlite_attack_v1.py"
@@ -61,7 +61,6 @@ for VARIANT in attack_v1 attack_v2 patterns uniform; do
         GRAMMAR="$GRAMMAR" \
         GRAMMAR_VERSION="$GRAMMAR_VERSION" \
         EXPERIMENT_TAG="$EXPERIMENT_TAG" \
-        HARNESS_SUFFIX=patterns_ \
         "$SCRIPT_DIR/run_eval.sh" "$TARGET" "$RUN_ID"
 
         echo "[ablation] running stack_dedup on $WORKDIR"

@@ -8,9 +8,6 @@
 #   ./scripts/run_eval.sh sqlite-3.31.1
 #   ./scripts/run_eval.sh sqlite-3.31.1 run2
 #
-#   # CVE-2020-13434 targeted harness (pre-loads PoC schema with trigger)
-#   HARNESS_SUFFIX=cve13434_ ./scripts/run_eval.sh sqlite-3.31.1 cve13434_pilot
-#
 # Environment variables (override defaults):
 #   WORKDIR_BASE    base directory for workdirs (default: /tmp/nautilus_eval)
 #   GRAMMAR         grammar file (default: grammars/sqlite.py)
@@ -18,9 +15,6 @@
 #   TIMEOUT_MS      per-execution timeout in ms (default: 500)
 #   DURATION        fuzzing duration in seconds (default: 86400 = 24h)
 #   THREADS         number of Nautilus threads (default: 1)
-#   HARNESS_SUFFIX  prefix before version in harness binary name
-#                   default: "" → sqlite_harness_<version>
-#                   "cve13434_" → sqlite_harness_cve13434_<version>
 #   GRAMMAR_VERSION grammar version tag for archiving (e.g., "v3.0")
 #                   If set, campaign results are archived to results/campaigns/
 
@@ -38,19 +32,10 @@ if [[ -z "$VERSION" ]]; then
     exit 1
 fi
 
-HARNESS_SUFFIX="${HARNESS_SUFFIX:-}"
-HARNESS_BIN="$ROOT/harness/sqlite_harness_${HARNESS_SUFFIX}${VERSION}"
+HARNESS_BIN="$ROOT/harness/sqlite_harness_${VERSION}"
 if [[ ! -f "$HARNESS_BIN" ]]; then
     echo "Error: harness binary not found: $HARNESS_BIN"
-    if [[ "$HARNESS_SUFFIX" == "patterns_" ]]; then
-        echo "Build it first:"
-        echo "  cd harness && make patterns-build SQLITE=../cve_builds/${VERSION}/sqlite3.c TARGET=sqlite_harness_${HARNESS_SUFFIX}${VERSION}"
-    elif [[ -n "$HARNESS_SUFFIX" ]]; then
-        echo "Build it first:"
-        echo "  cd harness && make cve13434-build SQLITE=../cve_builds/${VERSION}/sqlite3.c TARGET=sqlite_harness_${HARNESS_SUFFIX}${VERSION}"
-    else
-        echo "Build it first: cd harness && make SQLITE=../cve_builds/${VERSION}/sqlite3.c TARGET=sqlite_harness_${VERSION}"
-    fi
+    echo "Build it first: cd harness && make SQLITE=../cve_builds/${VERSION}/sqlite3.c TARGET=sqlite_harness_${VERSION}"
     exit 1
 fi
 

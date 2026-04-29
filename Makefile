@@ -16,7 +16,7 @@
 REPO_ROOT := $(shell pwd)
 CVE2GRAMMAR_DIR := $(REPO_ROOT)/cve2grammar
 GENERATED_GRAMMAR := $(REPO_ROOT)/grammars/sqlite_generated.py
-HARNESS := $(REPO_ROOT)/harness/sqlite_harness_patterns_sqlite-3.31.1
+HARNESS := $(REPO_ROOT)/harness/sqlite_harness_sqlite-3.31.1
 
 setup:
 	PYO3_USE_ABI3_FORWARD_COMPATIBILITY=1 cargo build --release
