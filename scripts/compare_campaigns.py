@@ -58,7 +58,13 @@ def render_markdown(tag: str, experiment: dict, campaigns: list[dict]) -> str:
             lines.append(f"\n**Conclusion:** {experiment['conclusion']}")
         return "\n".join(lines)
 
-    headers = ["Campaign", "Grammar", "Target", "Duration", "Crashes", "Queue", "Executions", "Unique RC"]
+    has_classification = any(
+        c.get("results", {}).get("crash_classification") for c in campaigns
+    )
+
+    headers = ["Campaign", "Grammar", "Target", "Duration", "Crashes", "Queue", "Unique RC"]
+    if has_classification:
+        headers += ["ASan", "UBSan", "Assert", "Signal"]
     lines.append("| " + " | ".join(headers) + " |")
     lines.append("| " + " | ".join(["---"] * len(headers)) + " |")
 
@@ -71,9 +77,16 @@ def render_markdown(tag: str, experiment: dict, campaigns: list[dict]) -> str:
             format_duration(c.get("duration_seconds", 0)),
             str(r.get("crashes", "?")),
             str(r.get("queue_paths", "?")),
-            str(r.get("total_executions", "?") or "?"),
             str(r.get("unique_root_causes", "?") or "?"),
         ]
+        if has_classification:
+            cc = r.get("crash_classification", {})
+            row += [
+                str(cc.get("asan", "—")),
+                str(cc.get("ubsan", "—")),
+                str(cc.get("debug_assert", "—")),
+                str(cc.get("signal", "—")),
+            ]
         lines.append("| " + " | ".join(row) + " |")
 
     conclusion = experiment.get("conclusion")
@@ -89,12 +102,22 @@ def render_latex(tag: str, experiment: dict, campaigns: list[dict]) -> str:
     lines = []
     lines.append(f"% Experiment: {tag}")
     lines.append(f"% Hypothesis: {experiment['hypothesis']}")
+
+    has_classification = any(
+        c.get("results", {}).get("crash_classification") for c in campaigns
+    )
+
+    col_spec = "lllrrrr" + ("rrrr" if has_classification else "")
     lines.append("\\begin{table}[h]")
     lines.append("\\centering")
     lines.append(f"\\caption{{Experiment: {tag}}}")
-    lines.append("\\begin{tabular}{llllrrrr}")
+    lines.append(f"\\begin{{tabular}}{{{col_spec}}}")
     lines.append("\\toprule")
-    lines.append("Campaign & Grammar & Target & Duration & Crashes & Queue & Executions & Unique RC \\\\")
+
+    header = "Campaign & Grammar & Target & Duration & Crashes & Queue & Unique RC"
+    if has_classification:
+        header += " & ASan & UBSan & Assert & Signal"
+    lines.append(header + " \\\\")
     lines.append("\\midrule")
 
     for c in campaigns:
@@ -106,9 +129,16 @@ def render_latex(tag: str, experiment: dict, campaigns: list[dict]) -> str:
             format_duration(c.get("duration_seconds", 0)),
             str(r.get("crashes", "?")),
             str(r.get("queue_paths", "?")),
-            str(r.get("total_executions", "?") or "?"),
             str(r.get("unique_root_causes", "?") or "?"),
         ]
+        if has_classification:
+            cc = r.get("crash_classification", {})
+            row += [
+                str(cc.get("asan", "--")),
+                str(cc.get("ubsan", "--")),
+                str(cc.get("debug_assert", "--")),
+                str(cc.get("signal", "--")),
+            ]
         lines.append(" & ".join(row) + " \\\\")
 
     lines.append("\\bottomrule")
