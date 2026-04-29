@@ -122,10 +122,9 @@ echo " Crashes: $(ls "$WORKDIR/outputs/signaled/" 2>/dev/null | wc -l) (in outpu
 echo " Queue:   $(ls "$WORKDIR/outputs/queue/" 2>/dev/null | wc -l) (in outputs/queue/)"
 echo "=============================================="
 echo ""
-echo "Run triage:"
-echo "  python3 triage/dedup.py $WORKDIR --harness $HARNESS_BIN --output $WORKDIR/dedup"
+echo "Run further analysis:"
+echo "  python3 triage/stack_dedup.py $WORKDIR --harness $HARNESS_BIN"
 echo "  python3 triage/minimize.py <crash> --harness $HARNESS_BIN"
-echo "  python3 triage/report.py $WORKDIR/dedup --harness $HARNESS_BIN --output $WORKDIR/report.md"
 
 # ----------------------------------------------------------------
 # A2: end-of-run coverage capture (per spec 2026-04-22-measurement-and-fidelity)
@@ -135,6 +134,17 @@ python3 "$SCRIPT_DIR/capture_coverage.py" "$WORKDIR" \
     --duration "$DURATION" \
     --output "$WORKDIR/coverage.json" \
     || echo "[run_eval] warning: coverage capture failed (non-fatal)"
+
+# ----------------------------------------------------------------
+# Auto-triage: classify + dedup crashes
+# ----------------------------------------------------------------
+echo "[run_eval] classifying crashes..."
+python3 "$ROOT/triage/classify.py" "$WORKDIR" \
+    --harness "$HARNESS_BIN" \
+    --output "$WORKDIR/triage.json" \
+    --dedup-dir "$WORKDIR/dedup" \
+    --report "$WORKDIR/triage_report.md" \
+    || echo "[run_eval] warning: crash classification failed (non-fatal)"
 
 # ----------------------------------------------------------------
 # Auto-archive: save campaign results to results/campaigns/
