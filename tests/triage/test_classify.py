@@ -62,6 +62,10 @@ class TestClassifyCrash:
         result = classify_crash(0, "")
         assert result == ("debug_assert", None)
 
+    def test_sigtrap_is_debug_assert(self) -> None:
+        result = classify_crash(-5, "")
+        assert result == ("debug_assert", None)
+
     def test_signal_negative_exit(self) -> None:
         result = classify_crash(-11, "")
         assert result == ("signal", "signal-11")

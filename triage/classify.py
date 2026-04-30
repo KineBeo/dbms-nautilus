@@ -52,6 +52,8 @@ class CrashCluster:
 def classify_crash(exit_code: int, stderr: str) -> tuple[str, str | None]:
     if exit_code == -1:
         return ("timeout", None)
+    if exit_code == -5:
+        return ("debug_assert", None)
     if exit_code < 0:
         return ("signal", f"signal-{abs(exit_code)}")
     if exit_code == 223:
