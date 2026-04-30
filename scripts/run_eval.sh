@@ -39,7 +39,7 @@ if [[ ! -f "$HARNESS_BIN" ]]; then
     exit 1
 fi
 
-WORKDIR_BASE="${WORKDIR_BASE:-/tmp/nautilus_eval}"
+WORKDIR_BASE="${WORKDIR_BASE:-$ROOT/workdirs}"
 GRAMMAR="${GRAMMAR:-$ROOT/grammars/sqlite.py}"
 MAX_TREE_SIZE="${MAX_TREE_SIZE:-300}"
 TIMEOUT_MS="${TIMEOUT_MS:-500}"
