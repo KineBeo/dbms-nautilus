@@ -6,6 +6,7 @@ extern crate candle_nn;
 extern crate forksrv;
 extern crate grammartec;
 extern crate rand;
+extern crate rand_distr;
 extern crate serde_json;
 extern crate time as othertime;
 #[macro_use]
@@ -17,6 +18,7 @@ extern crate ron;
 mod config;
 mod dqn;
 mod fuzzer;
+mod grammar_bandit;
 mod python_grammar_loader;
 mod queue;
 mod rl_hook;
@@ -28,6 +30,7 @@ use config::Config;
 use dqn::DqnTrainer;
 use forksrv::newtypes::SubprocessError;
 use fuzzer::Fuzzer;
+use grammar_bandit::GrammarBandit;
 use grammartec::chunkstore::ChunkStoreWrapper;
 use grammartec::context::Context;
 use queue::{InputState, QueueItem};
@@ -37,8 +40,8 @@ use state::FuzzingState;
 
 use clap::{App, Arg};
 use std::fs;
-use std::fs::File;
-use std::io::Read;
+use std::fs::{File, OpenOptions};
+use std::io::{Read, Write};
 use std::path::Path;
 use std::sync::atomic::Ordering;
 use std::sync::{Arc, Mutex};
@@ -179,6 +182,7 @@ fn fuzzing_thread(
     ctx: Context,
     cks: Arc<ChunkStoreWrapper>,
     dqn_trainer: Option<Arc<Mutex<DqnTrainer>>>,
+    shared_bandit: Option<Arc<Mutex<GrammarBandit>>>,
 ) {
     let path_to_bin_target = config.path_to_bin_target.to_owned();
     let args = config.arguments.clone();
@@ -219,6 +223,9 @@ fn fuzzing_thread(
     } else {
         &mut default_policy_storage
     };
+
+    let mut last_bandit_exec = 0_u64;
+    let mut last_bandit_coverage = 0_usize;
 
     //Normal mode
     loop {
@@ -272,6 +279,35 @@ fn fuzzing_thread(
                 .queue
                 .new_round();
         }
+
+        // Bandit weight update: every UPDATE_INTERVAL execs
+        if let Some(ref bandit_arc) = shared_bandit {
+            let exec = state.fuzzer.execution_count;
+            if exec >= last_bandit_exec + grammar_bandit::UPDATE_INTERVAL {
+                let (total_cov, total_crashes) = {
+                    let gs = global_state.lock().expect("bandit_cov");
+                    let cov = gs.bitmaps.get(&false)
+                        .map_or(0, |b| b.iter().filter(|&&x| x != 0).count());
+                    let crashes = gs.total_found_asan + gs.total_found_sig + gs.total_found_ubsan;
+                    (cov, crashes)
+                };
+                let cov_delta = total_cov.saturating_sub(last_bandit_coverage);
+                let is_crash = total_crashes > 0;
+
+                let mut bandit = bandit_arc.lock().expect("bandit_lock");
+                bandit.observe_reward(cov_delta, is_crash);
+                let mults = bandit.select_group();
+                let reward = if cov_delta > 0 || is_crash { 1.0 } else { 0.0 };
+                bandit.log_state(mults.selected, reward, total_cov);
+
+                // Apply multipliers to this thread's local Context
+                grammar_bandit::apply_multipliers(&mut state.ctx, &bandit, &mults);
+
+                last_bandit_exec = exec;
+                last_bandit_coverage = total_cov;
+            }
+        }
+
         let mut stats = global_state.lock().expect("RAND_2403514078");
         stats.execution_count += state.fuzzer.execution_count - old_execution_count;
         old_execution_count = state.fuzzer.execution_count;
@@ -335,6 +371,13 @@ fn main() {
                 .short("o")
                 .takes_value(true)
                 .help("Overwrite the workdir specified in the CONFIG"),
+        )
+        .arg(
+            Arg::with_name("policy")
+                .long("policy")
+                .takes_value(true)
+                .possible_values(&["uniform", "bandit", "dqn"])
+                .help("Grammar weight policy: uniform (default), bandit (Thompson Sampling), dqn"),
         )
         .arg(Arg::with_name("cmdline").multiple(true))
         .get_matches();
@@ -423,6 +466,11 @@ fn main() {
 
     my_context.initialize(config.max_tree_size);
 
+    // Override policy from CLI if provided
+    if let Some(policy_str) = matches.value_of("policy") {
+        config.policy = policy_str.to_string();
+    }
+
     //Create output folder
     let folders = [
         "/outputs/signaled",
@@ -463,6 +511,18 @@ fn main() {
         None
     };
 
+    // Build shared GrammarBandit when policy=bandit
+    let shared_bandit: Option<Arc<Mutex<GrammarBandit>>> = if config.policy == "bandit" {
+        let bandit = GrammarBandit::new(&my_context, &config.path_to_workdir);
+        println!("Bandit policy enabled: Thompson Sampling over {} grammar rule groups.", grammar_bandit::NUM_GROUPS);
+        Some(Arc::new(Mutex::new(bandit)))
+    } else {
+        if config.policy == "uniform" {
+            println!("Uniform policy: static grammar weights.");
+        }
+        None
+    };
+
     //Start fuzzing threads
     let mut thread_number = 0;
     let threads = (0..config.number_of_threads).map(|_| {
@@ -471,20 +531,32 @@ fn main() {
         let ctx = my_context.clone();
         let cks = shared_chunkstore.clone();
         let trainer = dqn_trainer.clone();
+        let bandit = shared_bandit.clone();
         thread_number += 1;
         thread::Builder::new()
             .name(format!("fuzzer_{}", thread_number))
             .stack_size(config.thread_size)
-            .spawn(move || fuzzing_thread(state, config, ctx, cks, trainer))
+            .spawn(move || fuzzing_thread(state, config, ctx, cks, trainer, bandit))
     });
 
     //Start status thread
     let status_thread = {
         let global_state = shared.clone();
         let shared_cks = shared_chunkstore.clone();
+        let status_bandit = shared_bandit.clone();
+        let cov_csv_path = format!("{}/coverage.csv", config.path_to_workdir);
+        let policy_name = config.policy.clone();
         thread::Builder::new()
             .name("status_thread".to_string())
             .spawn(move || {
+                // Initialize coverage CSV
+                {
+                    let mut f = std::fs::File::create(&cov_csv_path)
+                        .expect("failed to create coverage.csv");
+                    writeln!(f, "timestamp_sec,total_edges,total_crashes,exec_count,policy")
+                        .expect("failed to write coverage CSV header");
+                }
+
                 let start_time = Instant::now();
                 thread::sleep(time::Duration::from_secs(1));
                 print!("{}[2J", 27 as char);
@@ -505,6 +577,8 @@ fn main() {
                     let last_timeout;
                     let total_found_asan;
                     let total_found_sig;
+                    let total_edges;
+                    let total_crashes;
                     {
                         let shared_state = global_state.lock().expect("RAND_597319831");
                         execution_count = shared_state.execution_count;
@@ -522,6 +596,11 @@ fn main() {
                         last_timeout = shared_state.last_timeout.clone();
                         total_found_asan = shared_state.total_found_asan;
                         total_found_sig = shared_state.total_found_sig;
+                        total_edges = shared_state.bitmaps.get(&false)
+                            .map_or(0, |b| b.iter().filter(|&&x| x != 0).count());
+                        total_crashes = shared_state.total_found_asan
+                            + shared_state.total_found_sig
+                            + shared_state.total_found_ubsan;
                     }
                     let secs = start_time.elapsed().as_secs();
                     let minutes = secs / 60;
@@ -623,6 +702,29 @@ fn main() {
                         bits_found_by_havoc_rec
                     );
                     println!("------------------------------------------------------    ");
+
+                    // Bandit status display
+                    if let Some(ref bandit_ref) = status_bandit {
+                        if let Ok(bandit) = bandit_ref.lock() {
+                            println!(
+                                "Bandit weights:  {}                                      ",
+                                bandit.group_weights_summary()
+                            );
+                            println!("------------------------------------------------------    ");
+                        }
+                    }
+
+                    // Coverage CSV row (every second)
+                    {
+                        let secs_elapsed = start_time.elapsed().as_secs();
+                        if let Ok(mut f) = OpenOptions::new().append(true).open(&cov_csv_path) {
+                            let _ = writeln!(
+                                f, "{},{},{},{},{}",
+                                secs_elapsed, total_edges, total_crashes, execution_count, policy_name
+                            );
+                        }
+                    }
+
                     //println!("Global bitmap: {:?}", global_state.lock().expect("RAND_1887203473").bitmaps.get(&false).expect("RAND_1887203473"));
                     thread::sleep(time::Duration::from_secs(1));
                 }

@@ -1,0 +1,311 @@
+// Phase 2: Thompson Sampling bandit over grammar rule groups.
+// Adapts the grammar's generative distribution by boosting the selected
+// group's nonterminal weights every UPDATE_INTERVAL executions.
+//
+// Architecture: one GrammarBandit behind Arc<Mutex<>> shared across threads.
+// Each thread periodically locks it, calls select_group() to get the current
+// per-group multipliers, then applies them to its own local Context.
+
+use grammartec::context::Context;
+use grammartec::newtypes::NTermID;
+use rand::Rng;
+use rand_distr::{Beta, Distribution};
+use std::fs::OpenOptions;
+use std::io::Write;
+
+pub const NUM_GROUPS: usize = 6;
+pub const UPDATE_INTERVAL: u64 = 100;
+const BOOST_MULTIPLIER: f32 = 2.0;
+const DECAY_FACTOR: f32 = 0.95;
+const WEIGHT_MIN: f32 = 0.01;
+const WEIGHT_MAX: f32 = 100.0;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum RuleGroup {
+    S1SchemaSetup = 0,
+    S2DmlStress = 1,
+    S3QueryStress = 2,
+    S4BoundaryPrintf = 3,
+    S5FtsVirtual = 4,
+    S6Validation = 5,
+}
+
+impl RuleGroup {
+    pub fn from_index(i: usize) -> Option<Self> {
+        match i {
+            0 => Some(RuleGroup::S1SchemaSetup),
+            1 => Some(RuleGroup::S2DmlStress),
+            2 => Some(RuleGroup::S3QueryStress),
+            3 => Some(RuleGroup::S4BoundaryPrintf),
+            4 => Some(RuleGroup::S5FtsVirtual),
+            5 => Some(RuleGroup::S6Validation),
+            _ => None,
+        }
+    }
+
+    pub fn name(&self) -> &'static str {
+        match self {
+            RuleGroup::S1SchemaSetup => "S1_Schema",
+            RuleGroup::S2DmlStress => "S2_DML",
+            RuleGroup::S3QueryStress => "S3_Query",
+            RuleGroup::S4BoundaryPrintf => "S4_Boundary",
+            RuleGroup::S5FtsVirtual => "S5_FTS",
+            RuleGroup::S6Validation => "S6_Validation",
+        }
+    }
+}
+
+pub fn classify_nonterminal(name: &str) -> Option<RuleGroup> {
+    match name {
+        "Schema-Setup" | "Create-Table-Stmt" | "Create-Index-Stmt"
+        | "Create-View-Stmt" | "Create-Virtual-Table-Stmt"
+        | "Create-Trigger-Stmt" | "Alter-Table-Stmt" | "Drop-Stmt"
+        | "Col-Def-List-GenCol" => Some(RuleGroup::S1SchemaSetup),
+
+        "Insert-Stmt" | "Update-Stmt" | "Delete-Stmt" => Some(RuleGroup::S2DmlStress),
+
+        "Stress-Query" | "Select-Stmt" | "Select-Core" => Some(RuleGroup::S3QueryStress),
+
+        "Boundary-Func-Call" | "Boundary-Int" | "Boundary-Float"
+        | "Format-Spec" | "Printf-Fmt-Spec" => Some(RuleGroup::S4BoundaryPrintf),
+
+        "Fts-Engine" => Some(RuleGroup::S5FtsVirtual),
+
+        "Validation-Op" | "Pragma-Stmt" | "Analyze-Stmt" => Some(RuleGroup::S6Validation),
+
+        _ => None,
+    }
+}
+
+struct GroupState {
+    alpha: f32,
+    beta: f32,
+    nt_ids: Vec<NTermID>,
+    selection_count: u64,
+}
+
+/// Per-group multiplier returned by the bandit for threads to apply locally.
+#[derive(Clone)]
+pub struct GroupMultipliers {
+    pub multipliers: [f32; NUM_GROUPS],
+    pub selected: usize,
+}
+
+pub struct GrammarBandit {
+    groups: [GroupState; NUM_GROUPS],
+    current_multipliers: [f32; NUM_GROUPS],
+    active_group: Option<usize>,
+    total_updates: u64,
+    log_path: String,
+}
+
+impl GrammarBandit {
+    pub fn new(ctx: &Context, workdir: &str) -> Self {
+        let mut group_nts: [Vec<NTermID>; NUM_GROUPS] = Default::default();
+
+        for (nt_id, name) in ctx.all_nt_ids() {
+            if let Some(group) = classify_nonterminal(&name) {
+                group_nts[group as usize].push(nt_id);
+            }
+        }
+
+        let groups = std::array::from_fn(|i| GroupState {
+            alpha: 1.0,
+            beta: 1.0,
+            nt_ids: group_nts[i].clone(),
+            selection_count: 0,
+        });
+
+        let log_path = format!("{}/bandit_log.csv", workdir);
+        let file = OpenOptions::new()
+            .create(true)
+            .truncate(true)
+            .write(true)
+            .open(&log_path)
+            .expect("GrammarBandit: failed to open bandit_log.csv");
+        let mut file = file;
+        let group_headers: Vec<String> = (0..NUM_GROUPS)
+            .map(|i| {
+                let g = RuleGroup::from_index(i).unwrap();
+                format!("alpha_{0},beta_{0},count_{0}", g.name())
+            })
+            .collect();
+        writeln!(
+            file,
+            "update,selected_group,{},reward,total_coverage",
+            group_headers.join(",")
+        )
+        .expect("GrammarBandit: failed to write CSV header");
+
+        GrammarBandit {
+            groups,
+            current_multipliers: [1.0; NUM_GROUPS],
+            active_group: None,
+            total_updates: 0,
+            log_path,
+        }
+    }
+
+    /// Run Thompson Sampling: sample Beta distributions, pick the best group,
+    /// decay all multipliers, boost the selected group. Returns the new multipliers.
+    pub fn select_group(&mut self) -> GroupMultipliers {
+        let mut rng = rand::thread_rng();
+
+        let mut best_group = 0;
+        let mut best_sample = f32::NEG_INFINITY;
+
+        for (i, gs) in self.groups.iter().enumerate() {
+            if gs.nt_ids.is_empty() {
+                continue;
+            }
+            let dist = Beta::new(gs.alpha as f64, gs.beta as f64)
+                .unwrap_or_else(|_| Beta::new(1.0, 1.0).unwrap());
+            let sample = dist.sample(&mut rng) as f32;
+            if sample > best_sample {
+                best_sample = sample;
+                best_group = i;
+            }
+        }
+
+        // Decay all multipliers toward 1.0, then boost selected
+        for m in self.current_multipliers.iter_mut() {
+            *m = 1.0 + (*m - 1.0) * DECAY_FACTOR;
+        }
+        self.current_multipliers[best_group] =
+            (self.current_multipliers[best_group] * BOOST_MULTIPLIER).clamp(WEIGHT_MIN, WEIGHT_MAX);
+
+        self.active_group = Some(best_group);
+        self.groups[best_group].selection_count += 1;
+        self.total_updates += 1;
+
+        GroupMultipliers {
+            multipliers: self.current_multipliers,
+            selected: best_group,
+        }
+    }
+
+    /// Update Beta parameters based on observed reward.
+    pub fn observe_reward(&mut self, coverage_delta: usize, is_crash: bool) {
+        if let Some(gi) = self.active_group {
+            let reward = if coverage_delta > 0 || is_crash { 1.0 } else { 0.0 };
+            self.groups[gi].alpha += reward;
+            self.groups[gi].beta += 1.0 - reward;
+        }
+    }
+
+    /// Log current state to CSV.
+    pub fn log_state(&self, selected: usize, reward: f32, total_coverage: usize) {
+        let mut line = format!(
+            "{},{}", self.total_updates,
+            RuleGroup::from_index(selected).unwrap().name()
+        );
+        for gs in &self.groups {
+            line.push_str(&format!(",{:.4},{:.4},{}", gs.alpha, gs.beta, gs.selection_count));
+        }
+        line.push_str(&format!(",{:.4},{}", reward, total_coverage));
+        line.push('\n');
+
+        if let Ok(mut file) = OpenOptions::new().append(true).open(&self.log_path) {
+            let _ = file.write_all(line.as_bytes());
+        }
+    }
+
+    pub fn group_weights_summary(&self) -> String {
+        let mut parts = Vec::new();
+        for (i, gs) in self.groups.iter().enumerate() {
+            let g = RuleGroup::from_index(i).unwrap();
+            let ratio = gs.alpha / (gs.alpha + gs.beta);
+            parts.push(format!("{}={:.2}(x{:.2})", g.name(), ratio, self.current_multipliers[i]));
+        }
+        parts.join(" ")
+    }
+
+    /// Get the NTermIDs for a given group index, for applying multipliers.
+    pub fn group_nt_ids(&self, group_index: usize) -> &[NTermID] {
+        &self.groups[group_index].nt_ids
+    }
+}
+
+/// Apply bandit multipliers to a thread-local Context.
+/// For each group that has a multiplier != 1.0, scale its nonterminal weights.
+pub fn apply_multipliers(ctx: &mut Context, bandit: &GrammarBandit, mults: &GroupMultipliers) {
+    for gi in 0..NUM_GROUPS {
+        let m = mults.multipliers[gi];
+        if (m - 1.0).abs() < 0.001 {
+            continue;
+        }
+        for nt_id in bandit.group_nt_ids(gi) {
+            ctx.scale_weights_for_nt(*nt_id, m);
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_classify_nonterminal_coverage() {
+        assert_eq!(classify_nonterminal("Schema-Setup"), Some(RuleGroup::S1SchemaSetup));
+        assert_eq!(classify_nonterminal("Insert-Stmt"), Some(RuleGroup::S2DmlStress));
+        assert_eq!(classify_nonterminal("Stress-Query"), Some(RuleGroup::S3QueryStress));
+        assert_eq!(classify_nonterminal("Boundary-Int"), Some(RuleGroup::S4BoundaryPrintf));
+        assert_eq!(classify_nonterminal("Fts-Engine"), Some(RuleGroup::S5FtsVirtual));
+        assert_eq!(classify_nonterminal("Validation-Op"), Some(RuleGroup::S6Validation));
+        assert_eq!(classify_nonterminal("Expr"), None);
+        assert_eq!(classify_nonterminal("Literal"), None);
+    }
+
+    #[test]
+    fn test_rule_group_from_index_roundtrip() {
+        for i in 0..NUM_GROUPS {
+            let g = RuleGroup::from_index(i).unwrap();
+            assert_eq!(g as usize, i);
+        }
+        assert!(RuleGroup::from_index(NUM_GROUPS).is_none());
+    }
+
+    #[test]
+    fn test_thompson_sampling_beta_update() {
+        let alpha_before = 1.0_f32;
+        let beta_before = 1.0_f32;
+
+        // success: alpha increments
+        let alpha_after = alpha_before + 1.0;
+        assert!((alpha_after - 2.0).abs() < 1e-6);
+
+        // failure: beta increments
+        let beta_after = beta_before + 1.0;
+        assert!((beta_after - 2.0).abs() < 1e-6);
+
+        // Mean = alpha / (alpha + beta)
+        let mean = alpha_after / (alpha_after + beta_after);
+        assert!((mean - 0.5).abs() < 1e-6);
+    }
+
+    #[test]
+    fn test_weight_clamping() {
+        let w_low = (0.005_f32 * DECAY_FACTOR).clamp(WEIGHT_MIN, WEIGHT_MAX);
+        assert!(w_low >= WEIGHT_MIN);
+        let w_high = (99.0_f32 * BOOST_MULTIPLIER).clamp(WEIGHT_MIN, WEIGHT_MAX);
+        assert!(w_high <= WEIGHT_MAX);
+    }
+
+    #[test]
+    fn test_decay_toward_one() {
+        let mut m = 3.0_f32;
+        for _ in 0..100 {
+            m = 1.0 + (m - 1.0) * DECAY_FACTOR;
+        }
+        // After 100 steps: 1.0 + 2.0 * 0.95^100 = ~1.012
+        assert!((m - 1.0).abs() < 0.02, "multiplier should decay toward 1.0, got {}", m);
+    }
+
+    #[test]
+    fn test_boost_increases_multiplier() {
+        let m = 1.0_f32;
+        let boosted = (m * BOOST_MULTIPLIER).clamp(WEIGHT_MIN, WEIGHT_MAX);
+        assert!(boosted > m);
+        assert_eq!(boosted, 2.0);
+    }
+}

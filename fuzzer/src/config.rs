@@ -3,6 +3,10 @@
 
 // ---- default helpers for RL hyperparameters ----
 
+fn default_policy() -> String {
+    "uniform".to_string()
+}
+
 fn default_rl_epsilon_start() -> f32 {
     1.0
 }
@@ -47,6 +51,10 @@ pub struct Config {
     // Phase 2 hook: when true, RL policy controls mutation selection
     #[serde(default)]
     pub rl_enabled: bool,
+
+    // Phase 2 bandit: "uniform", "bandit", or "dqn"
+    #[serde(default = "default_policy")]
+    pub policy: String,
 
     // ---- RL hyperparameters (all optional; backward-compatible with existing .ron configs) ----
 
