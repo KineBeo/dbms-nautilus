@@ -46,6 +46,7 @@ TIMEOUT_MS="${TIMEOUT_MS:-500}"
 THREADS="${THREADS:-1}"
 DURATION="${DURATION:-86400}"
 GRAMMAR_VERSION="${GRAMMAR_VERSION:-}"
+POLICY="${POLICY:-uniform}"
 
 WORKDIR="$WORKDIR_BASE/${VERSION}_${RUN_ID}"
 mkdir -p "$WORKDIR"
@@ -61,6 +62,7 @@ echo " Grammar:      $GRAMMAR"
 echo " max_tree_size: $MAX_TREE_SIZE"
 echo " Timeout:      ${TIMEOUT_MS}ms"
 echo " Duration:     ${DURATION}s"
+echo " Policy:       $POLICY"
 if [[ -n "$GRAMMAR_VERSION" ]]; then
     echo " Grammar Ver:  $GRAMMAR_VERSION"
     echo " Auto-archive: ON"
@@ -104,12 +106,17 @@ export LD_LIBRARY_PATH="${LD_LIBRARY_PATH:-/home/linuxbrew/.linuxbrew/lib}"
 START_TIME=$(date +%s)
 
 # Run with timeout if DURATION is set
+POLICY_FLAG=""
+if [[ "$POLICY" != "uniform" ]]; then
+    POLICY_FLAG="--policy $POLICY"
+fi
+
 if command -v timeout &>/dev/null; then
     timeout "$DURATION" \
-        "$ROOT/target/release/fuzzer" -c "$CONFIG" \
+        "$ROOT/target/release/fuzzer" -c "$CONFIG" $POLICY_FLAG \
         || true
 else
-    "$ROOT/target/release/fuzzer" -c "$CONFIG"
+    "$ROOT/target/release/fuzzer" -c "$CONFIG" $POLICY_FLAG
 fi
 
 END_TIME=$(date +%s)
