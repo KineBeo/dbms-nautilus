@@ -226,6 +226,7 @@ fn fuzzing_thread(
 
     let mut last_bandit_exec = 0_u64;
     let mut last_bandit_coverage = 0_usize;
+    let mut last_bandit_crashes = 0_u64;
 
     //Normal mode
     loop {
@@ -292,19 +293,19 @@ fn fuzzing_thread(
                     (cov, crashes)
                 };
                 let cov_delta = total_cov.saturating_sub(last_bandit_coverage);
-                let is_crash = total_crashes > 0;
+                let crash_delta = total_crashes.saturating_sub(last_bandit_crashes);
 
                 let mut bandit = bandit_arc.lock().expect("bandit_lock");
-                bandit.observe_reward(cov_delta, is_crash);
+                bandit.observe_reward(cov_delta, crash_delta);
                 let mults = bandit.select_group();
-                let reward = if cov_delta > 0 || is_crash { 1.0 } else { 0.0 };
-                bandit.log_state(mults.selected, reward, total_cov);
+                bandit.log_state(mults.selected, total_cov);
 
                 // Apply multipliers to this thread's local Context
                 grammar_bandit::apply_multipliers(&mut state.ctx, &bandit, &mults);
 
                 last_bandit_exec = exec;
                 last_bandit_coverage = total_cov;
+                last_bandit_crashes = total_crashes;
             }
         }
 

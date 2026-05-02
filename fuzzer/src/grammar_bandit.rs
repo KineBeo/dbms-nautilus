@@ -82,6 +82,7 @@ struct GroupState {
     beta: f32,
     nt_ids: Vec<NTermID>,
     selection_count: u64,
+    last_reward: f32,
 }
 
 /// Per-group multiplier returned by the bandit for threads to apply locally.
@@ -96,6 +97,7 @@ pub struct GrammarBandit {
     current_multipliers: [f32; NUM_GROUPS],
     active_group: Option<usize>,
     total_updates: u64,
+    reward_ema: f32,
     log_path: String,
 }
 
@@ -114,6 +116,7 @@ impl GrammarBandit {
             beta: 1.0,
             nt_ids: group_nts[i].clone(),
             selection_count: 0,
+            last_reward: 0.0,
         });
 
         let log_path = format!("{}/bandit_log.csv", workdir);
@@ -127,12 +130,12 @@ impl GrammarBandit {
         let group_headers: Vec<String> = (0..NUM_GROUPS)
             .map(|i| {
                 let g = RuleGroup::from_index(i).unwrap();
-                format!("alpha_{0},beta_{0},count_{0}", g.name())
+                format!("alpha_{0},beta_{0},count_{0},last_reward_{0}", g.name())
             })
             .collect();
         writeln!(
             file,
-            "update,selected_group,{},reward,total_coverage",
+            "update,selected_group,{},reward_ema,total_coverage",
             group_headers.join(",")
         )
         .expect("GrammarBandit: failed to write CSV header");
@@ -142,6 +145,7 @@ impl GrammarBandit {
             current_multipliers: [1.0; NUM_GROUPS],
             active_group: None,
             total_updates: 0,
+            reward_ema: 0.0,
             log_path,
         }
     }
@@ -185,24 +189,37 @@ impl GrammarBandit {
     }
 
     /// Update Beta parameters based on observed reward.
-    pub fn observe_reward(&mut self, coverage_delta: usize, is_crash: bool) {
+    pub fn observe_reward(&mut self, coverage_delta: usize, crash_delta: u64) {
         if let Some(gi) = self.active_group {
-            let reward = if coverage_delta > 0 || is_crash { 1.0 } else { 0.0 };
-            self.groups[gi].alpha += reward;
-            self.groups[gi].beta += 1.0 - reward;
+            let raw_reward = coverage_delta as f32 + 10.0 * crash_delta as f32;
+
+            const EMA_ALPHA: f32 = 0.1;
+            self.reward_ema = EMA_ALPHA * raw_reward + (1.0 - EMA_ALPHA) * self.reward_ema;
+
+            let normalized = if self.reward_ema > 0.1 {
+                (raw_reward / self.reward_ema).min(2.0)
+            } else {
+                if raw_reward > 0.0 { 1.0 } else { 0.0 }
+            };
+
+            self.groups[gi].alpha += normalized;
+            if raw_reward == 0.0 {
+                self.groups[gi].beta += 1.0;
+            }
+            self.groups[gi].last_reward = raw_reward;
         }
     }
 
     /// Log current state to CSV.
-    pub fn log_state(&self, selected: usize, reward: f32, total_coverage: usize) {
+    pub fn log_state(&self, selected: usize, total_coverage: usize) {
         let mut line = format!(
             "{},{}", self.total_updates,
             RuleGroup::from_index(selected).unwrap().name()
         );
         for gs in &self.groups {
-            line.push_str(&format!(",{:.4},{:.4},{}", gs.alpha, gs.beta, gs.selection_count));
+            line.push_str(&format!(",{:.4},{:.4},{},{:.2}", gs.alpha, gs.beta, gs.selection_count, gs.last_reward));
         }
-        line.push_str(&format!(",{:.4},{}", reward, total_coverage));
+        line.push_str(&format!(",{:.4},{}", self.reward_ema, total_coverage));
         line.push('\n');
 
         if let Ok(mut file) = OpenOptions::new().append(true).open(&self.log_path) {
@@ -307,5 +324,53 @@ mod tests {
         let boosted = (m * BOOST_MULTIPLIER).clamp(WEIGHT_MIN, WEIGHT_MAX);
         assert!(boosted > m);
         assert_eq!(boosted, 2.0);
+    }
+
+    #[test]
+    fn test_proportional_reward_differentiates() {
+        let ema = 5.0_f32;
+        let reward_a = 10.0_f32;
+        let reward_b = 1.0_f32;
+
+        let norm_a = (reward_a / ema).min(2.0);
+        let norm_b = (reward_b / ema).min(2.0);
+
+        assert!(norm_a > norm_b, "10 edges should produce higher reward than 1 edge");
+        assert!(norm_a > 1.0, "above-average should normalize > 1.0");
+        assert!(norm_b < 1.0, "below-average should normalize < 1.0");
+
+        let mut alpha_a = 1.0_f32;
+        let mut alpha_b = 1.0_f32;
+        alpha_a += norm_a;
+        alpha_b += norm_b;
+
+        let mean_a = alpha_a / (alpha_a + 1.0);
+        let mean_b = alpha_b / (alpha_b + 1.0);
+        assert!(mean_a > mean_b, "group A should have higher Beta mean");
+    }
+
+    #[test]
+    fn test_zero_reward_increments_beta() {
+        let alpha_before = 5.0_f32;
+        let beta_before = 2.0_f32;
+
+        let norm_reward = 0.0_f32;
+        let alpha_after = alpha_before + norm_reward;
+        let beta_after = beta_before + 1.0;
+
+        assert_eq!(alpha_after, alpha_before, "alpha unchanged on zero reward");
+        assert_eq!(beta_after, 3.0, "beta increments on zero reward");
+    }
+
+    #[test]
+    fn test_ema_update() {
+        let mut ema = 0.0_f32;
+        let alpha = 0.1_f32;
+
+        ema = alpha * 10.0 + (1.0 - alpha) * ema;
+        assert!((ema - 1.0).abs() < 1e-6, "first update: 0.1*10 + 0.9*0 = 1.0");
+
+        ema = alpha * 10.0 + (1.0 - alpha) * ema;
+        assert!((ema - 1.9).abs() < 1e-6, "second update: 0.1*10 + 0.9*1.0 = 1.9");
     }
 }
