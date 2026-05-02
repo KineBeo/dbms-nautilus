@@ -1,0 +1,3565 @@
+{
+  "total_crashes": 296,
+  "unique_crashes": 296,
+  "summary": {
+    "asan": 0,
+    "ubsan": 0,
+    "debug_assert": 296,
+    "signal": 0,
+    "timeout": 0
+  },
+  "crashes": [
+    {
+      "hash": "639d48b175f7647c",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000000036",
+      "top_frames": [
+        "<no-stack-1c20c79181452048>"
+      ],
+      "sql_preview": "CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(b); INSERT INTO p DEFAULT VALUES; ANALYZE q; CREATE TABLE IF NOT EXISTS p(c1 VARCHAR(255) NOT NULL); CREATE TABLE IF NOT EXISTS q(c2 INTEGER GENERA"
+    },
+    {
+      "hash": "8edeaa8f929c6337",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000000168",
+      "top_frames": [
+        "<no-stack-bdb5280b6fcd7061>"
+      ],
+      "sql_preview": "CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c3, b); INSERT INTO p VALUES (NULL COLLATE BINARY BETWEEN NULL AND FALSE * NULL + FALSE NOT BETWEEN total_changes() != CASE WHEN NULL THEN NULL || "
+    },
+    {
+      "hash": "1a3b7445d5f10ee3",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000001291",
+      "top_frames": [
+        "<no-stack-5b2ce1e3cdb1a3a1>"
+      ],
+      "sql_preview": "SELECT printf('%.*f', -1, 0.0); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c3); WITH RECURSIVE q AS (VALUES (CURRENT_TIMESTAMP)) INSERT INTO p VALUES (-NULL IS NULL > hex(CURRENT_TIMESTAMP) "
+    },
+    {
+      "hash": "c626aacf22818485",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000001345",
+      "top_frames": [
+        "<no-stack-1528c161df2b6861>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 NUMERIC); INSERT OR ROLLBACK INTO p VALUES (NULL ISNULL); WITH RECURSIVE q AS (SELECT p.*) SELECT CURRENT_DATE FROM p; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING f"
+    },
+    {
+      "hash": "f23b2ab54aeec299",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000001785",
+      "top_frames": [
+        "<no-stack-9dd2e5cc495427df>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 NUMERIC); CREATE VIEW IF NOT EXISTS v1 AS VALUES (CURRENT_DATE); EXPLAIN QUERY PLAN VALUES (FALSE); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(a); INSERT INTO"
+    },
+    {
+      "hash": "3f6eeef65251f9d0",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000002122",
+      "top_frames": [
+        "<no-stack-78c4a112803acbad>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b INTEGER, c3 NUMERIC CHECK (CURRENT_TIME), c2 INTEGER PRIMARY KEY); CREATE INDEX IF NOT EXISTS idx1 ON p(b); INSERT INTO p DEFAULT VALUES; EXPLAIN QUERY PLAN VALUES (TRUE"
+    },
+    {
+      "hash": "2214f554cc3939d6",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000002156",
+      "top_frames": [
+        "<no-stack-0350025ff5674095>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b INTEGER, a BOOLEAN UNIQUE); CREATE INDEX IF NOT EXISTS idx1 ON p(b); INSERT INTO p DEFAULT VALUES; EXPLAIN QUERY PLAN VALUES (TRUE); CREATE VIRTUAL TABLE IF NOT EXISTS f"
+    },
+    {
+      "hash": "055ee823dfdb5603",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000002180",
+      "top_frames": [
+        "<no-stack-1aef7059761a14c5>"
+      ],
+      "sql_preview": "SELECT hex(zeroblob(-9223372036854775808)); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c2); INSERT INTO p DEFAULT VALUES; SELECT s.* FROM p WHERE EXISTS (SELECT DISTINCT t3.* FROM q INDEXED "
+    },
+    {
+      "hash": "942b6571ed933c1e",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000002188",
+      "top_frames": [
+        "<no-stack-49adb1e490b5f39d>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b INTEGER, c3 FLOAT PRIMARY KEY); CREATE INDEX IF NOT EXISTS idx1 ON p(b); INSERT INTO p DEFAULT VALUES; EXPLAIN QUERY PLAN VALUES (TRUE); CREATE VIRTUAL TABLE IF NOT EXIS"
+    },
+    {
+      "hash": "5de91b4f1282507d",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000002226",
+      "top_frames": [
+        "<no-stack-c93df198bae1e9d4>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b INTEGER, _rowid_ TEXT UNIQUE); CREATE INDEX IF NOT EXISTS idx1 ON p(b); INSERT INTO p DEFAULT VALUES; EXPLAIN QUERY PLAN VALUES (TRUE); CREATE VIRTUAL TABLE IF NOT EXIST"
+    },
+    {
+      "hash": "ad18e429fc98f47f",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000002247",
+      "top_frames": [
+        "<no-stack-43b9ce12079e8ffd>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 INT); INSERT OR REPLACE INTO p VALUES (CURRENT_TIME); PRAGMA quick_check; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c3, b); INSERT OR ABORT INTO r VALUES (--"
+    },
+    {
+      "hash": "de1a0f77fb4ff825",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000002253",
+      "top_frames": [
+        "<no-stack-0a4cd9e0dad35045>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 INT); INSERT OR REPLACE INTO p VALUES ((CURRENT_TIMESTAMP)); PRAGMA quick_check; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c3, b); INSERT OR ABORT INTO r VAL"
+    },
+    {
+      "hash": "c36b562c5ccf20a2",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000002259",
+      "top_frames": [
+        "<no-stack-79525e557ea3d467>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 INT); INSERT OR REPLACE INTO p VALUES ((CURRENT_TIMESTAMP NOT LIKE TRUE)); PRAGMA quick_check; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c3, b); INSERT OR AB"
+    },
+    {
+      "hash": "c99fa7540576b78f",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000002315",
+      "top_frames": [
+        "<no-stack-d91d5c3c7591069d>"
+      ],
+      "sql_preview": "SELECT hex(zeroblob(-2147483649)); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c3, b); INSERT OR ABORT INTO r VALUES (--+RAISE(IGNORE) IS DISTINCT FROM CURRENT_DATE NOT IN (RAISE(IGNORE) ISNU"
+    },
+    {
+      "hash": "dc0d7ebf7748a085",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000002430",
+      "top_frames": [
+        "<no-stack-f1085eec4e2a4ffd>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 NUMERIC); INSERT INTO p DEFAULT VALUES; VALUES (TRUE); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(_rowid_); SELECT +TRUE IS NULL AS a FROM t3 WHERE EXISTS (SE"
+    },
+    {
+      "hash": "c2a068f40f12ffcc",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000002859",
+      "top_frames": [
+        "<no-stack-54fdb19c88e7d34d>"
+      ],
+      "sql_preview": "SELECT hex(zeroblob(-1)); CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(c2 REAL NOT NULL DEFAULT FALSE); INSERT INTO q DEFAULT VALUES; ANALYZE p; CREATE VIRTUAL TAB"
+    },
+    {
+      "hash": "7b861e5a30b3be46",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000003099",
+      "top_frames": [
+        "<no-stack-589e76ed7611a741>"
+      ],
+      "sql_preview": "SELECT hex(zeroblob(-1)); CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(c1 NUMERIC PRIMARY KEY); INSERT INTO q DEFAULT VALUES; PRAGMA quick_check; SELECT hex(zerobl"
+    },
+    {
+      "hash": "561c480cc4e46ba5",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000003625",
+      "top_frames": [
+        "<no-stack-30999be47ee1d2e6>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 VARCHAR(255) UNIQUE); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; SELECT * FROM p NOT INDEXED WHERE FALSE GROUP BY TRUE ORDER BY CURRENT_TIME OR NULL; CREATE VIRTUAL TABL"
+    },
+    {
+      "hash": "d67bdf74864310ef",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000003631",
+      "top_frames": [
+        "<no-stack-18f27e45d0a9d494>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 VARCHAR(255) UNIQUE); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; SELECT * FROM p NOT INDEXED WHERE CURRENT_TIME GROUP BY TRUE ORDER BY CURRENT_TIME OR NULL; CREATE VIRTU"
+    },
+    {
+      "hash": "9f4aeadc87d83d36",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000003637",
+      "top_frames": [
+        "<no-stack-36e8d27358ec109c>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 VARCHAR(255) UNIQUE); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; SELECT * FROM p NOT INDEXED WHERE CURRENT_TIMESTAMP ISNULL GROUP BY TRUE ORDER BY CURRENT_TIME OR NULL; "
+    },
+    {
+      "hash": "54d984634a758d96",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000003643",
+      "top_frames": [
+        "<no-stack-9f04f34901fade29>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 VARCHAR(255) UNIQUE); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; SELECT * FROM p NOT INDEXED WHERE CURRENT_TIME < CURRENT_DATE IS NULL ISNULL GROUP BY TRUE ORDER BY CURR"
+    },
+    {
+      "hash": "ed7b7fd684770d5c",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000003649",
+      "top_frames": [
+        "<no-stack-9e95839c9644c7f9>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 VARCHAR(255) UNIQUE); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; SELECT * FROM p NOT INDEXED WHERE (CURRENT_DATE) < CURRENT_DATE IS NULL ISNULL GROUP BY TRUE ORDER BY CU"
+    },
+    {
+      "hash": "8e463859ce3e0422",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000003717",
+      "top_frames": [
+        "<no-stack-a20f26422e568e14>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 VARCHAR(255) UNIQUE); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; SELECT * FROM p NOT INDEXED WHERE FALSE GROUP BY TRUE ORDER BY TRUE DESC NULLS FIRST; CREATE VIRTUAL TAB"
+    },
+    {
+      "hash": "8056dff2e6ff1416",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000003725",
+      "top_frames": [
+        "<no-stack-3af5cc3ea4261196>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 VARCHAR(255) UNIQUE); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; SELECT * FROM p NOT INDEXED WHERE NULL < NULL ISNULL GROUP BY TRUE ORDER BY TRUE DESC NULLS FIRST; CREAT"
+    },
+    {
+      "hash": "11a84c8cf43fa7ca",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000003752",
+      "top_frames": [
+        "<no-stack-56bb4ba3d981ca80>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 VARCHAR(255) UNIQUE); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; SELECT * FROM p NOT INDEXED WHERE TRUE GROUP BY TRUE ORDER BY TRUE DESC NULLS FIRST; CREATE VIRTUAL TABL"
+    },
+    {
+      "hash": "046b2ea1fb3db300",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000003828",
+      "top_frames": [
+        "<no-stack-f60cb3dfbbf0063f>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 VARCHAR(255) UNIQUE); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; SELECT * FROM p NOT INDEXED WHERE FALSE GROUP BY TRUE ORDER BY CURRENT_TIMESTAMP DESC; CREATE VIRTUAL TA"
+    },
+    {
+      "hash": "19fed64d918918d3",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000004776",
+      "top_frames": [
+        "<no-stack-af8c9aaa5e91019e>"
+      ],
+      "sql_preview": "SELECT printf('%.*g', 9223372036854775807, 1.0); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c3); WITH RECURSIVE q AS MATERIALIZED (SELECT p.*, NOT EXISTS (SELECT *, -TRUE) FROM r WHERE CAST("
+    },
+    {
+      "hash": "d17d1488d5e68c9d",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000005863",
+      "top_frames": [
+        "<no-stack-79726a973141f5ce>"
+      ],
+      "sql_preview": "SELECT substr('o  0o66uH-', 2147483648, -2147483649); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c3); WITH RECURSIVE r AS (SELECT *, FALSE IS NOT DISTINCT FROM CURRENT_TIMESTAMP AS q_y1_2h__"
+    },
+    {
+      "hash": "6edfaeb2db1ebfd0",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000006195",
+      "top_frames": [
+        "<no-stack-2e89c0f251fba64b>"
+      ],
+      "sql_preview": "SELECT printf('%lld', 4294967295, 'QG9 P '); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c1); SELECT p.*, CASE RAISE(IGNORE) NOT NULL WHEN random() OVER () NOTNULL THEN zeroblob(~CURRENT_TIME"
+    },
+    {
+      "hash": "006f2a1b22461930",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000006229",
+      "top_frames": [
+        "<no-stack-1ccdb2d30faabdee>"
+      ],
+      "sql_preview": "SELECT printf('%lli', 2147483648, ''); SELECT hex(zeroblob(1)); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c2); SELECT RAISE(IGNORE) COLLATE NOCASE >> CURRENT_TIME >= FALSE AS a, quote(CASE "
+    },
+    {
+      "hash": "4a98ddc14f49d79c",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000006236",
+      "top_frames": [
+        "<no-stack-bb00a16d15bc94fc>"
+      ],
+      "sql_preview": "SELECT printf('%lli', 2147483648, ''); CREATE TABLE IF NOT EXISTS p(a BOOLEAN, b GENERATED ALWAYS AS (coalesce(a, b)) NOT NULL); EXPLAIN QUERY PLAN VALUES (CURRENT_TIMESTAMP); CREATE VIRTUAL TABLE IF "
+    },
+    {
+      "hash": "ae5ceb00943ba49b",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000007319",
+      "top_frames": [
+        "<no-stack-96b1e8ebca76c583>"
+      ],
+      "sql_preview": "CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c3, b, c2, c2, a, c3, c2, c1); INSERT INTO q (c2, c3, _rowid_, c2, a) VALUES (printf('', TRUE ->> CURRENT_DATE LIKE TRUE COLLATE NOCASE IS CURRENT_"
+    },
+    {
+      "hash": "9b7870ebee7c30a3",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000008315",
+      "top_frames": [
+        "<no-stack-c31547d6a669d5e8>"
+      ],
+      "sql_preview": "SELECT printf('%.*g', 2147483647, 0.01); SELECT printf('%.*d', 2147483647, 0.0);"
+    },
+    {
+      "hash": "f89415650b34b2e6",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000008393",
+      "top_frames": [
+        "<no-stack-271e51c6fc20fa92>"
+      ],
+      "sql_preview": "SELECT printf('%.*g', 4294967295, 0.01); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c1); WITH q (b) AS (VALUES (TRUE) UNION ALL SELECT s.* ORDER BY NULL ISNULL), p (c3) AS (VALUES (TRUE, CUR"
+    },
+    {
+      "hash": "4bbbc01d79a15cf6",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000013684",
+      "top_frames": [
+        "<no-stack-51d94084a596a0b4>"
+      ],
+      "sql_preview": "SELECT printf('%.*s', 4294967296, 1.0); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c3, b); INSERT INTO s DEFAULT VALUES; EXPLAIN QUERY PLAN SELECT *;"
+    },
+    {
+      "hash": "3c959d7bbb9fce58",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000016067",
+      "top_frames": [
+        "<no-stack-654ed4de266276f9>"
+      ],
+      "sql_preview": "SELECT printf('%.*f', -2147483649, 1e308); CREATE TABLE IF NOT EXISTS p(c2 FLOAT GENERATED ALWAYS AS (FALSE COLLATE NOCASE) VIRTUAL); CREATE INDEX IF NOT EXISTS idx1 ON p(b); WITH s (rowid, b) AS (VAL"
+    },
+    {
+      "hash": "1e807b2e3e067ec3",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000024450",
+      "top_frames": [
+        "<no-stack-a7f2adcc4d3b66ed>"
+      ],
+      "sql_preview": "SELECT printf('%.*d', -9223372036854775808); SELECT printf('%.*g', 2147483647, 0.01);"
+    },
+    {
+      "hash": "8cad674e9e5e7436",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000024577",
+      "top_frames": [
+        "<no-stack-c3a5b2023f070c78>"
+      ],
+      "sql_preview": "SELECT substr('', 4294967296, 0); SELECT printf('%.*g', 2147483647, 0.01);"
+    },
+    {
+      "hash": "bd197ec7878639d9",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000028346",
+      "top_frames": [
+        "<no-stack-c95805bcf999b2ff>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 NUMERIC); CREATE TABLE IF NOT EXISTS q(a INTEGER NOT NULL); SELECT * FROM p NATURAL JOIN p WHERE FALSE; SELECT printf('%.*g', 2147483647, 0.01);"
+    },
+    {
+      "hash": "cee9786ecee8ed19",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000028790",
+      "top_frames": [
+        "<no-stack-96147ba12d97d42e>"
+      ],
+      "sql_preview": "SELECT printf('%.*f', 2147483647, -1e308); SELECT hex(zeroblob(9223372036854775807));"
+    },
+    {
+      "hash": "3853b41da5d05a1a",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000028828",
+      "top_frames": [
+        "<no-stack-18abd70b07978630>"
+      ],
+      "sql_preview": "SELECT printf('%.*d', 2147483647, -1e308); SELECT printf('%.*e', 0, -0.0); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c2, _rowid_); INSERT OR IGNORE INTO t3 VALUES (NULL > CURRENT_TIMESTAMP "
+    },
+    {
+      "hash": "8f925394dbd94c54",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000029146",
+      "top_frames": [
+        "<no-stack-1e54df1b8f8f27cb>"
+      ],
+      "sql_preview": "SELECT printf('%lld', -1, ''); SELECT printf('%.*f', -2147483649, 1e308);"
+    },
+    {
+      "hash": "70737e2fd17c7f03",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000030030",
+      "top_frames": [
+        "<no-stack-2a55418a75ece205>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 VARCHAR(255) UNIQUE); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; SELECT * FROM p NOT INDEXED WHERE CURRENT_DATE < NULL GROUP BY TRUE ORDER BY NULL; CREATE VIRTUAL TABLE "
+    },
+    {
+      "hash": "79edc41ed0f6097f",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000030070",
+      "top_frames": [
+        "<no-stack-e6ff034423c65270>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 VARCHAR(255) UNIQUE); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; SELECT * FROM p NOT INDEXED WHERE CURRENT_DATE < NULL GROUP BY TRUE ORDER BY NULL; SELECT substr('', 429"
+    },
+    {
+      "hash": "2101485fa3b35405",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000035372",
+      "top_frames": [
+        "<no-stack-793d383aa128f612>"
+      ],
+      "sql_preview": "SELECT round(-1.0, -1); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c3); SELECT r.*, CURRENT_TIMESTAMP NOT BETWEEN NULL AND (CURRENT_DATE REGEXP NULL) - +FALSE REGEXP CURRENT_TIMESTAMP ISNULL"
+    },
+    {
+      "hash": "aab926d2fbae2f78",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000037460",
+      "top_frames": [
+        "<no-stack-c3f40885cd490a32>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(c1 NUMERIC PRIMARY KEY); INSERT INTO q DEFAULT VALUES; PRAGMA quick_check; CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIM"
+    },
+    {
+      "hash": "20fad8364be1c552",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000037745",
+      "top_frames": [
+        "<no-stack-0b8ade13ebd6fb7a>"
+      ],
+      "sql_preview": "SELECT hex(zeroblob(0)); SELECT hex(zeroblob(-1)); SELECT hex(zeroblob(-2147483648)); SELECT hex(zeroblob(-9223372036854775808)); CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF N"
+    },
+    {
+      "hash": "112cb0407441253d",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000037766",
+      "top_frames": [
+        "<no-stack-b98d56bd7ff402d0>"
+      ],
+      "sql_preview": "SELECT hex(zeroblob(0)); SELECT hex(zeroblob(-1)); SELECT hex(zeroblob(-2147483648)); SELECT hex(zeroblob(-9223372036854775808)); CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF N"
+    },
+    {
+      "hash": "cb9def9bddb62bde",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000039633",
+      "top_frames": [
+        "<no-stack-13e3d099615fd4a6>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(c1 TEXT NOT NULL); INSERT OR ABORT INTO q VALUES (CURRENT_DATE << CURRENT_TIME); PRAGMA integrity_check; SELECT printf"
+    },
+    {
+      "hash": "fab6d9cde3edbd29",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000040667",
+      "top_frames": [
+        "<no-stack-f52c82da35e30629>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(c2 NUMERIC PRIMARY KEY); INSERT INTO p DEFAULT VALUES; PRAGMA quick_check; CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIM"
+    },
+    {
+      "hash": "2842782604c2efcf",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000040866",
+      "top_frames": [
+        "<no-stack-a73f532148587467>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(c2 NUMERIC PRIMARY KEY); INSERT INTO p DEFAULT VALUES; PRAGMA integrity_check; CREATE TABLE IF NOT EXISTS p(b BOOLEAN "
+    },
+    {
+      "hash": "c9c595b16dcf8408",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000040891",
+      "top_frames": [
+        "<no-stack-ac622925cedce692>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(c2 NUMERIC PRIMARY KEY); INSERT INTO p DEFAULT VALUES; ANALYZE p; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5"
+    },
+    {
+      "hash": "45630bb8feebf51e",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000040981",
+      "top_frames": [
+        "<no-stack-917285ee1256e442>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(c2 NUMERIC PRIMARY KEY); INSERT OR ABORT INTO q VALUES (FALSE << FALSE); PRAGMA quick_check; CREATE VIRTUAL TABLE IF N"
+    },
+    {
+      "hash": "e409b116e7581fb9",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000041274",
+      "top_frames": [
+        "<no-stack-d8f0f21cfb14fee8>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(c2 NUMERIC PRIMARY KEY); INSERT OR ABORT INTO q VALUES (CURRENT_TIME); PRAGMA quick_check; CREATE VIRTUAL TABLE IF NOT"
+    },
+    {
+      "hash": "6d1304de38de6e6b",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000041284",
+      "top_frames": [
+        "<no-stack-78cd86fdee2e2c61>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(a INT UNIQUE); INSERT OR ABORT INTO q VALUES (TRUE); PRAGMA integrity_check; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1"
+    },
+    {
+      "hash": "f1f96f0781fabbb1",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000041478",
+      "top_frames": [
+        "<no-stack-19516ef31618e96e>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(a INT UNIQUE); INSERT OR ABORT INTO q VALUES (FALSE); PRAGMA integrity_check; SELECT printf('%.*g', 2147483647, 0.01);"
+    },
+    {
+      "hash": "1787630d216f6fe1",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000041852",
+      "top_frames": [
+        "<no-stack-fa5578441755902a>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(c2 REAL NOT NULL DEFAULT FALSE); INSERT OR ABORT INTO q VALUES (FALSE); PRAGMA integrity_check; CREATE VIRTUAL TABLE I"
+    },
+    {
+      "hash": "8c9850d165a91403",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000043472",
+      "top_frames": [
+        "<no-stack-ada28ccf66494ee8>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 INT); INSERT OR REPLACE INTO p VALUES (CURRENT_TIME NOT LIKE TRUE); PRAGMA quick_check; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(a, c3, c1, c1); SELECT * FR"
+    },
+    {
+      "hash": "46bb0ab651372380",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000043548",
+      "top_frames": [
+        "<no-stack-c5ab4348e7e13d78>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 INT); INSERT OR REPLACE INTO p VALUES (changes() NOT LIKE TRUE); PRAGMA quick_check; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c3); INSERT INTO p DEFAULT VAL"
+    },
+    {
+      "hash": "295d3b01eeb70caa",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000046359",
+      "top_frames": [
+        "<no-stack-74d8922f7ca015b9>"
+      ],
+      "sql_preview": "SELECT printf('%f', 0, 'b-2y  c'); SELECT printf('%.*f', -2147483649, 1e308);"
+    },
+    {
+      "hash": "4425d1a95dc59440",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000048047",
+      "top_frames": [
+        "<no-stack-a323b81d7131ec46>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 NUMERIC); CREATE VIEW IF NOT EXISTS v1 AS VALUES (CURRENT_DATE); SELECT * FROM (SELECT * FROM p WHERE CURRENT_TIME NOT IN (VALUES (TRUE))) AS sub1; CREATE VIRTUAL TABLE"
+    },
+    {
+      "hash": "af6df10eb53a5877",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000048851",
+      "top_frames": [
+        "<no-stack-bb2cbf9dec94130e>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 INT NOT NULL); CREATE VIEW IF NOT EXISTS v1 AS WITH RECURSIVE t1 AS (VALUES (CURRENT_TIMESTAMP)), q AS (SELECT *) SELECT *; EXPLAIN QUERY PLAN VALUES (FALSE); CREATE VI"
+    },
+    {
+      "hash": "92d338cc2d557daf",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000048910",
+      "top_frames": [
+        "<no-stack-4013117f19cebbaf>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 INT CHECK (CURRENT_TIME)); CREATE TABLE IF NOT EXISTS q(_rowid_ TEXT PRIMARY KEY); EXPLAIN QUERY PLAN VALUES (FALSE); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING ft"
+    },
+    {
+      "hash": "a886795f8c466dbc",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000048927",
+      "top_frames": [
+        "<no-stack-f146a42747f15b99>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 INT CHECK (+NULL < CURRENT_TIMESTAMP NOT IN (NULL) != CURRENT_TIMESTAMP)); CREATE TABLE IF NOT EXISTS q(_rowid_ TEXT PRIMARY KEY); INSERT INTO p DEFAULT VALUES; PRAGMA "
+    },
+    {
+      "hash": "52722ecd01bfc6a7",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000048966",
+      "top_frames": [
+        "<no-stack-109130c11e34fb3f>"
+      ],
+      "sql_preview": "SELECT substr('5M2_Q3', -2147483648, -2147483648); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(a); INSERT INTO q DEFAULT VALUES; EXPLAIN QUERY PLAN SELECT *;"
+    },
+    {
+      "hash": "be5c9f92bfebda7d",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000048972",
+      "top_frames": [
+        "<no-stack-2bee33b6f4dcf70b>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 BLOB, a GENERATED ALWAYS AS (a = 234859) NOT NULL); EXPLAIN QUERY PLAN VALUES (FALSE); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(a); INSERT INTO q DEFAULT VA"
+    },
+    {
+      "hash": "108deb21e6a3ce43",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000049671",
+      "top_frames": [
+        "<no-stack-06cb905fa23f9780>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 NUMERIC); CREATE VIEW IF NOT EXISTS v1 AS VALUES (CURRENT_DATE); SELECT * FROM (SELECT * FROM p WHERE NULL) AS sub1; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts"
+    },
+    {
+      "hash": "b25d4dc4574e8086",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000050283",
+      "top_frames": [
+        "<no-stack-0224b73886a92c08>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 VARCHAR(255)); VALUES (TRUE) EXCEPT VALUES (CURRENT_TIMESTAMP); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c2); SELECT DISTINCT q.*, NULL AS z8 FROM q INDEXED"
+    },
+    {
+      "hash": "9d5aaab697b321f4",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000050365",
+      "top_frames": [
+        "<no-stack-fc386747ceed1d94>"
+      ],
+      "sql_preview": "SELECT printf('%.*g', 0, 1.0); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(_rowid_); INSERT OR REPLACE INTO p VALUES (CURRENT_TIME ISNULL); SELECT * FROM q NATURAL JOIN t1 WHERE json_extract("
+    },
+    {
+      "hash": "44114ecf410b2cfe",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000050663",
+      "top_frames": [
+        "<no-stack-a46cef86c775b89d>"
+      ],
+      "sql_preview": "SELECT printf('%.*f', 2147483648); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c3); REPLACE INTO p VALUES (CURRENT_TIMESTAMP IS NOT NULL MATCH NULL NOTNULL | RAISE(IGNORE) COLLATE RTRIM <> ~F"
+    },
+    {
+      "hash": "0d1599c7ea204d78",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000050822",
+      "top_frames": [
+        "<no-stack-a61389ef334f0db2>"
+      ],
+      "sql_preview": "SELECT printf('%.*g', 2147483647, -1e308); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(a); SELECT t1.* ORDER BY q.rowid INTERSECT SELECT NOT CURRENT_DATE > (CURRENT_TIMESTAMP ISNULL) AS le, q"
+    },
+    {
+      "hash": "629087cc7e9bf555",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000050840",
+      "top_frames": [
+        "<no-stack-cf083739d24c8fac>"
+      ],
+      "sql_preview": "SELECT round(0.0, -2147483648); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(b); SELECT ((last_insert_rowid())) FROM t3 WHERE EXISTS (SELECT * FROM p WHERE CURRENT_TIMESTAMP GROUP BY RAISE(IGN"
+    },
+    {
+      "hash": "802068adc8eed8bd",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000051025",
+      "top_frames": [
+        "<no-stack-75828a2c86d7d77f>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b BLOB); CREATE TABLE IF NOT EXISTS q(c1 INT DEFAULT FALSE, a INT PRIMARY KEY); WITH RECURSIVE r (c1) AS (SELECT ALL *, * FROM p AS if___m9_ EXCEPT SELECT CURRENT_TIME OR "
+    },
+    {
+      "hash": "939393de1eeceb30",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000051179",
+      "top_frames": [
+        "<no-stack-54ff8d14f5ce4536>"
+      ],
+      "sql_preview": "SELECT substr('uNIZ_45 ', 4294967295, -9223372036854775808); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c3, a); SELECT t2.* FROM p JOIN p s__ ON upper(NULL != -CURRENT_TIMESTAMP LIKE CURRENT"
+    },
+    {
+      "hash": "74a87652942f5f36",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000053589",
+      "top_frames": [
+        "<no-stack-cb46fdf82cc6036b>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 NUMERIC); CREATE VIEW IF NOT EXISTS v1 AS VALUES (CURRENT_DATE); VALUES (count(*) OVER (ORDER BY NULL ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS"
+    },
+    {
+      "hash": "9b6fbf9d24bd1b8b",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000054337",
+      "top_frames": [
+        "<no-stack-ad5a94a1dfef83f4>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 NUMERIC); CREATE VIEW IF NOT EXISTS v1 AS VALUES (CURRENT_DATE); VALUES (count(*) OVER (), NULL); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c1); INSERT INTO "
+    },
+    {
+      "hash": "0f579cc6d50232a7",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000054428",
+      "top_frames": [
+        "<no-stack-a6c700e9eb3690e6>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 NUMERIC); CREATE VIEW IF NOT EXISTS v1 AS VALUES (CURRENT_DATE); VALUES (X'EBEfDbAbfBcD'); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c3); INSERT INTO p DEFAU"
+    },
+    {
+      "hash": "864e2944c5f1c47f",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000054793",
+      "top_frames": [
+        "<no-stack-d38f496d0513f59e>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 NUMERIC); CREATE VIEW IF NOT EXISTS v1 AS VALUES (CURRENT_DATE); EXPLAIN QUERY PLAN SELECT CURRENT_TIMESTAMP COLLATE BINARY AS g0_4a9x9h_q7 ORDER BY CURRENT_DATE COLLAT"
+    },
+    {
+      "hash": "a17ead255654f3ba",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000054893",
+      "top_frames": [
+        "<no-stack-0db7ca497fc7c9d8>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 NUMERIC); CREATE VIEW IF NOT EXISTS v1 AS VALUES (CURRENT_DATE); SELECT * FROM (SELECT * FROM p WHERE CURRENT_TIME COLLATE NOCASE < CURRENT_TIMESTAMP) AS sub1; CREATE V"
+    },
+    {
+      "hash": "0cccf336c16062e7",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000055030",
+      "top_frames": [
+        "<no-stack-8dc10ab2fbdea4ad>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 NUMERIC); CREATE VIEW IF NOT EXISTS v1 AS VALUES (CURRENT_DATE); SELECT * FROM (SELECT * FROM p WHERE TRUE OR RAISE(IGNORE)) AS sub1; SELECT printf('%.*f', -2147483649,"
+    },
+    {
+      "hash": "7430d31c905d8c0a",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000055534",
+      "top_frames": [
+        "<no-stack-7f0d0fcda6288b6b>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 NUMERIC); CREATE VIEW IF NOT EXISTS v1 AS VALUES (CURRENT_DATE); SELECT * FROM (SELECT * FROM p WHERE CURRENT_TIME NOT IN (SELECT * FROM p NOT INDEXED WHERE CURRENT_TIM"
+    },
+    {
+      "hash": "59437e299e8816b4",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000056745",
+      "top_frames": [
+        "<no-stack-6af8a02c7ccfeca4>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 NUMERIC); CREATE VIEW IF NOT EXISTS v1 AS VALUES (CURRENT_DATE); SELECT count(*) OVER () AS o4_8_v4____pe156h_n1wssh31_7k98431_8u16_pll_r780_u_1cu_98_98__3_rcic_217i__e"
+    },
+    {
+      "hash": "b4e4324c040bbd66",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000057359",
+      "top_frames": [
+        "<no-stack-9749a8a4d72b0412>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 NUMERIC); CREATE VIEW IF NOT EXISTS v1 AS VALUES (CURRENT_DATE); SELECT * FROM (SELECT * FROM p WHERE CURRENT_TIME NOT BETWEEN TRUE AND CURRENT_TIME) AS sub1; SELECT pr"
+    },
+    {
+      "hash": "3c3c04527ed04779",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000057694",
+      "top_frames": [
+        "<no-stack-c008279ac6755c56>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 BLOB DEFAULT -49061700399859.5695452180872605652294754737168978401855037896720742621653296208478134090255782486379662970647184752784757047050046931654672513274178814426"
+    },
+    {
+      "hash": "df40ea6d7ac4eb50",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000058219",
+      "top_frames": [
+        "<no-stack-a80f1ca28a1ffcb8>"
+      ],
+      "sql_preview": "SELECT printf('%.*f', 9223372036854775807, -1e308); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c1); INSERT INTO p DEFAULT VALUES; ANALYZE p; SELECT hex(zeroblob(9223372036854775807));"
+    },
+    {
+      "hash": "5b651e990afac899",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000058593",
+      "top_frames": [
+        "<no-stack-3b8e769388c33788>"
+      ],
+      "sql_preview": "SELECT substr('-sx_ -c Na -h ', -2147483649); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c1, b, c3, c1); SELECT FALSE LIKE FALSE AS i FROM t3 WHERE EXISTS (SELECT * FROM t1 INNER JOIN t1 NOT"
+    },
+    {
+      "hash": "755cb88fc57e2d10",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000060890",
+      "top_frames": [
+        "<no-stack-f396af151c7ab4ec>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b INTEGER, c3 FLOAT PRIMARY KEY); CREATE INDEX IF NOT EXISTS idx1 ON p(b); INSERT INTO p DEFAULT VALUES; EXPLAIN QUERY PLAN VALUES (TRUE); CREATE TABLE IF NOT EXISTS p(c1 "
+    },
+    {
+      "hash": "6b6ccac577789d91",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000060941",
+      "top_frames": [
+        "<no-stack-47055e8f0d86f619>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b INTEGER, c3 FLOAT PRIMARY KEY); CREATE INDEX IF NOT EXISTS idx1 ON p(b); INSERT INTO p DEFAULT VALUES; EXPLAIN QUERY PLAN VALUES (TRUE); SELECT round(-1e308, 0); CREATE "
+    },
+    {
+      "hash": "f8282e8537a36fc1",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000060995",
+      "top_frames": [
+        "<no-stack-4ad7eb95e934d6e1>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b INTEGER, c3 FLOAT PRIMARY KEY); CREATE INDEX IF NOT EXISTS idx1 ON p(b); INSERT INTO p DEFAULT VALUES; EXPLAIN QUERY PLAN VALUES (TRUE); SELECT printf('%.*f', -214748364"
+    },
+    {
+      "hash": "6cfa9bc58e8853c1",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000061001",
+      "top_frames": [
+        "<no-stack-f984ec9c17d66ac8>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b INTEGER, c3 FLOAT PRIMARY KEY); CREATE INDEX IF NOT EXISTS idx1 ON p(b); INSERT INTO p DEFAULT VALUES; EXPLAIN QUERY PLAN VALUES (TRUE); CREATE TABLE IF NOT EXISTS p(b F"
+    },
+    {
+      "hash": "01907034725593cf",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000061060",
+      "top_frames": [
+        "<no-stack-273020807eba76ec>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b INTEGER, c3 FLOAT PRIMARY KEY); CREATE INDEX IF NOT EXISTS idx1 ON p(b); INSERT INTO p DEFAULT VALUES; EXPLAIN QUERY PLAN VALUES (TRUE); CREATE TABLE IF NOT EXISTS p(c1 "
+    },
+    {
+      "hash": "c749bf232a512654",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000061085",
+      "top_frames": [
+        "<no-stack-911d5079440cf40f>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b INTEGER); CREATE INDEX IF NOT EXISTS idx1 ON p(b); INSERT INTO p DEFAULT VALUES; EXPLAIN QUERY PLAN VALUES (TRUE); CREATE TABLE IF NOT EXISTS p(c1 TEXT NOT NULL DEFAULT "
+    },
+    {
+      "hash": "cde35729431270a7",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000061755",
+      "top_frames": [
+        "<no-stack-9c15c6286a1d22f0>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 INT); INSERT OR REPLACE INTO p VALUES (last_insert_rowid()); PRAGMA quick_check; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(b); INSERT INTO p DEFAULT VALUES; "
+    },
+    {
+      "hash": "487b80908ef8f1d8",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000061889",
+      "top_frames": [
+        "<no-stack-3294a38b449cc042>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 INT); INSERT OR REPLACE INTO p VALUES (last_insert_rowid()); PRAGMA quick_check; SELECT printf('%x', 2147483648, '_1qp - _ 6-u 6j __ '); CREATE VIRTUAL TABLE IF NOT EXI"
+    },
+    {
+      "hash": "6f8d7f9c6acd7c14",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000062031",
+      "top_frames": [
+        "<no-stack-5024e32122df5545>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a NUMERIC, rowid GENERATED ALWAYS AS (a) NOT NULL); INSERT OR REPLACE INTO p VALUES (TRUE); PRAGMA quick_check; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(b); IN"
+    },
+    {
+      "hash": "227553b9205e4b3c",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000062153",
+      "top_frames": [
+        "<no-stack-d3f446a1af66191a>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 INT); INSERT OR REPLACE INTO p VALUES (char(NULL) NOT LIKE TRUE); PRAGMA quick_check; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c3); INSERT INTO p DEFAULT VA"
+    },
+    {
+      "hash": "f3e7fc9e4de8a319",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000062301",
+      "top_frames": [
+        "<no-stack-33bbd51710127f3f>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 INT); INSERT OR REPLACE INTO p VALUES (total_changes() NOT LIKE TRUE); PRAGMA quick_check; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c3); INSERT INTO p DEFAU"
+    },
+    {
+      "hash": "6b8d95336a9a80ff",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000062679",
+      "top_frames": [
+        "<no-stack-20f68942bb22506d>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b INTEGER PRIMARY KEY); INSERT OR REPLACE INTO p VALUES (CURRENT_TIME NOT LIKE TRUE); PRAGMA quick_check; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c1); INSERT "
+    },
+    {
+      "hash": "c1a1cc2f3ab8a67a",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000063106",
+      "top_frames": [
+        "<no-stack-abdd780876f09e95>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 INTEGER PRIMARY KEY); INSERT OR ABORT INTO p VALUES (FALSE); PRAGMA integrity_check; SELECT hex(zeroblob(-2147483649)); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING "
+    },
+    {
+      "hash": "7c4c202f9d51fb24",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000063679",
+      "top_frames": [
+        "<no-stack-4b7911c1a392f839>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BOOLEAN NOT NULL DEFAULT -7255423084591324945087681714187123153014764223574097014592745294747862531320266699223167324791238013984899650100404431035245565077220646984.878"
+    },
+    {
+      "hash": "795e474f3ace580e",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000064583",
+      "top_frames": [
+        "<no-stack-74212798693e7ef5>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(c1 BLOB NOT NULL DEFAULT -0); INSERT INTO q DEFAULT VALUES; PRAGMA integrity_check; CREATE VIRTUAL TABLE IF NOT EXISTS"
+    },
+    {
+      "hash": "a2615386bed50d10",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000064724",
+      "top_frames": [
+        "<no-stack-bdf61a60a244d910>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(c1 BLOB NOT NULL DEFAULT TRUE); INSERT INTO q DEFAULT VALUES; PRAGMA integrity_check; CREATE VIRTUAL TABLE IF NOT EXIS"
+    },
+    {
+      "hash": "d9507b3fbe8c383a",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000064856",
+      "top_frames": [
+        "<no-stack-1ddb79b7effda9b1>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(a INT UNIQUE); INSERT OR FAIL INTO p VALUES (CURRENT_DATE * CURRENT_DATE); PRAGMA integrity_check; CREATE VIRTUAL TABL"
+    },
+    {
+      "hash": "aba05fa1f15ca629",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000065747",
+      "top_frames": [
+        "<no-stack-10117ba616f9af04>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(a INT UNIQUE); INSERT OR FAIL INTO p VALUES (CURRENT_DATE); PRAGMA integrity_check; SELECT hex(zeroblob(-2147483648));"
+    },
+    {
+      "hash": "378f354bbae3caa9",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000065782",
+      "top_frames": [
+        "<no-stack-feea73249a8c2751>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(a INT UNIQUE); INSERT OR FAIL INTO p VALUES (TRUE); PRAGMA integrity_check; CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRI"
+    },
+    {
+      "hash": "bc5186a0392c8963",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000066974",
+      "top_frames": [
+        "<no-stack-87f49447fa88fad9>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(c1 TEXT NOT NULL); INSERT OR ABORT INTO q VALUES (FALSE IN (SELECT CURRENT_TIMESTAMP UNION SELECT CURRENT_DATE ORDER B"
+    },
+    {
+      "hash": "d59e0b9fc2a0cde8",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000067188",
+      "top_frames": [
+        "<no-stack-17da59e0d9d109de>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(c1 TEXT NOT NULL); INSERT OR ABORT INTO q VALUES (FALSE IN (SELECT CURRENT_TIMESTAMP UNION SELECT CURRENT_DATE ORDER B"
+    },
+    {
+      "hash": "04c2e493041fe7e8",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000067579",
+      "top_frames": [
+        "<no-stack-5586d6ae518cc45a>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(c1 TEXT NOT NULL); INSERT OR ABORT INTO p VALUES (CURRENT_DATE << CURRENT_TIME); PRAGMA integrity_check; CREATE VIRTUA"
+    },
+    {
+      "hash": "c0aa80b53828ddbb",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000067899",
+      "top_frames": [
+        "<no-stack-b9744fe40623258c>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(c3 REAL NOT NULL); INSERT OR ABORT INTO q VALUES (FALSE IN (VALUES (CURRENT_TIMESTAMP) UNION SELECT CURRENT_DATE ORDER"
+    },
+    {
+      "hash": "07dfe2486db043e9",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000068016",
+      "top_frames": [
+        "<no-stack-9694c3efd7dbc561>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(c3 REAL NOT NULL); INSERT OR ABORT INTO q VALUES (CURRENT_DATE); PRAGMA quick_check; CREATE VIRTUAL TABLE IF NOT EXIST"
+    },
+    {
+      "hash": "c77c8a8c1cc69a99",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000073923",
+      "top_frames": [
+        "<no-stack-31bf6e8e531b6121>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 INTEGER); CREATE TABLE IF NOT EXISTS q(a REAL); INSERT INTO p DEFAULT VALUES; WITH p AS (VALUES (FALSE)) VALUES (FALSE NOT BETWEEN FALSE AND FALSE NOT BETWEEN FALSE AND"
+    },
+    {
+      "hash": "28d75f81e69f32fd",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000080450",
+      "top_frames": [
+        "<no-stack-746e53d13f1dd42c>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 VARCHAR(255) UNIQUE); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; SELECT * FROM p NOT INDEXED WHERE CURRENT_TIMESTAMP GROUP BY CURRENT_TIMESTAMP HAVING CAST(CURRENT_TIMES"
+    },
+    {
+      "hash": "931dbf02b2c32b39",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000080675",
+      "top_frames": [
+        "<no-stack-d49ccd75461df671>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 VARCHAR(255) UNIQUE); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; SELECT * FROM p NOT INDEXED WHERE CURRENT_TIMESTAMP GROUP BY CURRENT_TIMESTAMP HAVING CURRENT_DATE IS NO"
+    },
+    {
+      "hash": "2b60e31695e5a689",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000080853",
+      "top_frames": [
+        "<no-stack-f97536cf57befdc3>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 VARCHAR(255) UNIQUE); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; SELECT * FROM p NOT INDEXED WHERE CURRENT_TIMESTAMP GROUP BY CURRENT_TIMESTAMP HAVING CURRENT_TIME + CUR"
+    },
+    {
+      "hash": "d579983833cec17d",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000080891",
+      "top_frames": [
+        "<no-stack-9ff1e4b19d503744>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 VARCHAR(255) UNIQUE); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; SELECT * FROM p NOT INDEXED WHERE CURRENT_TIMESTAMP GROUP BY CURRENT_TIMESTAMP HAVING count(*) FILTER (W"
+    },
+    {
+      "hash": "99c01f5da02945f7",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000081302",
+      "top_frames": [
+        "<no-stack-9db36a210af4a522>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 VARCHAR(255) UNIQUE); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; SELECT * FROM p NOT INDEXED WHERE CURRENT_TIMESTAMP IN (VALUES (CURRENT_TIME)) GROUP BY TRUE ORDER BY TR"
+    },
+    {
+      "hash": "8740d15e73f19c22",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000081554",
+      "top_frames": [
+        "<no-stack-85e8fe95fdf1deed>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 VARCHAR(255) UNIQUE); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; SELECT * FROM p NOT INDEXED WHERE TRUE BETWEEN NULL AND CURRENT_TIMESTAMP GROUP BY TRUE ORDER BY TRUE DE"
+    },
+    {
+      "hash": "1a03ef258cfe9797",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000082025",
+      "top_frames": [
+        "<no-stack-a88036fda2f12635>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 VARCHAR(255) UNIQUE); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; SELECT * FROM p NOT INDEXED WHERE '' GROUP BY TRUE ORDER BY TRUE DESC NULLS FIRST; CREATE VIRTUAL TABLE "
+    },
+    {
+      "hash": "5a362a60a6ef91d5",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000083480",
+      "top_frames": [
+        "<no-stack-a49d46ca43cf6de0>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 VARCHAR(255)); CREATE TABLE IF NOT EXISTS q(c1 TEXT PRIMARY KEY); EXPLAIN QUERY PLAN SELECT count(*) OVER () AS o4_8_v4____pe156h_n1wssh31_7k98431_8u16_pll_r780_u_1cu_9"
+    },
+    {
+      "hash": "a774ae00b9be91e7",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000083747",
+      "top_frames": [
+        "<no-stack-65d07dc2869f298b>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 NUMERIC); CREATE TABLE IF NOT EXISTS q(a INTEGER NOT NULL); SELECT * FROM p NATURAL JOIN p WHERE NULL == CURRENT_TIMESTAMP; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 US"
+    },
+    {
+      "hash": "d7c71805991074ee",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000084074",
+      "top_frames": [
+        "<no-stack-5a59551249f31218>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 INT GENERATED ALWAYS AS (FALSE) STORED, rowid DATE PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(a INTEGER NOT NULL); SELECT * FROM p NATURAL JOIN p WHERE FALSE; CREATE VI"
+    },
+    {
+      "hash": "eaddfc40e7fbb03d",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000084357",
+      "top_frames": [
+        "<no-stack-0289c5624dabd278>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 NUMERIC); CREATE TABLE IF NOT EXISTS q(a INTEGER NOT NULL); SELECT * FROM q NATURAL JOIN p WHERE FALSE; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c1); INSERT"
+    },
+    {
+      "hash": "910f97d952ca8c1d",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000084467",
+      "top_frames": [
+        "<no-stack-3a4f67f3dc8191bb>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 BLOB GENERATED ALWAYS AS (TRUE) STORED, c2 INTEGER NOT NULL); CREATE TABLE IF NOT EXISTS q(a INTEGER NOT NULL); SELECT * FROM p NATURAL JOIN p WHERE FALSE; CREATE VIRTU"
+    },
+    {
+      "hash": "765e8c45466275f5",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000084859",
+      "top_frames": [
+        "<no-stack-2dd909d64fe031fb>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 BLOB CHECK (CURRENT_DATE), b BOOLEAN UNIQUE); SELECT * FROM p NATURAL JOIN p WHERE FALSE; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c3); INSERT INTO p DEFAUL"
+    },
+    {
+      "hash": "d5602b08facc516d",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000096973",
+      "top_frames": [
+        "<no-stack-f1f1a3a7983468ce>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 BLOB UNIQUE); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; INSERT OR ABORT INTO p VALUES (CURRENT_TIME LIKE CURRENT_DATE OR TRUE); PRAGMA integrity_check; SELECT printf('%"
+    },
+    {
+      "hash": "59a4e701214aa83c",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000097180",
+      "top_frames": [
+        "<no-stack-1c861443b88e16fa>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 BLOB UNIQUE); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; INSERT OR ABORT INTO p VALUES (CURRENT_TIME - FALSE); PRAGMA integrity_check; CREATE VIRTUAL TABLE IF NOT EXISTS"
+    },
+    {
+      "hash": "11c68bd526da8879",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000097349",
+      "top_frames": [
+        "<no-stack-f9713246c3cde34f>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 BLOB UNIQUE); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; INSERT OR ABORT INTO p VALUES (CURRENT_DATE OR TRUE == CURRENT_TIME); PRAGMA integrity_check; CREATE VIRTUAL TAB"
+    },
+    {
+      "hash": "838b3e7b28f9f8c0",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000097771",
+      "top_frames": [
+        "<no-stack-e42224996f42516d>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b FLOAT UNIQUE); SELECT * FROM (SELECT p.* FROM p WHERE CURRENT_TIME) AS sub1; CREATE TABLE IF NOT EXISTS p(a DATE, c2 GENERATED ALWAYS AS (coalesce(a, b)) ); INSERT INTO "
+    },
+    {
+      "hash": "b5357807801eabfb",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000098173",
+      "top_frames": [
+        "<no-stack-2d2e3248010a17fe>"
+      ],
+      "sql_preview": "SELECT printf('%.*s', 4294967295); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c2); INSERT OR FAIL INTO p VALUES (CURRENT_TIME); PRAGMA integrity_check; SELECT hex(zeroblob(2147483647));"
+    },
+    {
+      "hash": "90397c79cf78d7ea",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000098361",
+      "top_frames": [
+        "<no-stack-172ebebe681b9a9e>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a INTEGER PRIMARY KEY); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; INSERT INTO p VALUES (-2696.98540809212866282108054857756194413524981986976766375767541232669437613610307"
+    },
+    {
+      "hash": "a6f88d25b92f685d",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000098499",
+      "top_frames": [
+        "<no-stack-0e49c012d1f6cfe7>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a INTEGER PRIMARY KEY); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; INSERT INTO p VALUES (CURRENT_TIMESTAMP IN (VALUES (CURRENT_TIME))); EXPLAIN QUERY PLAN VALUES (CURRENT_T"
+    },
+    {
+      "hash": "0e53bbe1d576a765",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000099412",
+      "top_frames": [
+        "<no-stack-75686395da59cfb9>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a INTEGER PRIMARY KEY); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; INSERT INTO p VALUES (-413); VALUES (CURRENT_TIME); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5("
+    },
+    {
+      "hash": "04b2c8d0d8c94e71",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000099469",
+      "top_frames": [
+        "<no-stack-e03b3b2f492c7765>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a INTEGER PRIMARY KEY); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; INSERT INTO p VALUES (TRUE IN (SELECT FALSE % CURRENT_TIME)); VALUES (CURRENT_DATE); CREATE VIRTUAL TABLE"
+    },
+    {
+      "hash": "f0fbe83fbbe9e893",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000099694",
+      "top_frames": [
+        "<no-stack-e396ff92c904eea7>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a INTEGER PRIMARY KEY); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; INSERT INTO p VALUES (TRUE IN (SELECT CURRENT_TIMESTAMP FROM p WHERE CURRENT_TIMESTAMP GROUP BY CURRENT_T"
+    },
+    {
+      "hash": "98eadc7c646f79ee",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000099954",
+      "top_frames": [
+        "<no-stack-f684e314be4cdf05>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a INTEGER PRIMARY KEY); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; INSERT INTO p VALUES (TRUE IN (SELECT * FROM p GROUP BY CURRENT_TIMESTAMP)); EXPLAIN QUERY PLAN VALUES (C"
+    },
+    {
+      "hash": "83261da61f6da68d",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000100295",
+      "top_frames": [
+        "<no-stack-4619d2edf826e10a>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a INTEGER PRIMARY KEY); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; INSERT INTO p VALUES (CURRENT_TIME IN (VALUES (CURRENT_TIME))); VALUES (TRUE); CREATE VIRTUAL TABLE IF NO"
+    },
+    {
+      "hash": "07edb84e6b744af1",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000101829",
+      "top_frames": [
+        "<no-stack-45f39afbb4899f5c>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b REAL UNIQUE); INSERT OR REPLACE INTO p VALUES ((SELECT * FROM p NOT INDEXED WHERE FALSE GROUP BY FALSE WINDOW w1 AS ())); PRAGMA integrity_check; CREATE VIRTUAL TABLE IF"
+    },
+    {
+      "hash": "08bd3cf8403b8921",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000101840",
+      "top_frames": [
+        "<no-stack-91b6403d4e3cfdc4>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b DATE, a GENERATED ALWAYS AS (a) NOT NULL); SELECT CURRENT_TIMESTAMP UNION ALL SELECT CURRENT_DATE AS g0_4a9x9h_q7 ORDER BY CURRENT_TIMESTAMP ASC NULLS FIRST; CREATE VIRT"
+    },
+    {
+      "hash": "dc1e56dc04a151b0",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000101871",
+      "top_frames": [
+        "<no-stack-05796451459388c0>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 REAL NOT NULL); CREATE VIEW IF NOT EXISTS v1 AS SELECT ALL total_changes() OVER (ORDER BY CURRENT_TIME DESC NULLS LAST ROWS BETWEEN CURRENT_TIME PRECEDING AND NULL FOLL"
+    },
+    {
+      "hash": "c4670afd29617cd5",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000110671",
+      "top_frames": [
+        "<no-stack-4a89e0ba974cbfdc>"
+      ],
+      "sql_preview": "CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts3(c1); WITH RECURSIVE p AS (VALUES (CURRENT_TIME) EXCEPT SELECT CURRENT_TIME) SELECT * FROM p; SELECT printf('%.*f', -2147483649, 1e308);"
+    },
+    {
+      "hash": "cc96f2e7190fb584",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000114641",
+      "top_frames": [
+        "<no-stack-41bd9dc740911d7c>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a NUMERIC NOT NULL, b NUMERIC PRIMARY KEY); CREATE INDEX IF NOT EXISTS idx1 ON p(a); WITH RECURSIVE t2 AS (SELECT *) SELECT * FROM p; CREATE VIRTUAL TABLE IF NOT EXISTS ft"
+    },
+    {
+      "hash": "5b7d3073f65012cc",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000115915",
+      "top_frames": [
+        "<no-stack-edf306032662c141>"
+      ],
+      "sql_preview": "SELECT substr('', -2147483649, 9223372036854775807); SELECT printf('%.*f', -2147483649, 1e308);"
+    },
+    {
+      "hash": "5fc204aef83eace2",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000118647",
+      "top_frames": [
+        "<no-stack-4ff20f03b3ff6e59>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 INTEGER UNIQUE); EXPLAIN QUERY PLAN VALUES (CURRENT_TIME) EXCEPT SELECT FALSE | CURRENT_DATE COLLATE RTRIM; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(a); INS"
+    },
+    {
+      "hash": "122dc0917c14e942",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000118804",
+      "top_frames": [
+        "<no-stack-276d6b98157bd1b5>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 INTEGER UNIQUE); EXPLAIN QUERY PLAN VALUES (CURRENT_TIME) EXCEPT SELECT FALSE / CURRENT_DATE; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c2); INSERT OR FAIL I"
+    },
+    {
+      "hash": "a9fa4a2f23f14d60",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000119216",
+      "top_frames": [
+        "<no-stack-e60676c4548eb8b5>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 INTEGER UNIQUE); EXPLAIN QUERY PLAN VALUES (CURRENT_TIME > FALSE) EXCEPT SELECT TRUE BETWEEN NULL AND CURRENT_TIMESTAMP; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING"
+    },
+    {
+      "hash": "2cbbd5a21ccf60d0",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000119383",
+      "top_frames": [
+        "<no-stack-03f594936ecec195>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 INTEGER UNIQUE); EXPLAIN QUERY PLAN SELECT * FROM p WHERE CURRENT_TIMESTAMP GROUP BY CURRENT_TIME WINDOW w1 AS () EXCEPT SELECT CURRENT_DATE; CREATE VIRTUAL TABLE IF NO"
+    },
+    {
+      "hash": "563a6bdfca943eba",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000119595",
+      "top_frames": [
+        "<no-stack-bc0369e18eb296b8>"
+      ],
+      "sql_preview": "CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts3(b); EXPLAIN QUERY PLAN VALUES (TRUE) INTERSECT SELECT CURRENT_DATE; SELECT printf('%.*g', 2147483647, 0.01);"
+    },
+    {
+      "hash": "b0d4108fe75a01f0",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000119951",
+      "top_frames": [
+        "<no-stack-a6ee832451a8ac9c>"
+      ],
+      "sql_preview": "CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts3(c2); EXPLAIN QUERY PLAN VALUES (CURRENT_TIME > CURRENT_TIME > CURRENT_TIME > CURRENT_TIME > CURRENT_TIME > CURRENT_TIME > CURRENT_TIME > CURRENT_TI"
+    },
+    {
+      "hash": "45424c1d4c72bc6a",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000126800",
+      "top_frames": [
+        "<no-stack-cdaafcedc7942818>"
+      ],
+      "sql_preview": "SELECT substr('', 9223372036854775807); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c1); SELECT CURRENT_DATE ->> TRUE > CURRENT_TIMESTAMP NOT NULL AS t_od FROM p WHERE EXISTS (SELECT DISTINCT"
+    },
+    {
+      "hash": "39b7580505d8e58c",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000128046",
+      "top_frames": [
+        "<no-stack-6ad8b5c3b109fb3c>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 INT UNIQUE); CREATE TABLE IF NOT EXISTS q(c2 VARCHAR(255) UNIQUE); SELECT FALSE >> CURRENT_DATE IS NOT FALSE ORDER BY CURRENT_DATE ASC NULLS LAST; CREATE VIRTUAL TABLE "
+    },
+    {
+      "hash": "02f009b52aea59d8",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000135395",
+      "top_frames": [
+        "<no-stack-1fb6bc2b90c5439c>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b DATE, a GENERATED ALWAYS AS (a) NOT NULL UNIQUE); WITH RECURSIVE t2 AS (SELECT *) SELECT CURRENT_TIMESTAMP AS g_f__ FROM p; SELECT printf('%.*f', -2147483649, 1e308);"
+    },
+    {
+      "hash": "652056c9f00af1cd",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000143510",
+      "top_frames": [
+        "<no-stack-3a67bb2e94325b36>"
+      ],
+      "sql_preview": "CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts3(c2); SELECT CURRENT_DATE || NULL AS r_8___e___1m9_di60caft23_0pi95_0__k6_3___4unm8_877_pv_mo0ml___v_ UNION ALL SELECT CURRENT_DATE AS g0_4a9x9h_q7 "
+    },
+    {
+      "hash": "f8fff50475ae3943",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000144431",
+      "top_frames": [
+        "<no-stack-1be719bf110c1efd>"
+      ],
+      "sql_preview": "CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts3(c3); VALUES (NULL) EXCEPT VALUES (CURRENT_TIMESTAMP) UNION ALL VALUES (min(FALSE)); SELECT printf('%.*f', -2147483649, 1e308);"
+    },
+    {
+      "hash": "99e59c9bf56fe3ba",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000144582",
+      "top_frames": [
+        "<no-stack-4e02993fc8ae7adf>"
+      ],
+      "sql_preview": "CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts3(c3); VALUES (NULL) EXCEPT VALUES (CURRENT_TIMESTAMP) UNION ALL VALUES (CURRENT_TIME); SELECT printf('%.*f', -2147483649, 1e308);"
+    },
+    {
+      "hash": "d183d5b918a648b4",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000145352",
+      "top_frames": [
+        "<no-stack-d27533b64d0fa6ff>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 NUMERIC NOT NULL DEFAULT 5092733011042654156582870086161136879438981605685354486370992241601318183832796.9e+0472); SELECT CURRENT_TIMESTAMP UNION ALL SELECT CURRENT_DAT"
+    },
+    {
+      "hash": "83846dadf87847de",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000145371",
+      "top_frames": [
+        "<no-stack-51c4dcc28f42bb61>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 DATE NOT NULL); CREATE VIEW IF NOT EXISTS v1 AS VALUES (random() FILTER (WHERE TRUE)) EXCEPT SELECT * ORDER BY CURRENT_TIMESTAMP DESC NULLS LAST; SELECT CURRENT_TIMESTA"
+    },
+    {
+      "hash": "c2ae155dc5ee0d22",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000145400",
+      "top_frames": [
+        "<no-stack-4a8cb7f2b895d850>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 BLOB GENERATED ALWAYS AS (NULL) STORED, c2 INTEGER NOT NULL); CREATE INDEX IF NOT EXISTS idx1 ON p(c3); SELECT CURRENT_TIMESTAMP UNION ALL SELECT CURRENT_DATE AS g0_4a9"
+    },
+    {
+      "hash": "9a703f46518500ea",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000146194",
+      "top_frames": [
+        "<no-stack-67f89053b6d8fa50>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b TEXT PRIMARY KEY); SELECT DISTINCT max(NULL) AS o4_8_v4____pe156h_n1wssh31_7k98431_8u16_pll_r780_u_1cu_98_98__3_rcic_217i__e_2_m340_3g8507ww_lzz62_32312c7t_1_949__g__8z_"
+    },
+    {
+      "hash": "32bf7aec2db4a2cd",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000146361",
+      "top_frames": [
+        "<no-stack-1b967ed7b91c6765>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b TEXT PRIMARY KEY); SELECT DISTINCT * FROM p NOT INDEXED UNION ALL VALUES (FALSE); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c1); INSERT INTO p DEFAULT VALUES;"
+    },
+    {
+      "hash": "b975e7dad9caaccf",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000146368",
+      "top_frames": [
+        "<no-stack-99ecc6ca2e20e72f>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b TEXT PRIMARY KEY); SELECT DISTINCT FALSE AS o4_8_v4____pe156h_n1wssh31_7k98431_8u16_pll_r780_u_1cu_98_98__3_rcic_217i__e_2_m340_3g8507ww_lzz62_32312c7t_1_949__g__8z__22h"
+    },
+    {
+      "hash": "f1d4c0d7aca32ba7",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000147202",
+      "top_frames": [
+        "<no-stack-a08d19d892f033c5>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a INTEGER PRIMARY KEY); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; INSERT INTO p VALUES (TRUE IN (SELECT FALSE % count(*) OVER (ORDER BY CURRENT_TIME DESC NULLS LAST ROWS B"
+    },
+    {
+      "hash": "533882389aa963b9",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000147401",
+      "top_frames": [
+        "<no-stack-00ce57a2aa7b8f87>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a INTEGER PRIMARY KEY); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; INSERT OR FAIL INTO p VALUES (CURRENT_DATE * CURRENT_DATE * CURRENT_DATE); VALUES (CURRENT_DATE); CREATE "
+    },
+    {
+      "hash": "a69b524bedd68e1c",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000147638",
+      "top_frames": [
+        "<no-stack-19f6cdbdfa43c4ff>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a INTEGER PRIMARY KEY); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; INSERT OR FAIL INTO p VALUES (CURRENT_DATE * CURRENT_TIMESTAMP); VALUES (CURRENT_DATE); CREATE VIRTUAL TA"
+    },
+    {
+      "hash": "f9a18d8875e262ef",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000148568",
+      "top_frames": [
+        "<no-stack-3c7e07a055b8a16b>"
+      ],
+      "sql_preview": "SELECT printf('%.*g', 2147483648); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c2, b); SELECT CASE +RAISE(IGNORE) >= CURRENT_DATE + CURRENT_TIME == RAISE(IGNORE) IS NOT NULL NOT BETWEEN FALSE"
+    },
+    {
+      "hash": "aa8b41303c8bc8e5",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000149609",
+      "top_frames": [
+        "<no-stack-ee4770a01ae57698>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a INTEGER PRIMARY KEY); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; INSERT INTO p VALUES (-2696.98540809212866282108054857756194413524981986976766375767541232669437613610307"
+    },
+    {
+      "hash": "75f5ace0b58e375e",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000150023",
+      "top_frames": [
+        "<no-stack-4b4b9b462d1fe098>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a INTEGER PRIMARY KEY); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; INSERT INTO p VALUES (X'' IN (VALUES (CURRENT_TIME))); EXPLAIN QUERY PLAN VALUES (CURRENT_TIME); CREATE V"
+    },
+    {
+      "hash": "60f3fb69363e2100",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000150192",
+      "top_frames": [
+        "<no-stack-2e31c4db6510d2ef>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a INTEGER PRIMARY KEY); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; INSERT INTO p VALUES (NULL); EXPLAIN QUERY PLAN VALUES (CURRENT_TIME); CREATE VIRTUAL TABLE IF NOT EXISTS"
+    },
+    {
+      "hash": "72e18774905009f2",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000150549",
+      "top_frames": [
+        "<no-stack-42e380d66cf184e5>"
+      ],
+      "sql_preview": "SELECT printf('%.*s', 4294967295); SELECT hex(zeroblob(-2147483648)); SELECT printf('%.*d', -2147483649, -1.0); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c1, b); WITH RECURSIVE r AS (WITH R"
+    },
+    {
+      "hash": "9b821e3498dbb994",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000151355",
+      "top_frames": [
+        "<no-stack-089fc777d2e28970>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 BLOB UNIQUE); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; INSERT OR ABORT INTO p VALUES (X'Ee63DaBEabFc3d' == CURRENT_TIME); PRAGMA integrity_check; CREATE VIRTUAL TABLE "
+    },
+    {
+      "hash": "da918fc403fcdb67",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000156370",
+      "top_frames": [
+        "<no-stack-d9e7f1934acf485d>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(_rowid_ DATE NOT NULL); CREATE VIEW IF NOT EXISTS v1 AS VALUES (RAISE(IGNORE)); SELECT max(NULL) AS o4_8_v4____pe156h_n1wssh31_7k98431_8u16_pll_r780_u_1cu_98_98__3_rcic_21"
+    },
+    {
+      "hash": "e2a5f9b6d2975573",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000164913",
+      "top_frames": [
+        "<no-stack-97295213faef3e70>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 FLOAT NOT NULL); SELECT count(*) OVER (ORDER BY NULL ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS o4_8_v4____pe156h_n1wssh31_7k98431_8u16_pll_"
+    },
+    {
+      "hash": "2ff4a8cfb4a24ce6",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000165847",
+      "top_frames": [
+        "<no-stack-8547dedbfd8cc42e>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 BLOB GENERATED ALWAYS AS (TRUE) STORED, c2 VARCHAR(255) NOT NULL); CREATE TABLE IF NOT EXISTS q(a INTEGER NOT NULL); SELECT * FROM p NATURAL JOIN p WHERE FALSE; CREATE "
+    },
+    {
+      "hash": "59966c553b42b599",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000165973",
+      "top_frames": [
+        "<no-stack-75afc8ed074a2fdf>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a VARCHAR(255) UNIQUE); CREATE TABLE IF NOT EXISTS q(a INTEGER NOT NULL); SELECT * FROM p NATURAL JOIN p WHERE FALSE; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5("
+    },
+    {
+      "hash": "65e69dd288a28e47",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000166002",
+      "top_frames": [
+        "<no-stack-45cf0eac86b0b3ba>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 DATE PRIMARY KEY, a INTEGER); CREATE TABLE IF NOT EXISTS q(a INTEGER NOT NULL); SELECT * FROM q NATURAL JOIN p WHERE FALSE; SELECT printf('%.*f', -2147483649, 1e308);"
+    },
+    {
+      "hash": "1379c7e9694e5de3",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000166169",
+      "top_frames": [
+        "<no-stack-426dbcd9c3ff5c3a>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL UNIQUE); CREATE TABLE IF NOT EXISTS q(a INTEGER NOT NULL); SELECT * FROM q NATURAL JOIN p WHERE FALSE; SELECT printf('%.*f', -2147483649, 1e308);"
+    },
+    {
+      "hash": "ead5665dd204af51",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000166228",
+      "top_frames": [
+        "<no-stack-b11bf63b84bfe3ae>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 NUMERIC); CREATE TABLE IF NOT EXISTS q(c3 TEXT PRIMARY KEY); SELECT * FROM q NATURAL JOIN p WHERE FALSE; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(b); INSERT"
+    },
+    {
+      "hash": "c2baa2bd28909415",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000166386",
+      "top_frames": [
+        "<no-stack-ad2dc8b77ee11b0c>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b INTEGER, a VARCHAR(255) PRIMARY KEY); CREATE INDEX IF NOT EXISTS idx1 ON p(b); SELECT * FROM p NATURAL JOIN p WHERE FALSE; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USIN"
+    },
+    {
+      "hash": "5d6fa47076ae5398",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000166772",
+      "top_frames": [
+        "<no-stack-877f2812c0c127c1>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 NUMERIC); CREATE TABLE IF NOT EXISTS q(a INTEGER NOT NULL); SELECT * FROM p NATURAL JOIN p WHERE CURRENT_TIMESTAMP LIKE CURRENT_TIME ESCAPE NULL; CREATE VIRTUAL TABLE I"
+    },
+    {
+      "hash": "ad546ac1e9d6014a",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000167906",
+      "top_frames": [
+        "<no-stack-ba9fd5efa9377612>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 VARCHAR(255) UNIQUE); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; SELECT * FROM p NOT INDEXED WHERE CURRENT_TIMESTAMP GROUP BY TRUE ORDER BY CURRENT_TIMESTAMP LIKE CURREN"
+    },
+    {
+      "hash": "e75645c0a6c1024a",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000168989",
+      "top_frames": [
+        "<no-stack-9c4cbd8ea6ee38ed>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 VARCHAR(255) UNIQUE); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; SELECT * FROM p NOT INDEXED WHERE NULL LIKE CURRENT_DATE GROUP BY TRUE ORDER BY CURRENT_TIMESTAMP DESC N"
+    },
+    {
+      "hash": "10a6680e83a3352b",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000169722",
+      "top_frames": [
+        "<no-stack-2b1366daeb236018>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 VARCHAR(255) UNIQUE); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; SELECT CURRENT_DATE AS td__0_8__641_ti_u69odxm_267_9___7_cg__ FROM p NOT INDEXED WHERE FALSE GROUP BY TR"
+    },
+    {
+      "hash": "8a78e27931284e08",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000170295",
+      "top_frames": [
+        "<no-stack-6b6558412245f693>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 VARCHAR(255) UNIQUE); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; SELECT *, *, *, *, *, *, *, *, *, *, * FROM p NOT INDEXED WHERE FALSE GROUP BY TRUE ORDER BY TRUE DESC N"
+    },
+    {
+      "hash": "1fda86b78bee1db3",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000170540",
+      "top_frames": [
+        "<no-stack-2d7f32fb28794932>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 VARCHAR(255) UNIQUE); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; SELECT * FROM p NOT INDEXED WHERE TRUE GROUP BY _rowid_ LIKE CURRENT_TIME ESCAPE TRUE HAVING NULL ORDER "
+    },
+    {
+      "hash": "f73b619225147ba1",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000171491",
+      "top_frames": [
+        "<no-stack-20eef5fb7e243796>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 VARCHAR(255) UNIQUE); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; SELECT * FROM p NOT INDEXED WHERE CURRENT_TIMESTAMP GROUP BY CURRENT_TIMESTAMP HAVING CAST(CURRENT_TIMES"
+    },
+    {
+      "hash": "8b0cd0c1ac639826",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000171669",
+      "top_frames": [
+        "<no-stack-13a967801639da6f>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 VARCHAR(255) UNIQUE); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; SELECT * FROM p NOT INDEXED WHERE CURRENT_TIMESTAMP GROUP BY CURRENT_TIMESTAMP HAVING FALSE ORDER BY NUL"
+    },
+    {
+      "hash": "c7ae21ed02654802",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000181352",
+      "top_frames": [
+        "<no-stack-eeeec9ba2c912fef>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 INTEGER); CREATE TABLE IF NOT EXISTS q(a REAL); INSERT INTO p DEFAULT VALUES; WITH p AS (VALUES (FALSE)) SELECT * FROM p NOT INDEXED WHERE CURRENT_DATE != CURRENT_TIMES"
+    },
+    {
+      "hash": "b399d102ba8f787d",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000181651",
+      "top_frames": [
+        "<no-stack-2dccbade2b2cfa04>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 INTEGER); CREATE TABLE IF NOT EXISTS q(a REAL); INSERT INTO p DEFAULT VALUES; WITH p AS (VALUES (count(*) FILTER (WHERE CURRENT_TIME), FALSE)) SELECT * FROM p NOT INDEX"
+    },
+    {
+      "hash": "811b9c859fbfc46f",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000182174",
+      "top_frames": [
+        "<no-stack-bb75c8513dbc15c5>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 INTEGER); CREATE TABLE IF NOT EXISTS q(a REAL); INSERT INTO p DEFAULT VALUES; WITH p AS (VALUES (FALSE) UNION SELECT CURRENT_DATE ORDER BY FALSE) SELECT * FROM p NOT IN"
+    },
+    {
+      "hash": "1faf0d5db6ba5290",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000182854",
+      "top_frames": [
+        "<no-stack-32c5f4bc592c3ef5>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 INTEGER); CREATE TABLE IF NOT EXISTS q(a REAL); INSERT INTO p DEFAULT VALUES; WITH p AS (VALUES (count(*) OVER (), NULL)) SELECT * FROM p NOT INDEXED WHERE CURRENT_DATE"
+    },
+    {
+      "hash": "8ca8c31ab423b78e",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000183235",
+      "top_frames": [
+        "<no-stack-794ab41ed7574a71>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 INTEGER); CREATE TABLE IF NOT EXISTS q(a REAL); INSERT INTO p DEFAULT VALUES; WITH p AS (VALUES (FALSE)) SELECT * FROM p LEFT OUTER JOIN q NOT INDEXED ON CURRENT_TIMEST"
+    },
+    {
+      "hash": "60718503d0dd7eba",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000183507",
+      "top_frames": [
+        "<no-stack-9e7012f9116062f9>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 INTEGER); CREATE TABLE IF NOT EXISTS q(a REAL); INSERT INTO p DEFAULT VALUES; WITH p AS (WITH p AS (VALUES (FALSE)) SELECT * FROM p NOT INDEXED WHERE CURRENT_DATE GROUP"
+    },
+    {
+      "hash": "dfca3047570b0483",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000183779",
+      "top_frames": [
+        "<no-stack-5270d71e7e6e9b70>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 BLOB GENERATED ALWAYS AS (NULL) STORED, c2 REAL UNIQUE); CREATE INDEX IF NOT EXISTS idx1 ON p(c3); INSERT INTO p (c2) VALUES (TRUE) ON CONFLICT(c2) DO UPDATE SET _rowid"
+    },
+    {
+      "hash": "4ccfdcb038726715",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000185134",
+      "top_frames": [
+        "<no-stack-0a3d047dd42846ed>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a NUMERIC, c3 GENERATED ALWAYS AS (a = 0) NOT NULL UNIQUE); INSERT OR FAIL INTO p VALUES (CURRENT_DATE); PRAGMA integrity_check; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 "
+    },
+    {
+      "hash": "125df9cbb090228e",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000191885",
+      "top_frames": [
+        "<no-stack-60652533f4ec7e57>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b INT CHECK (NULL), c3 NUMERIC CHECK (CURRENT_TIME), c2 INTEGER PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(c2 REAL NOT NULL DEFAULT FALSE); INSERT OR ABORT INTO q VALUES ("
+    },
+    {
+      "hash": "a5468fd94d2b102d",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000192527",
+      "top_frames": [
+        "<no-stack-d8906ed5e9ee9752>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(c1 TEXT NOT NULL); INSERT OR ABORT INTO p VALUES (CURRENT_DATE << -CURRENT_TIMESTAMP); PRAGMA integrity_check; CREATE "
+    },
+    {
+      "hash": "cd12128ede4f9ac4",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000192628",
+      "top_frames": [
+        "<no-stack-efabefb28775bc1d>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(c1 TEXT NOT NULL); INSERT OR ABORT INTO p VALUES (CURRENT_DATE << FALSE); PRAGMA integrity_check; CREATE VIRTUAL TABLE"
+    },
+    {
+      "hash": "58006ad715a0d404",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000192863",
+      "top_frames": [
+        "<no-stack-6f19fdb9f5a8918b>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(c1 TEXT NOT NULL); INSERT OR ABORT INTO q VALUES (FALSE IN (SELECT CURRENT_TIMESTAMP UNION SELECT CURRENT_DATE ORDER B"
+    },
+    {
+      "hash": "b5c62e43f69c5510",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000193058",
+      "top_frames": [
+        "<no-stack-c3cbe3cf87a8fa6a>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(c1 TEXT NOT NULL); INSERT OR ABORT INTO q VALUES (FALSE IN (VALUES (TRUE))); PRAGMA integrity_check; SELECT printf('%."
+    },
+    {
+      "hash": "7129878b824563e9",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000193307",
+      "top_frames": [
+        "<no-stack-032a08dc102dde99>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(c1 TEXT NOT NULL); INSERT OR ABORT INTO q VALUES (FALSE IN (SELECT * FROM p NOT INDEXED WHERE FALSE GROUP BY TRUE UNIO"
+    },
+    {
+      "hash": "28aef894a2f361e4",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000195363",
+      "top_frames": [
+        "<no-stack-4b24bf5ac986995c>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(a INT UNIQUE); INSERT OR FAIL INTO p VALUES (EXISTS (VALUES (NULL)) * CURRENT_DATE); PRAGMA integrity_check; SELECT pr"
+    },
+    {
+      "hash": "2fa623698344fc00",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000195718",
+      "top_frames": [
+        "<no-stack-5817a0cfaabcbc6a>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(a INT UNIQUE); INSERT OR FAIL INTO p VALUES (CURRENT_DATE * CURRENT_DATE); PRAGMA integrity_check; CREATE TABLE IF NOT"
+    },
+    {
+      "hash": "5a33ebf6c0e139d8",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000195744",
+      "top_frames": [
+        "<no-stack-257785900a9c86bf>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(a INT UNIQUE); INSERT OR FAIL INTO p VALUES (CURRENT_DATE * CURRENT_DATE); PRAGMA integrity_check; CREATE TABLE IF NOT"
+    },
+    {
+      "hash": "f0fd79113ca62576",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000195761",
+      "top_frames": [
+        "<no-stack-3b50010562df8a3d>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(a INT UNIQUE); INSERT OR FAIL INTO p VALUES (CURRENT_DATE * CURRENT_DATE); PRAGMA integrity_check; CREATE TABLE IF NOT"
+    },
+    {
+      "hash": "8bd277f48074dee1",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000195959",
+      "top_frames": [
+        "<no-stack-feda9c2c1a71c98e>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(a INT UNIQUE); INSERT OR FAIL INTO p VALUES (TRUE); PRAGMA integrity_check; CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRI"
+    },
+    {
+      "hash": "8b328571f2c646ff",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000196076",
+      "top_frames": [
+        "<no-stack-76512656d37a065c>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(a INT UNIQUE); INSERT OR FAIL INTO p VALUES (TRUE); PRAGMA integrity_check; CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRI"
+    },
+    {
+      "hash": "afb8b79a208d5ecc",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000196198",
+      "top_frames": [
+        "<no-stack-86195f9beeb20d67>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(a INT UNIQUE); INSERT OR FAIL INTO p VALUES (CURRENT_DATE); PRAGMA integrity_check; CREATE TABLE IF NOT EXISTS p(c3 IN"
+    },
+    {
+      "hash": "bf3cf36869cda110",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000196351",
+      "top_frames": [
+        "<no-stack-2c14cc4c0c61f883>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(a INT UNIQUE); INSERT OR FAIL INTO p VALUES (randomblob(randomblob(CURRENT_TIMESTAMP))); PRAGMA integrity_check; CREAT"
+    },
+    {
+      "hash": "dc7440a68c876117",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000196373",
+      "top_frames": [
+        "<no-stack-3910e3b00627fad2>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(a INT UNIQUE); INSERT OR FAIL INTO p VALUES (randomblob(CURRENT_TIMESTAMP)); PRAGMA integrity_check; CREATE VIRTUAL TA"
+    },
+    {
+      "hash": "401b152ee0a004a7",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000196471",
+      "top_frames": [
+        "<no-stack-3afe2a7b54d9d5da>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(a INT UNIQUE); INSERT OR FAIL INTO p VALUES (TRUE); PRAGMA integrity_check; CREATE TABLE IF NOT EXISTS p(c3 VARCHAR(25"
+    },
+    {
+      "hash": "afd534a155f8c526",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000196781",
+      "top_frames": [
+        "<no-stack-32e4ffb8977eafc3>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(a INT UNIQUE); INSERT OR FAIL INTO p VALUES (CURRENT_DATE * FALSE); PRAGMA integrity_check; CREATE VIRTUAL TABLE IF NO"
+    },
+    {
+      "hash": "1f5ce3a0ffc48377",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000197111",
+      "top_frames": [
+        "<no-stack-2477a38bc3914e43>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(a INT UNIQUE); INSERT OR FAIL INTO p VALUES (CURRENT_DATE * CURRENT_DATE * CURRENT_DATE); PRAGMA integrity_check; CREA"
+    },
+    {
+      "hash": "5f70e7b795fc27fe",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000198149",
+      "top_frames": [
+        "<no-stack-053f85677c0e2771>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a TEXT NOT NULL DEFAULT -7255423084591324945087681714187123153014764223574097014592745294747862531320266699223167324791238013984899650100404431035245565077220646984.878621"
+    },
+    {
+      "hash": "1f500fc4996be926",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000198701",
+      "top_frames": [
+        "<no-stack-e3d0ecdbb73303ac>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 INT DEFAULT X'23Edbcd8F6'); CREATE INDEX IF NOT EXISTS idx1 ON p(c3); INSERT INTO p DEFAULT VALUES; PRAGMA integrity_check; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 US"
+    },
+    {
+      "hash": "980988813c5eb1cf",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000198855",
+      "top_frames": [
+        "<no-stack-d0195f1947feb9f5>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 NUMERIC NOT NULL DEFAULT 5092733011042654156582870086161136879438981605685354486370992241601318183832796.9e+0472); INSERT INTO p DEFAULT VALUES; PRAGMA integrity_check;"
+    },
+    {
+      "hash": "39b56291c94c1fda",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000200320",
+      "top_frames": [
+        "<no-stack-171cda56e1af778f>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 INT); INSERT OR REPLACE INTO p VALUES (trim(FALSE) NOT LIKE changes()); PRAGMA quick_check; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c2); INSERT OR FAIL INT"
+    },
+    {
+      "hash": "fb34c7a89f3c8808",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000201126",
+      "top_frames": [
+        "<no-stack-dcea3e6253d82e5b>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 INT); INSERT OR REPLACE INTO p VALUES (CURRENT_DATE NOT LIKE NULL); PRAGMA quick_check; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c1); INSERT OR ABORT INTO p"
+    },
+    {
+      "hash": "42846ab8c6f45047",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000201471",
+      "top_frames": [
+        "<no-stack-61f43d7e39b15237>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a NUMERIC, rowid GENERATED ALWAYS AS (a * a) NOT NULL); INSERT OR REPLACE INTO p VALUES (TRUE); PRAGMA quick_check; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c2"
+    },
+    {
+      "hash": "0caddac9dd6d3254",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000201705",
+      "top_frames": [
+        "<no-stack-81c10090568a8145>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b BLOB UNIQUE); CREATE INDEX IF NOT EXISTS idx1 ON p(b); INSERT OR REPLACE INTO p VALUES (TRUE); PRAGMA quick_check; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c"
+    },
+    {
+      "hash": "3eed074c6d7e6bf0",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000201852",
+      "top_frames": [
+        "<no-stack-5009936bbe174d38>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a NUMERIC, rowid GENERATED ALWAYS AS (a = -0) NOT NULL); INSERT OR REPLACE INTO p VALUES (TRUE); PRAGMA quick_check; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c"
+    },
+    {
+      "hash": "fb5ecd4d679ff9a4",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000202668",
+      "top_frames": [
+        "<no-stack-15ef79bcaf9b0591>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 INT); INSERT OR REPLACE INTO p VALUES (NULL IS NOT FALSE); PRAGMA quick_check; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(b); INSERT INTO p DEFAULT VALUES; PR"
+    },
+    {
+      "hash": "e514c768a52933ea",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000202833",
+      "top_frames": [
+        "<no-stack-9b5cbc10faaeb4e7>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 INT); INSERT OR REPLACE INTO p VALUES (TRUE IS NOT FALSE); PRAGMA quick_check; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(a); INSERT INTO p DEFAULT VALUES; PR"
+    },
+    {
+      "hash": "0998daa7ceb4b7fe",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000203061",
+      "top_frames": [
+        "<no-stack-3d4a282b5428659f>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 INT); INSERT OR REPLACE INTO p VALUES (char(CURRENT_TIMESTAMP) IS NOT FALSE); PRAGMA quick_check; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c1); INSERT INTO "
+    },
+    {
+      "hash": "2359b68411a638e6",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000203263",
+      "top_frames": [
+        "<no-stack-69a5c395d22f74f1>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 INT); INSERT OR REPLACE INTO p VALUES (CURRENT_DATE IS NOT FALSE); PRAGMA quick_check; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(a, c3); REPLACE INTO r VALUE"
+    },
+    {
+      "hash": "49478b9445b89281",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000203779",
+      "top_frames": [
+        "<no-stack-b8e3e693ab1551f0>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b INTEGER, c3 FLOAT PRIMARY KEY); CREATE INDEX IF NOT EXISTS idx1 ON p(b); INSERT INTO p DEFAULT VALUES; EXPLAIN QUERY PLAN VALUES (TRUE); CREATE TABLE IF NOT EXISTS p(c3 "
+    },
+    {
+      "hash": "1a6515038e798194",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000204751",
+      "top_frames": [
+        "<no-stack-002d4131d0bc7a61>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b INTEGER, a DATE PRIMARY KEY); CREATE INDEX IF NOT EXISTS idx1 ON p(b); INSERT INTO p DEFAULT VALUES; EXPLAIN QUERY PLAN SELECT DISTINCT * FROM p WHERE CURRENT_TIME NOT I"
+    },
+    {
+      "hash": "19002320c5f48054",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000206075",
+      "top_frames": [
+        "<no-stack-3e06952af519b9d2>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b INTEGER, c2 INTEGER PRIMARY KEY); CREATE INDEX IF NOT EXISTS idx1 ON p(b); INSERT INTO p DEFAULT VALUES; SELECT group_concat(CURRENT_TIME, 'os1Q-') FILTER (WHERE FALSE) "
+    },
+    {
+      "hash": "01d95262f3e166dc",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000208318",
+      "top_frames": [
+        "<no-stack-d0a6579b76da24de>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 NUMERIC); CREATE VIEW IF NOT EXISTS v1 AS VALUES (CURRENT_DATE); SELECT * FROM (SELECT * FROM p WHERE CURRENT_TIME NOT BETWEEN TRUE AND changes()) AS sub1; CREATE VIRTU"
+    },
+    {
+      "hash": "6294bb186c151b0c",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000208462",
+      "top_frames": [
+        "<no-stack-d50d0a58358b6836>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 BLOB DEFAULT -49061700399859.5695452180872605652294754737168978401855037896720742621653296208478134090255782486379662970647184752784757047050046931654672513274178814426"
+    },
+    {
+      "hash": "a1b0bfbfac9de56f",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000208632",
+      "top_frames": [
+        "<no-stack-d2ccba4fc2dffad0>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 BLOB DEFAULT CURRENT_TIMESTAMP); SELECT * FROM (SELECT * FROM p WHERE TRUE) AS sub1; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c1); INSERT OR FAIL INTO p VAL"
+    },
+    {
+      "hash": "fab695aa7d04e66d",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000209128",
+      "top_frames": [
+        "<no-stack-1166b3306cf66f82>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 NUMERIC); CREATE VIEW IF NOT EXISTS v1 AS VALUES (CURRENT_DATE); SELECT count(*) OVER (ORDER BY CURRENT_TIME DESC NULLS LAST ROWS BETWEEN FALSE PRECEDING AND CURRENT_TI"
+    },
+    {
+      "hash": "b26d469d3e400b80",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000209228",
+      "top_frames": [
+        "<no-stack-3e8da27a215613fc>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 NUMERIC); CREATE VIEW IF NOT EXISTS v1 AS VALUES (CURRENT_DATE); SELECT count(*) OVER (ORDER BY CURRENT_TIME DESC NULLS LAST RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOU"
+    },
+    {
+      "hash": "2e8edf2d6e827c59",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000210545",
+      "top_frames": [
+        "<no-stack-a3348574c80f97e4>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 NUMERIC); CREATE VIEW IF NOT EXISTS v1 AS VALUES (CURRENT_DATE); SELECT * FROM (SELECT CURRENT_TIME COLLATE RTRIM AS a FROM p WHERE FALSE) AS sub1; CREATE VIRTUAL TABLE"
+    },
+    {
+      "hash": "a075a8d7b05a841c",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000210731",
+      "top_frames": [
+        "<no-stack-9c8ff687007f672c>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 NUMERIC); CREATE VIEW IF NOT EXISTS v1 AS VALUES (CURRENT_DATE); SELECT * FROM (SELECT CURRENT_DATE AS a FROM p WHERE FALSE) AS sub1; CREATE VIRTUAL TABLE IF NOT EXISTS"
+    },
+    {
+      "hash": "8128ea83f71fa39f",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000210830",
+      "top_frames": [
+        "<no-stack-7106bb0e7923984c>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 NUMERIC); CREATE VIEW IF NOT EXISTS v1 AS VALUES (CURRENT_DATE); SELECT * FROM (SELECT CURRENT_TIME COLLATE RTRIM IS NOT NULL AS a FROM p WHERE FALSE) AS sub1; CREATE V"
+    },
+    {
+      "hash": "48b6e08088bfcb9a",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000212366",
+      "top_frames": [
+        "<no-stack-eb1e5fef4996647c>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 NUMERIC); CREATE VIEW IF NOT EXISTS v1 AS VALUES (CURRENT_DATE); SELECT * FROM (SELECT * FROM p WHERE CURRENT_TIME NOT IN (VALUES (max(NULL)))) AS sub1; CREATE VIRTUAL "
+    },
+    {
+      "hash": "ace5c0e314974e95",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000212708",
+      "top_frames": [
+        "<no-stack-78cc6998c22a0d4b>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 NUMERIC); CREATE VIEW IF NOT EXISTS v1 AS VALUES (CURRENT_DATE); SELECT * FROM (SELECT * FROM p WHERE CURRENT_DATE IS NOT FALSE) AS sub1; CREATE VIRTUAL TABLE IF NOT EX"
+    },
+    {
+      "hash": "e4a8072b3e4bd20e",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000212895",
+      "top_frames": [
+        "<no-stack-9b28fa497c5e0c9b>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 NUMERIC); CREATE VIEW IF NOT EXISTS v1 AS VALUES (CURRENT_DATE); SELECT * FROM (SELECT * FROM p WHERE CURRENT_TIME NOT IN (SELECT * FROM p NOT INDEXED WHERE CURRENT_TIM"
+    },
+    {
+      "hash": "2465a71d8d9ab8fb",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000213265",
+      "top_frames": [
+        "<no-stack-07efeb1e359facf4>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 NUMERIC); CREATE VIEW IF NOT EXISTS v1 AS VALUES (CURRENT_DATE); SELECT * FROM (SELECT * FROM p WHERE FALSE IN (VALUES (FALSE) UNION SELECT CURRENT_DATE ORDER BY FALSE "
+    },
+    {
+      "hash": "7dec698c414f19ab",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000213736",
+      "top_frames": [
+        "<no-stack-167110628a3d8d31>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 NUMERIC); CREATE VIEW IF NOT EXISTS v1 AS VALUES (CURRENT_DATE); SELECT * FROM (SELECT * FROM p WHERE TRUE OR RAISE(IGNORE) OR RAISE(IGNORE) OR RAISE(IGNORE) OR RAISE(I"
+    },
+    {
+      "hash": "87a9b142f6c9084b",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000213985",
+      "top_frames": [
+        "<no-stack-b8845a8cdb2dbead>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 NUMERIC); CREATE VIEW IF NOT EXISTS v1 AS VALUES (CURRENT_DATE); SELECT * FROM (SELECT * FROM p WHERE CAST(CURRENT_TIMESTAMP AS BOOLEAN) < CURRENT_TIMESTAMP) AS sub1; C"
+    },
+    {
+      "hash": "44ace50194e1b7a1",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000214605",
+      "top_frames": [
+        "<no-stack-9279ac83121c1efc>"
+      ],
+      "sql_preview": "CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts3(a); EXPLAIN QUERY PLAN SELECT CURRENT_DATE AS g0_4a9x9h_q7 ORDER BY TRUE COLLATE NOCASE DESC NULLS FIRST; SELECT printf('%.*f', 2147483647, -1e308)"
+    },
+    {
+      "hash": "9a1b453ce3d8ad5b",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000214726",
+      "top_frames": [
+        "<no-stack-b0d6fb0ecdeeb0f3>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 NUMERIC); CREATE VIEW IF NOT EXISTS v1 AS VALUES (CURRENT_DATE); EXPLAIN QUERY PLAN SELECT CURRENT_DATE AS g0_4a9x9h_q7 ORDER BY CURRENT_DATE COLLATE NOCASE DESC NULLS "
+    },
+    {
+      "hash": "53347135ca3052d7",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000216082",
+      "top_frames": [
+        "<no-stack-71476bb1fb416bd3>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 NUMERIC); CREATE VIEW IF NOT EXISTS v1 AS VALUES (CURRENT_DATE); VALUES (count(*) OVER (ORDER BY (VALUES (NULL)) ASC NULLS LAST ROWS BETWEEN UNBOUNDED PRECEDING AND CUR"
+    },
+    {
+      "hash": "dbb674ab39900dda",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000216640",
+      "top_frames": [
+        "<no-stack-3c3d647412d7f8a2>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 NUMERIC); CREATE VIEW IF NOT EXISTS v1 AS VALUES (CURRENT_DATE); VALUES (count(*) OVER (), count(*) OVER (ORDER BY NULL ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW"
+    },
+    {
+      "hash": "d166bb0044002905",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000216822",
+      "top_frames": [
+        "<no-stack-19462ea482eaa217>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 NUMERIC); CREATE VIEW IF NOT EXISTS v1 AS VALUES (CURRENT_DATE); VALUES (count(*) OVER (), count(*) OVER (), NULL); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5"
+    },
+    {
+      "hash": "0691cfb2e6317892",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000217211",
+      "top_frames": [
+        "<no-stack-42e4c39405ea6c40>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 NUMERIC); CREATE VIEW IF NOT EXISTS v1 AS VALUES (CURRENT_DATE); VALUES (count(*) OVER (ORDER BY NULL ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS"
+    },
+    {
+      "hash": "db68fd331db13b63",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000217382",
+      "top_frames": [
+        "<no-stack-775bc218d22349d5>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 NUMERIC); CREATE VIEW IF NOT EXISTS v1 AS VALUES (CURRENT_DATE); VALUES (CURRENT_DATE, count(*) OVER (ORDER BY NULL ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXC"
+    },
+    {
+      "hash": "46f341b75741a3a9",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000217392",
+      "top_frames": [
+        "<no-stack-73d60ee836f0ff7a>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 NUMERIC); CREATE VIEW IF NOT EXISTS v1 AS VALUES (CURRENT_DATE); VALUES (count(*) OVER (ORDER BY NULL ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS"
+    },
+    {
+      "hash": "9558cb64f1e72aaa",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000225385",
+      "top_frames": [
+        "<no-stack-9e60554b83051514>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 NUMERIC); CREATE VIEW IF NOT EXISTS v1 AS VALUES (CURRENT_DATE); SELECT * FROM (SELECT * FROM p WHERE CURRENT_TIME OR FALSE) AS sub1; CREATE VIRTUAL TABLE IF NOT EXISTS"
+    },
+    {
+      "hash": "7aac74a60ce28475",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000225620",
+      "top_frames": [
+        "<no-stack-56543f11d949451e>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 NUMERIC); CREATE VIEW IF NOT EXISTS v1 AS VALUES (CURRENT_DATE); SELECT * FROM (SELECT * FROM p WHERE FALSE IN (VALUES (FALSE) UNION SELECT count(*) ORDER BY FALSE DESC"
+    },
+    {
+      "hash": "e67a4d760af097e6",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000227040",
+      "top_frames": [
+        "<no-stack-5825cb5ed6c3adb1>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 NUMERIC); CREATE VIEW IF NOT EXISTS v1 AS VALUES (CURRENT_DATE); SELECT * FROM (SELECT * FROM p WHERE CURRENT_TIME NOT IN (VALUES (p.c2))) AS sub1; CREATE VIRTUAL TABLE"
+    },
+    {
+      "hash": "272918b250d574aa",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000232113",
+      "top_frames": [
+        "<no-stack-d48d44e7db733a67>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b REAL); CREATE INDEX IF NOT EXISTS idx1 ON p(b); INSERT INTO p DEFAULT VALUES; SELECT DISTINCT *, *, *, *, *, *, *, *, *, *, *, *, * FROM p NOT INDEXED; CREATE VIRTUAL TA"
+    },
+    {
+      "hash": "e08aa27bf09c2661",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000232864",
+      "top_frames": [
+        "<no-stack-47c95fd36c6c41a8>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b INTEGER, c3 TEXT NOT NULL DEFAULT -93375435560104974801464411205563433704082159089607885822692321364458418179194423542343221764945121789780099625658409481411795054800211"
+    },
+    {
+      "hash": "6c17dab2ea7a6359",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000233000",
+      "top_frames": [
+        "<no-stack-232ebd4e867e5878>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b INTEGER, c3 TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP); CREATE INDEX IF NOT EXISTS idx1 ON p(b); INSERT INTO p DEFAULT VALUES; EXPLAIN QUERY PLAN VALUES (CURRENT_TIME); CR"
+    },
+    {
+      "hash": "3448028978c3ab2a",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000234193",
+      "top_frames": [
+        "<no-stack-3b440e922ca1f948>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b INT CHECK (NULL), c2 INTEGER PRIMARY KEY); CREATE INDEX IF NOT EXISTS idx1 ON p(b); INSERT INTO p DEFAULT VALUES; VALUES (TRUE); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t"
+    },
+    {
+      "hash": "3320cafd6f3931e6",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000234577",
+      "top_frames": [
+        "<no-stack-fea95cb1e80814ef>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b INTEGER, c3 FLOAT PRIMARY KEY); CREATE INDEX IF NOT EXISTS idx1 ON p(b); INSERT INTO p DEFAULT VALUES; EXPLAIN QUERY PLAN VALUES (TRUE); CREATE TABLE IF NOT EXISTS p(b T"
+    },
+    {
+      "hash": "08d2b6d7ca0c611a",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000234683",
+      "top_frames": [
+        "<no-stack-3bc3dfa55834d628>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b INTEGER, c3 FLOAT PRIMARY KEY); CREATE INDEX IF NOT EXISTS idx1 ON p(b); INSERT INTO p DEFAULT VALUES; EXPLAIN QUERY PLAN VALUES (TRUE); CREATE TABLE IF NOT EXISTS p(b T"
+    },
+    {
+      "hash": "b4dcb92e33c50cfb",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000235428",
+      "top_frames": [
+        "<no-stack-3da07d47f6718611>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 INT); INSERT OR REPLACE INTO p VALUES (json_type(TRUE)); PRAGMA quick_check; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c2); INSERT OR FAIL INTO p VALUES (CUR"
+    },
+    {
+      "hash": "97e33d980e1808cf",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000237296",
+      "top_frames": [
+        "<no-stack-1ebcd66c7c2da81c>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 INT); INSERT OR REPLACE INTO p VALUES (CURRENT_TIMESTAMP NOT LIKE changes() NOT LIKE randomblob(randomblob(CURRENT_DATE))); PRAGMA quick_check; CREATE VIRTUAL TABLE IF "
+    },
+    {
+      "hash": "ec748827afe51011",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000237462",
+      "top_frames": [
+        "<no-stack-dd307ef738ee98bc>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 INT); INSERT OR REPLACE INTO p VALUES (trim(NULL)); PRAGMA quick_check; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(b); INSERT OR ABORT INTO p VALUES (NULL); P"
+    },
+    {
+      "hash": "ef2d7ac928abaa54",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000237646",
+      "top_frames": [
+        "<no-stack-90fa379481eb3ecf>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 INT); INSERT OR REPLACE INTO p VALUES (trim(randomblob(randomblob(CURRENT_TIMESTAMP))) NOT LIKE changes()); PRAGMA quick_check; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t"
+    },
+    {
+      "hash": "fc86a2fa9ae08885",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000238614",
+      "top_frames": [
+        "<no-stack-21f82d90863bedf1>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 INT); INSERT OR REPLACE INTO p VALUES (random() NOT LIKE changes()); PRAGMA quick_check; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c1); INSERT OR FAIL INTO p"
+    },
+    {
+      "hash": "8a05f68657bb6567",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000239106",
+      "top_frames": [
+        "<no-stack-1838ec82105ac911>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 FLOAT PRIMARY KEY); INSERT INTO p DEFAULT VALUES; PRAGMA integrity_check; CREATE TABLE IF NOT EXISTS p(c3 INTEGER NOT NULL); CREATE TABLE IF NOT EXISTS q(c2 INTEGER UNI"
+    },
+    {
+      "hash": "afa5e7d2d69738ca",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000239183",
+      "top_frames": [
+        "<no-stack-7828498aca6a5fe5>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 FLOAT PRIMARY KEY); INSERT INTO p DEFAULT VALUES; PRAGMA integrity_check; CREATE TABLE IF NOT EXISTS p(c3 BLOB GENERATED ALWAYS AS (CAST(RAISE(IGNORE) AS FLOAT)) STORED"
+    },
+    {
+      "hash": "cd8b88e2d0cccd29",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000239365",
+      "top_frames": [
+        "<no-stack-a2f61df1c24dfb45>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 INTEGER PRIMARY KEY); INSERT OR ABORT INTO p VALUES (FALSE); PRAGMA integrity_check; CREATE TABLE IF NOT EXISTS p(c3 VARCHAR(255) GENERATED ALWAYS AS (RAISE(ROLLBACK, '"
+    },
+    {
+      "hash": "264b24b4e2b22d46",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000239859",
+      "top_frames": [
+        "<no-stack-d1e4491e6298c9b9>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 TEXT NOT NULL DEFAULT 5092733011042654156582870086161136879438981605685354486370992241601318183832796.9e+0472); INSERT INTO p DEFAULT VALUES; PRAGMA integrity_check; CR"
+    },
+    {
+      "hash": "6fc01d661a889f9c",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000242939",
+      "top_frames": [
+        "<no-stack-179833411bcc75a6>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(a INT UNIQUE); INSERT OR FAIL INTO p VALUES (TRUE); PRAGMA integrity_check; CREATE TABLE IF NOT EXISTS p(c2 NUMERIC NO"
+    },
+    {
+      "hash": "6e1289b5c56e1925",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000243121",
+      "top_frames": [
+        "<no-stack-7b71ffa4ec27b009>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(a INT UNIQUE); INSERT OR FAIL INTO p VALUES (TRUE); PRAGMA integrity_check; CREATE TABLE IF NOT EXISTS p(c3 INTEGER NO"
+    },
+    {
+      "hash": "bd8a3f6895ff5e68",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000243359",
+      "top_frames": [
+        "<no-stack-4888279501d4ef9c>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(a INT UNIQUE); INSERT OR FAIL INTO p VALUES (TRUE); PRAGMA integrity_check; CREATE TABLE IF NOT EXISTS p(c1 VARCHAR(25"
+    },
+    {
+      "hash": "ac6f47a10babc975",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000243530",
+      "top_frames": [
+        "<no-stack-4e6b20ce872757e4>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(a INT UNIQUE); INSERT OR FAIL INTO p VALUES (randomblob(CURRENT_TIMESTAMP)); PRAGMA integrity_check; CREATE TABLE IF N"
+    },
+    {
+      "hash": "ccfdd67bce17a217",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000243707",
+      "top_frames": [
+        "<no-stack-4eb261804fc96132>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(a INT UNIQUE); INSERT INTO p DEFAULT VALUES; PRAGMA integrity_check; CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KE"
+    },
+    {
+      "hash": "3c7f10b062c43893",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000243719",
+      "top_frames": [
+        "<no-stack-fb9951d5547aac3b>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(a INT UNIQUE); INSERT INTO p DEFAULT VALUES; PRAGMA integrity_check; CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KE"
+    },
+    {
+      "hash": "b65602d8ccaead53",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000243731",
+      "top_frames": [
+        "<no-stack-ef8922f9ea0c0ef2>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(a INT UNIQUE); INSERT INTO p DEFAULT VALUES; PRAGMA integrity_check; CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KE"
+    },
+    {
+      "hash": "91e4556c53f1c515",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000243745",
+      "top_frames": [
+        "<no-stack-063aa16a4658c729>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(a INT UNIQUE); INSERT INTO p DEFAULT VALUES; PRAGMA integrity_check; CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KE"
+    },
+    {
+      "hash": "b9e3dc0740353840",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000243763",
+      "top_frames": [
+        "<no-stack-9132127428900bb1>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(a INT UNIQUE); INSERT INTO p DEFAULT VALUES; PRAGMA integrity_check; CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KE"
+    },
+    {
+      "hash": "6f5e7ab6a0c69548",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000244186",
+      "top_frames": [
+        "<no-stack-832890e749c023d5>"
+      ],
+      "sql_preview": "SELECT hex(zeroblob(-2147483648)); CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(a INT UNIQUE); INSERT OR FAIL INTO p VALUES (randomblob(CURRENT_TIMESTAMP)); PRAGMA"
+    },
+    {
+      "hash": "6ad384cbdd32b742",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000244468",
+      "top_frames": [
+        "<no-stack-b8382912efb9c98b>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(a INT UNIQUE); INSERT OR FAIL INTO p VALUES (randomblob(randomblob(CURRENT_TIMESTAMP))); PRAGMA integrity_check; CREAT"
+    },
+    {
+      "hash": "1cf799770ee8d631",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000244608",
+      "top_frames": [
+        "<no-stack-9dde04260b0066ff>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(a INT UNIQUE); INSERT OR FAIL INTO p VALUES (CURRENT_DATE); PRAGMA integrity_check; CREATE TABLE IF NOT EXISTS p(a BLO"
+    },
+    {
+      "hash": "60e20213dc6a48af",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000244630",
+      "top_frames": [
+        "<no-stack-14f0fe56f005ebfa>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(a INT UNIQUE); INSERT OR FAIL INTO p VALUES (CURRENT_DATE); PRAGMA integrity_check; CREATE TABLE IF NOT EXISTS p(c3 IN"
+    },
+    {
+      "hash": "6bfca674bd927a7d",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000245206",
+      "top_frames": [
+        "<no-stack-57c5af47d370bddb>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(a INT UNIQUE); INSERT OR FAIL INTO p VALUES ((SELECT ALL * FROM q ORDER BY TRUE ASC LIMIT TRUE, TRUE)); PRAGMA integri"
+    },
+    {
+      "hash": "02cf6a0fa9d85c29",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000247437",
+      "top_frames": [
+        "<no-stack-5836e379c41128ed>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b BOOLEAN PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(c1 TEXT NOT NULL); INSERT OR ABORT INTO p VALUES (CURRENT_DATE << CURRENT_TIME); PRAGMA integrity_check; CREATE TABLE "
+    },
+    {
+      "hash": "e56f5f4e95ec0849",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000253477",
+      "top_frames": [
+        "<no-stack-f0f16112dcd42932>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a NUMERIC, c3 GENERATED ALWAYS AS (a) NOT NULL UNIQUE); INSERT OR FAIL INTO p VALUES (CURRENT_DATE); ANALYZE p; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c1); I"
+    },
+    {
+      "hash": "48329998b44d3a86",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000255304",
+      "top_frames": [
+        "<no-stack-f267eea21ce35ec6>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 INTEGER); CREATE TABLE IF NOT EXISTS q(a REAL); INSERT INTO p DEFAULT VALUES; WITH p AS (WITH p AS (VALUES (FALSE)) SELECT DISTINCT * FROM p NOT INDEXED) SELECT * FROM "
+    },
+    {
+      "hash": "36605ec7f42acd19",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000255539",
+      "top_frames": [
+        "<no-stack-8c76bf572c62a653>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 INTEGER); CREATE TABLE IF NOT EXISTS q(a REAL); INSERT INTO p DEFAULT VALUES; WITH p AS (VALUES (FALSE)) SELECT * FROM ((VALUES (CURRENT_TIME)) AS a LEFT JOIN p) NATURA"
+    },
+    {
+      "hash": "0acb92ba632b41ef",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000255897",
+      "top_frames": [
+        "<no-stack-39e536817d59f04a>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 INTEGER); CREATE TABLE IF NOT EXISTS q(a REAL); INSERT INTO p DEFAULT VALUES; WITH p AS (VALUES (FALSE)) SELECT * FROM q NATURAL JOIN p NOT INDEXED WHERE CURRENT_DATE G"
+    },
+    {
+      "hash": "c491e4ce01a2c485",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000256107",
+      "top_frames": [
+        "<no-stack-01d4fcb63d12a9ab>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 INTEGER); CREATE TABLE IF NOT EXISTS q(a REAL); INSERT INTO p DEFAULT VALUES; WITH p AS (VALUES (FALSE)) SELECT * FROM p LEFT OUTER JOIN q NOT INDEXED ON CURRENT_TIMEST"
+    },
+    {
+      "hash": "8d5e775b0500a869",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000256286",
+      "top_frames": [
+        "<no-stack-3c8dadffb42c6f2f>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 INTEGER); CREATE TABLE IF NOT EXISTS q(c1 INTEGER PRIMARY KEY); INSERT INTO p DEFAULT VALUES; WITH p AS (VALUES (FALSE)) SELECT * FROM p LEFT OUTER JOIN q NOT INDEXED O"
+    },
+    {
+      "hash": "315b80ea189b0f69",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000256536",
+      "top_frames": [
+        "<no-stack-4371ef6955a4e9e8>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 INTEGER); CREATE TABLE IF NOT EXISTS q(a REAL); INSERT INTO p DEFAULT VALUES; WITH p AS (VALUES (FALSE)) SELECT * FROM p LEFT OUTER JOIN q NOT INDEXED ON TRUE != CURREN"
+    },
+    {
+      "hash": "c874763766d2f61e",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000256766",
+      "top_frames": [
+        "<no-stack-5330e43d2825bf72>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 INTEGER); CREATE TABLE IF NOT EXISTS q(a REAL); INSERT INTO p DEFAULT VALUES; WITH p AS (VALUES (CURRENT_TIME, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, "
+    },
+    {
+      "hash": "a437456d2581b44c",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000257465",
+      "top_frames": [
+        "<no-stack-5ac521d5676841c0>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 INTEGER); CREATE TABLE IF NOT EXISTS q(a REAL); INSERT INTO p DEFAULT VALUES; WITH p AS (VALUES (FALSE)) SELECT * FROM p NOT INDEXED WHERE CURRENT_DATE GROUP BY -2696.9"
+    },
+    {
+      "hash": "48dd3f8055b3d206",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000269085",
+      "top_frames": [
+        "<no-stack-cd910649f41a09f8>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 VARCHAR(255) UNIQUE); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; SELECT * FROM p NOT INDEXED WHERE CURRENT_TIMESTAMP GROUP BY CURRENT_TIMESTAMP COLLATE BINARY HAVING CUR"
+    },
+    {
+      "hash": "88aa5aa594d55c27",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000269240",
+      "top_frames": [
+        "<no-stack-f477741a498ade25>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 VARCHAR(255) UNIQUE); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; SELECT * FROM p NOT INDEXED WHERE CURRENT_TIMESTAMP GROUP BY CURRENT_TIMESTAMP HAVING quote(FALSE) ORDER"
+    },
+    {
+      "hash": "0b3ff1424c9b1cab",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000269430",
+      "top_frames": [
+        "<no-stack-ea90f2db0645e19e>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 VARCHAR(255) UNIQUE); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; SELECT * FROM p NOT INDEXED WHERE CURRENT_TIMESTAMP GROUP BY CURRENT_TIMESTAMP HAVING changes() ORDER BY"
+    },
+    {
+      "hash": "451eba2cce5ecf68",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000269480",
+      "top_frames": [
+        "<no-stack-e0b431c084d06bf0>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 VARCHAR(255) UNIQUE); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; SELECT * FROM p NOT INDEXED WHERE CURRENT_TIMESTAMP GROUP BY CURRENT_TIMESTAMP HAVING CAST(CAST(CURRENT_"
+    },
+    {
+      "hash": "d94463db7a3a98bb",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000270882",
+      "top_frames": [
+        "<no-stack-5032176b5c15728a>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 VARCHAR(255) UNIQUE); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; SELECT * FROM p CROSS JOIN (SELECT TRUE LIMIT FALSE) AS a NATURAL LEFT JOIN p WHERE TRUE BETWEEN NULL AN"
+    },
+    {
+      "hash": "ace24f4bec98415e",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000272047",
+      "top_frames": [
+        "<no-stack-f662a95db07e6b98>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 VARCHAR(255) UNIQUE); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; SELECT * FROM p NOT INDEXED WHERE X'72dC24' GROUP BY TRUE ORDER BY TRUE DESC NULLS FIRST; CREATE VIRTUAL"
+    }
+  ]
+}
