@@ -7,7 +7,7 @@
 // per-group multipliers, then applies them to its own local Context.
 
 use grammartec::context::Context;
-use grammartec::newtypes::NTermID;
+use grammartec::newtypes::{NTermID, RuleID};
 use rand::Rng;
 use rand_distr::{Beta, Distribution};
 use std::fs::OpenOptions;
@@ -81,6 +81,7 @@ struct GroupState {
     alpha: f32,
     beta: f32,
     nt_ids: Vec<NTermID>,
+    base_weights: Vec<(RuleID, f32)>,
     selection_count: u64,
     last_reward: f32,
 }
@@ -104,10 +105,15 @@ pub struct GrammarBandit {
 impl GrammarBandit {
     pub fn new(ctx: &Context, workdir: &str) -> Self {
         let mut group_nts: [Vec<NTermID>; NUM_GROUPS] = Default::default();
+        let mut group_base_weights: [Vec<(RuleID, f32)>; NUM_GROUPS] = Default::default();
 
         for (nt_id, name) in ctx.all_nt_ids() {
             if let Some(group) = classify_nonterminal(&name) {
-                group_nts[group as usize].push(nt_id);
+                let gi = group as usize;
+                group_nts[gi].push(nt_id);
+                for &(rid, w) in &ctx.get_weights_for_nt(nt_id) {
+                    group_base_weights[gi].push((rid, w));
+                }
             }
         }
 
@@ -115,6 +121,7 @@ impl GrammarBandit {
             alpha: 1.0,
             beta: 1.0,
             nt_ids: group_nts[i].clone(),
+            base_weights: group_base_weights[i].clone(),
             selection_count: 0,
             last_reward: 0.0,
         });
@@ -237,22 +244,26 @@ impl GrammarBandit {
         parts.join(" ")
     }
 
-    /// Get the NTermIDs for a given group index, for applying multipliers.
+    /// Get the NTermIDs for a given group index.
     pub fn group_nt_ids(&self, group_index: usize) -> &[NTermID] {
         &self.groups[group_index].nt_ids
+    }
+
+    /// Get the base (original) weights for a given group index.
+    pub fn group_base_weights(&self, group_index: usize) -> &[(RuleID, f32)] {
+        &self.groups[group_index].base_weights
     }
 }
 
 /// Apply bandit multipliers to a thread-local Context.
-/// For each group that has a multiplier != 1.0, scale its nonterminal weights.
+/// Resets each group's rules to base weights, then applies the multiplier.
+/// This prevents compounding: base_weight * multiplier, not weight * multiplier.
 pub fn apply_multipliers(ctx: &mut Context, bandit: &GrammarBandit, mults: &GroupMultipliers) {
     for gi in 0..NUM_GROUPS {
         let m = mults.multipliers[gi];
-        if (m - 1.0).abs() < 0.001 {
-            continue;
-        }
-        for nt_id in bandit.group_nt_ids(gi) {
-            ctx.scale_weights_for_nt(*nt_id, m);
+        for &(rid, base_w) in bandit.group_base_weights(gi) {
+            let new_w = (base_w * m).clamp(WEIGHT_MIN, WEIGHT_MAX);
+            ctx.set_weight(rid, new_w);
         }
     }
 }
@@ -360,6 +371,26 @@ mod tests {
 
         assert_eq!(alpha_after, alpha_before, "alpha unchanged on zero reward");
         assert_eq!(beta_after, 3.0, "beta increments on zero reward");
+    }
+
+    #[test]
+    fn test_no_weight_compounding() {
+        let base_w = 3.0_f32;
+        let multiplier = 2.0_f32;
+
+        // Old (broken): compound on previous result
+        let mut compounded = base_w;
+        for _ in 0..10 {
+            compounded = (compounded * multiplier).min(WEIGHT_MAX);
+        }
+        assert_eq!(compounded, WEIGHT_MAX, "compounding hits clamp fast");
+
+        // New (fixed): always multiply from base
+        let mut from_base = base_w;
+        for _ in 0..10 {
+            from_base = (base_w * multiplier).min(WEIGHT_MAX);
+        }
+        assert_eq!(from_base, 6.0, "base*multiplier stays at 6.0 forever");
     }
 
     #[test]

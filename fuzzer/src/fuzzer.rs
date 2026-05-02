@@ -228,8 +228,8 @@ impl Fuzzer {
                 if new_bits.is_some() {
                     self.global_state
                         .lock()
-                        .expect("RAND_ubsan_asan")
-                        .total_found_asan += 1;
+                        .expect("RAND_ubsan_count")
+                        .total_found_ubsan += 1;
                     self.global_state
                         .lock()
                         .expect("RAND_ubsan_time")
