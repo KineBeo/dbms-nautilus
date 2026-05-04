@@ -13,7 +13,7 @@ export LD_LIBRARY_PATH="$(python3 -c "import sysconfig; print(sysconfig.get_conf
 
 FUZZER="$ROOT/target/release/fuzzer"
 GRAMMAR="$ROOT/grammars/active/sqlite_v3.py"
-HARNESS="$ROOT/harness/sqlite_harness_sqlite-3.31.1"
+HARNESS="$ROOT/harness/afl/sqlite_harness_sqlite-3.31.1"
 CAMPAIGN_DURATION=90
 
 for bin in "$FUZZER" "$HARNESS"; do

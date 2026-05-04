@@ -14,7 +14,7 @@ export LD_LIBRARY_PATH="$(python3 -c "import sysconfig; print(sysconfig.get_conf
 GENERATOR="$ROOT/target/release/generator"
 FUZZER="$ROOT/target/release/fuzzer"
 GRAMMAR="$ROOT/grammars/active/sqlite_v3.py"
-HARNESS="$ROOT/harness/sqlite_harness_sqlite-3.31.1"
+HARNESS="$ROOT/harness/afl/sqlite_harness_sqlite-3.31.1"
 
 TMPDIR=$(mktemp -d /tmp/smoke_XXXXXX)
 trap 'rm -rf "$TMPDIR"' EXIT
@@ -189,7 +189,7 @@ echo "SELECT 1;" > "$T09_INPUT"
 T09_ALL_OK=true
 T09_DETAIL=""
 for ver in sqlite-3.30.1 sqlite-3.31.1 sqlite-3.32.0 sqlite-3.32.2; do
-    H="$ROOT/harness/sqlite_harness_${ver}"
+    H="$ROOT/harness/afl/sqlite_harness_${ver}"
     if [[ ! -x "$H" ]]; then
         T09_ALL_OK=false
         T09_DETAIL="missing: $H"

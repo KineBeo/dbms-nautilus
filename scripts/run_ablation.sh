@@ -39,7 +39,7 @@ if [[ ! -f /tmp/sqlite_attack_v1.py ]]; then
     git show attack-v1-frozen:grammars/sqlite_attack.py > /tmp/sqlite_attack_v1.py
 fi
 
-HARNESS="$ROOT/harness/sqlite_harness_${TARGET}"
+HARNESS="$ROOT/harness/afl/sqlite_harness_${TARGET}"
 
 declare -A VARIANTS=(
     [attack_v1]="/tmp/sqlite_attack_v1.py"

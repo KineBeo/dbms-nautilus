@@ -32,7 +32,7 @@ if [[ -z "$VERSION" ]]; then
     exit 1
 fi
 
-HARNESS_BIN="$ROOT/harness/sqlite_harness_${VERSION}"
+HARNESS_BIN="$ROOT/harness/afl/sqlite_harness_${VERSION}"
 if [[ ! -f "$HARNESS_BIN" ]]; then
     echo "Error: harness binary not found: $HARNESS_BIN"
     echo "Build it first: cd harness && make SQLITE=../cve_builds/${VERSION}/sqlite3.c TARGET=sqlite_harness_${VERSION}"
