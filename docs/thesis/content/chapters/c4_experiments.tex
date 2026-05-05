@@ -1,1 +1,234 @@
 \chapter{Experiments and Evaluation}
+\label{chap:experiments}
+
+This chapter presents the empirical evaluation of the proposed grammar-based greybox fuzzing system. The evaluation is structured around four research questions that address the effectiveness of the weighted (bandit) sampling policy compared to uniform sampling, the temporal dynamics of crash discovery, the relationship between grammar coverage and CVE reachability, and the impact of grammar evolution on fuzzing outcomes. Section~\ref{sec:setup} describes the experimental setup, including hardware, campaign parameters, and statistical methodology. Sections~\ref{sec:rq1} through~\ref{sec:rq4} present results for each research question. Section~\ref{sec:threats} discusses threats to validity.
+
+\section{Experimental Setup}
+\label{sec:setup}
+
+All experiments were conducted on a standard development workstation equipped with an Intel Core i7 processor, 16 gigabytes of RAM, and running Ubuntu 22.04 LTS. The fuzzer was compiled with Rust 1.77 in release mode, and all SQLite harness binaries were compiled with Clang 14 using AddressSanitizer and UndefinedBehaviorSanitizer instrumentation as described in Chapter~\ref{chap:method}.
+
+Table~\ref{tab:params} summarizes the campaign parameters used across all experiments. Each campaign ran for 30 minutes with a single fuzzing thread to eliminate concurrency-related variance. The grammar version used for the main comparison (RQ1 and RQ2) was v3.2, which includes all structural primitives identified through the CVE reachability analysis (RQ3). Three SQLite versions with confirmed CVEs served as targets: 3.30.1 (CVE-2019-19646~\cite{cve201919646}), 3.31.1 (CVE-2020-13434~\cite{cve202013434}, CVE-2020-9327~\cite{cve20209327}), and 3.32.0 (CVE-2020-13435~\cite{cve202013435}). Each (version, policy) pair was repeated five times to enable statistical comparison, yielding a total of 53 campaigns when including the supplementary runs from early iterations.
+
+\begin{table}[htbp]
+\caption{Campaign parameters for all experiments. Each cell represents one (version, policy) pair with N=5 independent runs.}
+\label{tab:params}
+\centering
+\begin{tabular}{ll}
+\toprule
+\textbf{Parameter} & \textbf{Value} \\
+\midrule
+Campaign duration & 1800 seconds (30 minutes) \\
+Runs per cell & N = 5 \\
+Grammar version & v3.2 (475 production rules) \\
+Target SQLite versions & 3.30.1, 3.31.1, 3.32.0 \\
+Sampling policies & Bandit (EXP3), Uniform \\
+Maximum tree size & 300 nodes \\
+Execution timeout & 500 ms \\
+Fuzzing threads & 1 \\
+Coverage bitmap size & 2 MB (2,097,152 bytes) \\
+Total campaigns & 53 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The primary metric for crash diversity is the number of unique root causes per campaign, determined through the triage pipeline's stack-hash deduplication using the top three frames of the crashing call stack. For temporal analysis, crash counts were recorded at one-second resolution via the coverage bitmap logger, and crash rates were computed per time window.
+
+Statistical comparisons between policies use the Mann-Whitney U test~\cite{mannwhitney}, a non-parametric rank-based test that does not assume normal distribution of the underlying data. This choice is motivated by the small sample sizes (N=5 per cell), the non-normality evident in the data (uniform sampling exhibits extreme outliers such as 27 unique root causes in one run versus 4 in another), and the ordinal nature of the count data. The significance threshold is set at $\alpha = 0.05$ for per-version comparisons and the aggregate test.
+
+
+\section{RQ1: Does Weighted Sampling Improve Crash Diversity?}
+\label{sec:rq1}
+
+The first research question asks whether the bandit-based weighted sampling policy, which dynamically adjusts grammar rule weights based on coverage feedback, discovers more diverse crash classes than a uniform baseline that selects production rules with equal probability.
+
+Table~\ref{tab:rq1} presents the per-version and aggregate results. Across all 39 campaigns, the uniform policy achieved a mean of 7.60 unique root causes per campaign (standard deviation 5.86), while the bandit policy achieved a mean of 4.21 (standard deviation 1.58). The aggregate Mann-Whitney U test yields $p \approx 0.01$, indicating that uniform sampling discovers significantly more diverse crashes than bandit sampling at the $\alpha = 0.05$ level.
+
+\begin{table}[htbp]
+\caption{Unique root causes per campaign by target version and sampling policy. Bandit has N=4 for version 3.32.0 due to one campaign that failed to initialize. Bold indicates the higher mean for each version.}
+\label{tab:rq1}
+\centering
+\begin{tabular}{llccccc}
+\toprule
+\textbf{Version} & \textbf{Policy} & \textbf{N} & \textbf{Mean} & \textbf{Std} & \textbf{Min} & \textbf{Max} \\
+\midrule
+\multirow{2}{*}{sqlite-3.30.1} & Bandit & 5 & 5.2 & 1.79 & 3 & 7 \\
+                                & Uniform & 5 & \textbf{11.4} & 9.34 & 4 & 27 \\
+\midrule
+\multirow{2}{*}{sqlite-3.31.1} & Bandit & 5 & 4.0 & 1.00 & 3 & 5 \\
+                                & Uniform & 5 & \textbf{6.8} & 5.22 & 4 & 16 \\
+\midrule
+\multirow{2}{*}{sqlite-3.32.0} & Bandit & 4 & 3.2 & 0.50 & 3 & 4 \\
+                                & Uniform & 5 & \textbf{7.6} & 3.51 & 4 & 13 \\
+\midrule
+\multirow{2}{*}{sqlite-3.31.1 (fixed)} & Bandit & 5 & 4.2 & 2.17 & 3 & 8 \\
+                                        & Uniform & 5 & \textbf{4.6} & 2.51 & 3 & 9 \\
+\midrule
+\multirow{2}{*}{\textbf{Aggregate}} & Bandit & 19 & 4.21 & 1.58 & 3 & 8 \\
+                                     & Uniform & 20 & \textbf{7.60} & 5.86 & 3 & 27 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The per-version analysis reveals that sqlite-3.32.0 shows the most pronounced difference (bandit mean 3.2 versus uniform mean 7.6), and this version is the only one where the per-version Mann-Whitney test reaches significance at $p \leq 0.05$. For sqlite-3.30.1 (bandit 5.2 versus uniform 11.4) and sqlite-3.31.1 (bandit 4.0 versus uniform 6.8), the differences follow the same direction but do not reach individual significance due to the high variance in the uniform condition. The supplementary sqlite-3.31.1 (fixed) series, which used a later harness configuration, shows the smallest difference between policies (4.2 versus 4.6), suggesting that the harness configuration also influences the observable crash diversity.
+
+The most striking feature of these results is the variance asymmetry between the two policies. The bandit policy exhibits consistently low variance (standard deviation 0.50 to 2.17 across versions), indicating that it converges to a stable exploitation strategy regardless of the target. In contrast, the uniform policy produces dramatically higher variance (3.51 to 9.34), with individual runs ranging from 4 to 27 unique root causes. This pattern is consistent with the exploration-exploitation trade-off: the bandit policy learns to exploit rule paths that reliably trigger crashes, but in doing so narrows the search to a subset of the crash space. The uniform policy maintains maximum exploration of the grammar's production rules, occasionally discovering rich pockets of bugs (as in the run with 27 unique root causes on sqlite-3.30.1) and occasionally exploring unproductive regions of the input space.
+
+The implication for CVE-class vulnerability discovery is clear. Since the goal is to maximize the diversity of discovered bug classes rather than the reliability of finding any single bug, uniform sampling's exploration advantage outweighs the bandit's focused exploitation. The bandit policy's reward signal, which is based on new edge coverage, drives it toward rules that increase code coverage but not necessarily toward rules that trigger distinct failure modes. Coverage novelty and crash diversity are correlated but not equivalent objectives.
+
+
+\section{RQ2: How Does Crash Discovery Rate Evolve Over Time?}
+\label{sec:rq2}
+
+The second research question examines the temporal dynamics of crash discovery under both policies, focusing on time-to-first-crash, crash accumulation trajectories, and rate decay patterns.
+
+Table~\ref{tab:ttfc} presents the time-to-first-crash (TTFC) results. Both policies discover their first crash within 1--2 seconds of campaign start across all target versions. The aggregate mean is 1.4 seconds for both policies, with no statistically meaningful difference. This result confirms that the grammar's structural patterns are immediately effective at triggering sanitizer-detected violations in all three SQLite versions, and that TTFC is not a useful differentiator for grammar-based fuzzers operating on targets with known vulnerabilities.
+
+\begin{table}[htbp]
+\caption{Time-to-first-crash (seconds) by target version and sampling policy. Both policies achieve first crash within 1--2 seconds, indicating no meaningful TTFC difference.}
+\label{tab:ttfc}
+\centering
+\begin{tabular}{llccccc}
+\toprule
+\textbf{Version} & \textbf{Policy} & \textbf{N} & \textbf{Mean} & \textbf{Median} & \textbf{Min} & \textbf{Max} \\
+\midrule
+\multirow{2}{*}{sqlite-3.30.1} & Bandit & 5 & 1.0 & 1.0 & 1 & 1 \\
+                                & Uniform & 5 & 1.2 & 1.0 & 1 & 2 \\
+\midrule
+\multirow{2}{*}{sqlite-3.31.1} & Bandit & 10 & 1.5 & 1.5 & 1 & 2 \\
+                                & Uniform & 10 & 1.4 & 1.0 & 1 & 2 \\
+\midrule
+\multirow{2}{*}{sqlite-3.32.0} & Bandit & 4 & 1.5 & 1.5 & 1 & 2 \\
+                                & Uniform & 5 & 1.8 & 2.0 & 1 & 3 \\
+\midrule
+\multirow{2}{*}{\textbf{Aggregate}} & Bandit & 19 & 1.4 & 1.0 & 1 & 2 \\
+                                     & Uniform & 20 & 1.4 & 1.0 & 1 & 3 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+While TTFC provides no differentiation, the crash accumulation over time reveals a growing divergence between policies. Table~\ref{tab:accumulation} reports the mean total crashes at five time checkpoints. At the 60-second mark, both policies have accumulated approximately equal crash counts (bandit 24, uniform 24 averaged across versions). By the 300-second mark (5 minutes), the counts remain close (bandit 56, uniform 58). However, the gap widens progressively: at 900 seconds (15 minutes), uniform leads 147 to 134, and by 1800 seconds (30 minutes), uniform has accumulated 245 total crashes versus bandit's 212, a 16\% advantage.
+
+\begin{table}[htbp]
+\caption{Mean total crashes at time checkpoints (averaged across runs). The gap between policies widens after the 10-minute mark, indicating that uniform sampling maintains discovery effectiveness longer.}
+\label{tab:accumulation}
+\centering
+\begin{tabular}{llcccccc}
+\toprule
+\textbf{Version} & \textbf{Policy} & \textbf{N} & \textbf{@60s} & \textbf{@300s} & \textbf{@600s} & \textbf{@900s} & \textbf{@1800s} \\
+\midrule
+\multirow{2}{*}{sqlite-3.30.1} & Bandit & 5 & 21 & 53 & 99 & 140 & 243 \\
+                                & Uniform & 5 & 21 & 54 & 106 & 150 & 278 \\
+\midrule
+\multirow{2}{*}{sqlite-3.31.1} & Bandit & 10 & 25 & 59 & 104 & 142 & 196 \\
+                                & Uniform & 10 & 28 & 60 & 109 & 144 & 195 \\
+\midrule
+\multirow{2}{*}{sqlite-3.32.0} & Bandit & 4 & 26 & 56 & 88 & 119 & 198 \\
+                                & Uniform & 5 & 23 & 59 & 103 & 148 & 261 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The crash rate analysis in Table~\ref{tab:rate} provides insight into why this divergence occurs. Both policies start at similar rates in the first five minutes (bandit 11.4 crashes per minute, uniform 11.7). As the campaign progresses, both rates decline due to the finite nature of easily-discoverable crash paths. However, the bandit policy's rate decays faster: from 11.4 crashes per minute in the 0--5 minute window to 4.8 in the 15--30 minute window, a 58\% reduction. The uniform policy decays from 11.7 to 5.7, a 51\% reduction. This differential decay is consistent with the exploitation hypothesis: the bandit policy rapidly exhausts its focused set of high-reward rule paths, leading to diminishing returns as it repeatedly exercises the same code regions. The uniform policy, by continuously exploring the full grammar, maintains a higher probability of encountering fresh crash-inducing paths throughout the campaign.
+
+\begin{table}[htbp]
+\caption{Crash rate (crashes per minute) by time window, aggregated across all versions. The bandit policy exhibits faster rate decay (58\%) compared to uniform (51\%), consistent with exploitation-driven search space exhaustion.}
+\label{tab:rate}
+\centering
+\begin{tabular}{llcccc}
+\toprule
+\textbf{Version} & \textbf{Policy} & \textbf{0--5 min} & \textbf{5--10 min} & \textbf{10--15 min} & \textbf{15--30 min} \\
+\midrule
+\multirow{2}{*}{sqlite-3.30.1} & Bandit & 10.7 & 9.0 & 8.3 & 6.9 \\
+                                & Uniform & 10.8 & 10.4 & 8.9 & 8.5 \\
+\midrule
+\multirow{2}{*}{sqlite-3.31.1} & Bandit & 11.9 & 8.9 & 7.7 & 3.5 \\
+                                & Uniform & 12.1 & 9.6 & 7.0 & 3.4 \\
+\midrule
+\multirow{2}{*}{sqlite-3.32.0} & Bandit & 11.2 & 6.4 & 6.2 & 5.3 \\
+                                & Uniform & 11.9 & 8.6 & 9.2 & 7.5 \\
+\midrule
+\multirow{2}{*}{\textbf{Aggregate}} & \textbf{Bandit} & \textbf{11.4} & \textbf{8.4} & \textbf{7.5} & \textbf{4.8} \\
+                                     & \textbf{Uniform} & \textbf{11.7} & \textbf{9.6} & \textbf{8.0} & \textbf{5.7} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+These temporal results carry an important methodological implication. Time-to-first-crash, which is frequently reported in fuzzing literature as a primary evaluation metric~\cite{fuzzingsurvey}, is uninformative for grammar-based fuzzers targeting well-understood vulnerability classes. When the grammar already encodes the structural patterns that trigger bugs, the first crash is essentially immediate. The more meaningful metrics are crash diversity (RQ1) and the rate at which new crash classes are discovered over time. The divergence between policies manifests not in speed to first discovery but in the sustained breadth of exploration over extended campaigns.
+
+
+\section{RQ3: Which CVEs Are Reachable by the Grammar?}
+\label{sec:rq3}
+
+The third research question investigates the relationship between grammar coverage and the ability to trigger specific known CVEs. Rather than measuring whether the fuzzer actually triggers each CVE during a campaign (which depends on campaign duration, luck, and triage accuracy), this analysis examines whether the grammar contains all the structural building blocks necessary to construct a triggering input for each CVE.
+
+Table~\ref{tab:cve} presents the CVE reachability analysis for grammar versions v3.1 (449 rules) and v3.2 (475 rules). Each CVE is characterized by its required SQL structural patterns, which were determined by manually analyzing the minimal proof-of-concept inputs from the CVE disclosures and identifying which grammar non-terminals and production rules are necessary to generate inputs of that structural form.
+
+\begin{table}[htbp]
+\caption{CVE reachability analysis. Each CVE requires specific SQL structural patterns that must be expressible within the grammar. Checkmarks indicate the grammar version contains all required building blocks. Grammar v3.2 achieves full reachability for all six target CVEs.}
+\label{tab:cve}
+\centering
+\begin{tabular}{p{2.8cm}p{5.5cm}cc}
+\toprule
+\textbf{CVE} & \textbf{Required Patterns} & \textbf{v3.1} & \textbf{v3.2} \\
+\midrule
+CVE-2019-19646 & NOT INDEXED, recursive INSERT & \checkmark & \checkmark \\
+CVE-2020-13434 & printf(\%lld), large integer literal & \checkmark & \checkmark \\
+CVE-2020-9327 & Self-referential generated column (b AS b) & $\times$ & \checkmark \\
+CVE-2020-13435 & Window function (row\_number, lead, lag) & $\times$ & \checkmark \\
+CVE-2020-13871 & Window function + count() + ORDER BY 3-term & $\times$ & \checkmark \\
+CVE-2020-15358 & INTERSECT in scalar subquery context & $\times$ & \checkmark \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Grammar v3.1 achieves full reachability for only two of six target CVEs: CVE-2019-19646~\cite{cve201919646}, which requires the NOT INDEXED hint and recursive INSERT patterns that were present in the initial grammar design, and CVE-2020-13434~\cite{cve202013434}, which requires the printf format string function with a \%lld format specifier applied to a large integer literal. Both of these CVEs are triggered by relatively simple SQL constructs that fall within the scope of basic query patterns.
+
+The remaining four CVEs require structural primitives that were absent from v3.1. CVE-2020-9327~\cite{cve20209327} requires a self-referential generated column definition where a column's generated expression references the column itself (e.g., \texttt{b AS (b) STORED}), creating a circular dependency that triggers a null-pointer dereference during query planning. CVE-2020-13435~\cite{cve202013435} and CVE-2020-13871~\cite{cve202013871} both require window function syntax (LEAD, LAG, ROW\_NUMBER, RANK, and related functions) that exercises SQLite's window function implementation, where use-after-free and buffer overflow vulnerabilities reside. CVE-2020-13871 additionally requires the zero-argument form of the count() aggregate function and an ORDER BY clause with three or more terms to trigger the specific code path containing the vulnerability. CVE-2020-15358~\cite{cve202015358} requires an INTERSECT set operation nested within a scalar subquery context, which exercises a rarely-tested interaction between the set operation planner and the scalar expression evaluator.
+
+Grammar v3.2 addresses all four gaps by adding 26 new production rules: 15 window function rules covering the complete set of SQL:2003 window functions (lead, lag, row\_number, rank, dense\_rank, ntile, first\_value, last\_value, nth\_value, percent\_rank, cume\_dist, and their OVER clause variations), 3 self-referential generated column expression rules (columns b, c1, and c2 referencing themselves), 3 explicit self-referential column definition list templates with constraints (UNIQUE, NOT NULL), one count() zero-argument form for window-compatible aggregate usage, and one ORDER BY three-term rule for multi-column ordering patterns. With these additions, all six target CVEs have their required structural building blocks present in the grammar, achieving 100\% reachability.
+
+This analysis reveals a fundamental insight about grammar-based fuzzing for CVE discovery: vulnerabilities encode specific structural patterns in the input language, not arbitrary byte sequences. A buffer overflow in the window function implementation cannot be triggered without generating syntactically valid SQL that exercises window functions. The grammar therefore acts as a gatekeeping layer --- if the grammar cannot express the structural pattern required by a CVE, no amount of fuzzing time or policy sophistication can discover that vulnerability. This makes grammar design the single most critical factor for CVE reachability, superseding both the sampling policy (RQ1) and the campaign duration (RQ2) in importance.
+
+
+\section{RQ4: How Does Grammar Evolution Affect Fuzzing Outcomes?}
+\label{sec:rq4}
+
+The fourth research question examines how iterative refinement of the grammar --- adjusting weights and adding structural primitives --- affects the distribution and diversity of discovered crashes.
+
+Table~\ref{tab:grammar-evolution} summarizes the three grammar versions developed during this work. The evolution proceeded through two distinct phases: weight rebalancing (v3.0 to v3.1) and structural expansion (v3.1 to v3.2).
+
+\begin{table}[htbp]
+\caption{Grammar version evolution. Each version addresses a specific deficiency identified through experimental feedback. Rule count is the total number of production rules across all non-terminals.}
+\label{tab:grammar-evolution}
+\centering
+\begin{tabular}{lccp{6cm}}
+\toprule
+\textbf{Version} & \textbf{Rules} & \textbf{CVEs Reachable} & \textbf{Key Change} \\
+\midrule
+v3.0 & 449 & 2/6 & Initial structural primitives (4 statement shapes, 6 schemas, 8 query types) \\
+v3.1 & 449 & 2/6 & FTS5 schema weight reduced from 2.0 to 0.5 \\
+v3.2 & 475 & 6/6 & +26 rules: window functions, self-ref genCol, count(), ORDER BY 3-term \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The transition from v3.0 to v3.1 addressed a weight dominance problem. In v3.0, the Schema-Setup alternative S5 (which generates FTS virtual table schemas) had an initial weight of 2.0, while all other schema alternatives had weight 1.0. This seemingly modest 2:1 ratio produced a dramatic effect: 92\% of all crashes discovered during 15-minute campaigns on sqlite-3.31.1 were FTS-related. The FTS module in SQLite is known to contain many shallow bugs that are easily triggered, so the bandit policy's coverage-driven reward mechanism reinforced the already-elevated weight of S5, creating a feedback loop that drove the crash portfolio toward near-total FTS dominance. Reducing the S5 weight to 0.5 in v3.1 immediately diversified the crash portfolio, allowing crashes from generated columns, views, joins, and index operations to appear in campaign results.
+
+The transition from v3.1 to v3.2 addressed structural gaps rather than weight problems. The CVE reachability analysis (Section~\ref{sec:rq3}) identified four CVEs that were structurally unreachable due to missing grammar primitives. Adding 26 targeted production rules --- specifically chosen to cover the SQL feature space required by the unreachable CVEs --- brought reachability from 2/6 to 6/6 without disrupting the existing crash diversity that v3.1's weight rebalancing had achieved.
+
+These results demonstrate that grammar evolution operates on two orthogonal axes. The first axis is weight tuning, which controls the probability distribution over existing rules and thus determines which regions of the input space receive more sampling effort. The second axis is structural expansion, which extends the boundaries of the expressible input space itself. Both are necessary: weight tuning without structural coverage leaves CVEs unreachable regardless of campaign duration, while structural expansion without weight tuning can lead to dominance of one grammar region (as the v3.0 FTS problem illustrates).
+
+The practical implication is that grammar design matters more than sampling policy for CVE discovery. The grammar defines the search space boundaries; the policy merely determines how efficiently that space is navigated. A uniform policy operating on a well-designed grammar (v3.2) outperforms a sophisticated bandit policy operating on a structurally incomplete grammar (v3.1) for the simple reason that structural reachability is a prerequisite for discovery. This finding suggests that future work should prioritize automated grammar expansion (learning new structural primitives from CVE disclosures or code analysis) over increasingly sophisticated sampling policies.
+
+
+\section{Threats to Validity}
+\label{sec:threats}
+
+Several threats to validity must be acknowledged when interpreting these results.
+
+Regarding internal validity, the sample size of N=5 runs per (version, policy) cell, while sufficient for non-parametric testing, limits the statistical power to detect small effect sizes. The bandit policy's hyperparameters --- specifically the EXP3 learning rate $\eta$ --- were not tuned via grid search or cross-validation but rather set to a single reasonable value based on the literature~\cite{exp3}. A different learning rate might yield better or worse performance relative to uniform sampling, and the optimal rate likely varies across grammar sizes and target programs. Additionally, the coverage logs record crash counts at one-second granularity based on execution order rather than wall-clock timestamps with sub-second precision, which introduces minor measurement noise in the temporal analysis.
+
+Regarding external validity, all experiments target a single DBMS (SQLite~\cite{sqlite}) with a single input language (SQL). SQLite is an embedded database with a relatively compact codebase (approximately 150,000 lines of code in the amalgamation), and its bug landscape may not be representative of larger, server-based systems such as MySQL or PostgreSQL. The grammar was manually designed for SQL, and the findings about grammar design importance may not generalize to fuzzing targets that accept less structured input formats. The CVE set is limited to six vulnerabilities across four versions, all discovered between 2019 and 2020. More recent SQLite versions have benefited from extensive fuzzing by the SQLite developers themselves, potentially making the remaining bug population qualitatively different from the CVEs studied here.
+
+Regarding construct validity, the stack-hash deduplication method using the top three frames of the crashing call stack is a heuristic that may both over-count (classifying two manifestations of the same root cause as distinct because they crash through different call paths) and under-count (merging distinct bugs that happen to crash through the same three-frame sequence). The fidelity scoring threshold of 80\% --- used to filter crashes that reproduce reliably during triage --- is an arbitrary cutoff that trades precision for recall. Coverage bitmap hash collisions, where distinct edges map to the same bitmap byte due to the hash function used by AFL-style instrumentation~\cite{afl}, can cause the fuzzer to miss coverage-increasing inputs, potentially affecting both the bandit's reward signal and the crash diversity counts. Finally, the CVE reachability analysis (RQ3) assesses structural expressibility rather than empirical triggering probability; a CVE being reachable in principle does not guarantee it will be triggered within any finite campaign duration.
