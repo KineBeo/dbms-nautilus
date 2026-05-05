@@ -1,1 +1,376 @@
 \chapter{Proposed Method}
+\label{chap:method}
+
+This chapter presents the design and implementation of the proposed grammar-based greybox fuzzing system for DBMS vulnerability detection. The system extends Nautilus~\cite{nautilus} with a weighted grammar sampling strategy, a structured attack grammar, and a triage pipeline for automated crash analysis. Section~\ref{sec:overview} provides an architectural overview of the system components and their interactions. Section~\ref{sec:grammar-design} details the grammar design philosophy and its layered decomposition. Section~\ref{sec:bandit} describes the bandit-based weight update mechanism. Section~\ref{sec:harness} explains the harness construction and oracle classification. Section~\ref{sec:triage} covers the post-campaign triage pipeline. Section~\ref{sec:cve-targets} discusses the selection criteria for CVE targets.
+
+\section{System Overview}
+\label{sec:overview}
+
+The proposed system consists of five major components that together form a closed-loop fuzzing pipeline. The Grammar Engine, implemented in Rust (2,441 lines of code in the \texttt{grammartec/} module), loads grammar specifications from Python files via the PyO3 foreign function interface. It builds a rule table from the parsed grammar, assigns initial weights to each production rule, and provides weighted sampling via the \texttt{loaded\_dice} crate~\cite{loadeddice}. The engine supports three mutation operators: random subtree regeneration, recursive expansion of non-terminals, and splice mutations that graft subtrees between different inputs in the queue.
+
+The Fuzzer Coordinator (1,658 lines of code in \texttt{fuzzer/}) orchestrates the main fuzzing loop. On each iteration, it either generates a fresh input from the grammar or selects an existing input from the queue and applies a mutation. The resulting parse tree is unparsed into a SQL string, which is then transmitted to the fork server for execution. Upon receiving coverage feedback, the coordinator determines whether the input triggered new edge transitions in the coverage bitmap. If so, it adds the input to the queue and updates the grammar weights according to the bandit policy described in Section~\ref{sec:bandit}.
+
+The Fork Server (570 lines of code in \texttt{forksrv/}) implements an AFL-compatible fork server protocol~\cite{afl}. A parent process loads the target program into memory, pre-initializes shared state, and then forks a child process for each test case. The child executes the SQL input and exits, while the parent collects the exit status and reads the shared memory coverage bitmap. This bitmap is a 2-megabyte region where each byte corresponds to one edge (basic block transition) in the control flow graph of the instrumented target. The fork server eliminates the overhead of \texttt{execve} on every test case, achieving throughput of thousands of executions per second.
+
+The Harness (approximately 200 lines of C in \texttt{harness/}) is a thin wrapper around the SQLite amalgamation. It uses the \texttt{\_\_AFL\_INIT()} macro for fork-server mode (not persistent mode, since Nautilus does not implement the \texttt{\_\_AFL\_LOOP} protocol). The harness opens an in-memory database, reads the fuzzed SQL input from a file path passed as a command-line argument, executes it via \texttt{sqlite3\_exec}, and exits. The binary is compiled with AddressSanitizer and UndefinedBehaviorSanitizer instrumentation to serve as the bug oracle.
+
+The Triage Pipeline (approximately 500 lines of Python in \texttt{triage/}) performs post-campaign analysis. It deduplicates crashes via stack-hash clustering, measures fidelity through replay testing, matches crashes against known CVE signatures, and minimizes crashing inputs to produce succinct reproducers.
+
+Figure~\ref{fig:architecture} illustrates the data flow through the system. The grammar rules define the space of possible SQL inputs. Weighted sampling selects production rules according to their current weights. The selected rules drive tree generation, producing a parse tree that is then unparsed into a concrete SQL string. The fork server transmits this string to the harness, which executes it against an instrumented SQLite build. The resulting coverage bitmap is returned to the fuzzer coordinator, which computes reward signals and updates rule weights, closing the feedback loop.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    node distance=1.8cm and 2.2cm,
+    block/.style={rectangle, draw, rounded corners, minimum width=2.8cm, minimum height=1.0cm, text centered, font=\small},
+    arrow/.style={->, >=stealth, thick},
+    label/.style={font=\scriptsize, midway}
+]
+    % Nodes
+    \node[block] (grammar) {Grammar Rules\\(\texttt{grammartec/})};
+    \node[block, right=of grammar] (sampling) {Weighted\\Sampling};
+    \node[block, right=of sampling] (tree) {Tree Generation\\+ Mutation};
+    \node[block, below=of tree] (unparse) {Unparse\\to SQL String};
+    \node[block, below=of unparse] (forkserver) {Fork Server\\(\texttt{forksrv/})};
+    \node[block, left=of forkserver] (harness) {SQLite Harness\\(ASan+UBSan)};
+    \node[block, left=of harness] (coverage) {Coverage\\Bitmap (2\,MB)};
+    \node[block, above=of coverage] (feedback) {Weight Update\\(Bandit Policy)};
+
+    % Arrows
+    \draw[arrow] (grammar) -- (sampling) node[label, above] {rules};
+    \draw[arrow] (sampling) -- (tree) node[label, above] {weights};
+    \draw[arrow] (tree) -- (unparse) node[label, right] {parse tree};
+    \draw[arrow] (unparse) -- (forkserver) node[label, right] {SQL text};
+    \draw[arrow] (forkserver) -- (harness) node[label, above] {fork + exec};
+    \draw[arrow] (harness) -- (coverage) node[label, above] {exit status};
+    \draw[arrow] (coverage) -- (feedback) node[label, left] {new edges?};
+    \draw[arrow] (feedback) -- (sampling) node[label, left] {update $w_i$};
+\end{tikzpicture}
+\caption{Architecture of the proposed grammar-based greybox fuzzing system. Arrows indicate the direction of data flow. The feedback loop from coverage observation back to weighted sampling enables the system to adapt its input generation strategy based on which grammar rules are most effective at discovering new program behavior.}
+\label{fig:architecture}
+\end{figure}
+
+\section{Grammar Design}
+\label{sec:grammar-design}
+
+\subsection{Structural Primitives Philosophy}
+
+The grammar encodes SQL structural patterns that trigger vulnerability classes rather than specific proof-of-concept inputs. This ``zero PoC contamination'' principle ensures that the fuzzer discovers bugs through compositional exploration rather than replaying known attacks. For example, the CVE-2020-13434 integer overflow~\cite{cve202013434} requires both a \texttt{printf} function call and an INT32 boundary value. Rather than encoding the exact PoC \texttt{SELECT printf('\%.*g', 2147483647, 0.01)}, the grammar provides independent non-terminals for format specifiers, boundary integers, and function call syntax. The fuzzer must compose these building blocks into a triggering combination through random generation and mutation, demonstrating genuine discovery capability.
+
+This philosophy yields three concrete design constraints. First, no grammar rule may contain a complete CVE proof-of-concept as a fixed string. Second, every structural pattern needed to reach a target CVE must exist as a composable non-terminal. Third, the grammar must preserve sufficient compositional freedom that the fuzzer can discover novel combinations beyond the known CVEs.
+
+\subsection{Layer Decomposition}
+
+The grammar employs a two-layer architecture that separates atomic SQL constructs from composed vulnerability-triggering patterns. Layer~1 defines the SQL primitives: over 30 expression alternatives (arithmetic, comparison, logical, string, subquery), SELECT/FROM/WHERE/JOIN clauses, window functions with frame specifications, common table expressions, DML statements (INSERT, UPDATE, DELETE), DDL statements (CREATE TABLE, VIEW, INDEX, TRIGGER), function calls (aggregate, scalar, window-specific), and terminal literals (integers, floats, strings, blobs, boundary values). These constitute the atomic building blocks of SQL.
+
+Layer~2 composes Layer~1 primitives into four high-level shapes. The \texttt{Schema-Setup} non-terminal provides six schema construction alternatives. The \texttt{Stress-Query} non-terminal provides eight query patterns designed to exercise complex query planning paths. The \texttt{Validation-Op} non-terminal provides four verification operations that check internal database consistency. The \texttt{Boundary-Func-Call} non-terminal provides function calls with boundary values targeting integer overflow and buffer overread conditions.
+
+Listing~\ref{lst:schema-setup} shows the Layer~2 Schema-Setup alternatives. Each alternative creates a different database schema topology that enables distinct classes of vulnerability-triggering queries. The weights assigned to each rule reflect the empirical importance of each schema pattern for triggering bugs: the generated-column schema (S2) receives the highest weight of 3.0 because generated columns are involved in two of the six target CVEs.
+
+\begin{lstlisting}[language=Python, caption={Schema-Setup alternatives (Layer 2). Each alternative constructs a different schema topology. Weights reflect empirical importance for vulnerability triggering.}, label=lst:schema-setup, basicstyle=\ttfamily\small, numbers=left]
+# S1: Single table, basic columns
+ctx.rule("Schema-Setup",
+    "CREATE TABLE IF NOT EXISTS p({Col-Def-List})",
+    weight=1.5)
+
+# S2: Table with generated column + constraints
+ctx.rule("Schema-Setup",
+    "CREATE TABLE IF NOT EXISTS p({Col-Def-List-GenCol})",
+    weight=3.0)
+
+# S3: Two tables (enables JOINs between p and q)
+ctx.rule("Schema-Setup",
+    "CREATE TABLE IF NOT EXISTS p({Col-Def-List});\n"
+    "CREATE TABLE IF NOT EXISTS q({Col-Def-List})",
+    weight=2.5)
+
+# S4: Table + VIEW
+ctx.rule("Schema-Setup",
+    "CREATE TABLE IF NOT EXISTS p({Col-Def-List});\n"
+    "CREATE VIEW IF NOT EXISTS v1 AS {Select-Stmt}",
+    weight=2.0)
+
+# S5: Virtual table (FTS5/FTS3) -- reduced in v3.1
+ctx.rule("Schema-Setup",
+    "CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 "
+    "USING {Fts-Engine}({Col-Name-List})",
+    weight=0.5)
+
+# S6: Table + INDEX
+ctx.rule("Schema-Setup",
+    "CREATE TABLE IF NOT EXISTS p({Col-Def-List});\n"
+    "CREATE INDEX IF NOT EXISTS idx1 ON p({Col-Name})",
+    weight=1.0)
+\end{lstlisting}
+
+Listing~\ref{lst:stress-query} shows representative Stress-Query alternatives. The NATURAL JOIN pattern (Q3) is particularly relevant because CVE-2020-13435~\cite{cve202013435} requires a NATURAL JOIN in combination with window functions and a coalesce call. The compound query pattern (Q5) exercises the INTERSECT and EXCEPT operators needed for CVE-2020-15358~\cite{cve202015358} and CVE-2020-13871~\cite{cve202013871}.
+
+\begin{lstlisting}[language=Python, caption={Representative Stress-Query alternatives (Layer 2). Each pattern exercises a distinct query planning path in the SQLite optimizer.}, label=lst:stress-query, basicstyle=\ttfamily\small, numbers=left]
+# Q2: EXISTS subquery
+ctx.rule("Stress-Query",
+    "SELECT {Result-Col-List} FROM {Table-Name} "
+    "WHERE EXISTS ({Select-Stmt})",
+    weight=3.0)
+
+# Q3: NATURAL JOIN
+ctx.rule("Stress-Query",
+    "SELECT {Result-Col-List} FROM {Table-Name} "
+    "NATURAL JOIN {Table-Name} WHERE {Expr}",
+    weight=3.0)
+
+# Q5: Compound query (INTERSECT/EXCEPT)
+ctx.rule("Stress-Query",
+    "{Select-Stmt} {Compound-Op} {Select-Stmt}",
+    weight=2.5)
+
+# Q6: Self-JOIN + expression
+ctx.rule("Stress-Query",
+    "SELECT {Result-Col-List} FROM {Table-Name} "
+    "JOIN {Table-Name} {Col-Alias} ON {Expr}",
+    weight=2.0)
+\end{lstlisting}
+
+Listing~\ref{lst:boundary-func} shows the Boundary-Func-Call non-terminal. The \texttt{printf} with format specifier \texttt{'\%.*g'} and boundary integer 2147483647 directly targets the CVE-2020-13434 integer overflow in SQLite's printf implementation. The \texttt{substr} with boundary integers can trigger heap buffer overreads, while \texttt{hex(zeroblob(N))} with large N values exercises memory allocation edge cases.
+
+\begin{lstlisting}[language=Python, caption={Boundary-Func-Call alternatives targeting integer overflow and buffer boundary conditions.}, label=lst:boundary-func, basicstyle=\ttfamily\small, numbers=left]
+ctx.rule("Boundary-Func-Call",
+    "printf({Format-Spec}, {Boundary-Int}, {Boundary-Float})",
+    weight=3.0)
+ctx.rule("Boundary-Func-Call",
+    "substr({Str-Literal}, {Boundary-Int}, {Boundary-Int})",
+    weight=1.5)
+ctx.rule("Boundary-Func-Call",
+    "hex(zeroblob({Boundary-Int}))", weight=2.0)
+
+ctx.rule("Format-Spec", "'%.*g'", weight=3.0)
+ctx.rule("Format-Spec", "'%.*f'", weight=2.0)
+
+ctx.rule("Boundary-Int", "2147483647", weight=3.0)   # INT32_MAX
+ctx.rule("Boundary-Int", "2147483648", weight=3.0)   # INT32_MAX+1
+ctx.rule("Boundary-Int", "-2147483648", weight=3.0)  # INT32_MIN
+ctx.rule("Boundary-Int", "9223372036854775807", weight=3.0) # INT64_MAX
+\end{lstlisting}
+
+\subsection{Grammar Evolution}
+
+The grammar underwent iterative refinement guided by experimental feedback. Table~\ref{tab:grammar-evolution} summarizes the three versions. Version~3.0 established the structural primitives architecture with 449 rules. Version~3.1 addressed a diversity problem: an A/B test revealed that 92\% of crashes involved FTS virtual tables because the S5 schema variant dominated the crash portfolio. Reducing the S5 weight from 2.0 to 0.5 distributed crashes more evenly across generated columns, views, joins, and index schemas. Version~3.2 added 26 rules after a gap analysis showed that four CVEs (CVE-2020-9327, CVE-2020-13435, CVE-2020-13871, CVE-2020-15358) were unreachable due to missing structural primitives: window functions, self-referential generated columns, the zero-argument \texttt{count()} form, and multi-column ORDER BY clauses.
+
+\begin{table}[htbp]
+\caption{Grammar version history. Each version addresses limitations identified through experimental evaluation.}
+\label{tab:grammar-evolution}
+\centering
+\begin{tabular}{llrl}
+\toprule
+\textbf{Version} & \textbf{Date} & \textbf{Rules} & \textbf{Key Change} \\
+\midrule
+v3.0 & 2026-04-27 & 449 & Initial structural primitives design \\
+v3.1 & 2026-04-28 & 449 & S5 (FTS) weight 2.0$\to$0.5; diversify crash portfolio \\
+v3.2 & 2026-05-05 & 475 & +window functions, +self-ref generated columns, \\
+     &            &     & +count() zero-arg, +ORDER BY 3-term \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Weighted Sampling with Bandit Policy}
+\label{sec:bandit}
+
+\subsection{Alias Method for O(1) Sampling}
+
+Grammar-based fuzzing requires sampling production rules millions of times during a campaign. For a non-terminal with $K$ alternatives, naive weighted sampling requires $O(K)$ time per sample using the cumulative distribution function. The \texttt{loaded\_dice} crate~\cite{loadeddice} implements Vose's alias method, which pre-computes an alias table in $O(K)$ time and then produces each sample in $O(1)$ time using one uniform random number and one comparison. This constant-time sampling is critical because the fuzzer performs on the order of $10^6$ to $10^7$ rule selections per hour-long campaign.
+
+Given $K$ rules with weights $w_1, \ldots, w_K$, the alias method first normalizes the weights into probabilities $p_i = w_i / \sum_{j=1}^{K} w_j$. It then constructs two arrays of length $K$: a probability table $U[i]$ and an alias table $A[i]$. To sample, the algorithm generates a uniform random index $i \in \{1, \ldots, K\}$ and a uniform random number $u \in [0, 1)$. If $u < U[i]$, the algorithm returns rule $i$; otherwise, it returns rule $A[i]$. This two-step lookup achieves exactly the target distribution while requiring only constant time per sample.
+
+\subsection{Bandit Formulation}
+
+The weight update problem is modeled as a multi-armed bandit~\cite{exp3}. Each production rule for a given non-terminal constitutes one arm. When the fuzzer needs to expand a non-terminal during tree generation, it samples a rule according to the current weight distribution. After executing the generated input, the fuzzer observes a binary reward: 1 if the input triggered new edge coverage in the bitmap, and 0 otherwise. The goal is to maximize cumulative coverage discovery over the campaign duration, which corresponds to maximizing the total reward.
+
+This formulation faces the exploration-exploitation dilemma. Rules that have previously led to new coverage should be sampled more frequently (exploitation), but under-explored rules might lead to coverage in unexplored regions of the program (exploration). The EXP3-style update described below addresses this tradeoff by maintaining positive probability on all rules while concentrating mass on historically productive ones.
+
+Algorithm~\ref{alg:bandit-update} presents the weight update procedure. The learning rate $\eta$ controls the speed of adaptation: larger values cause faster convergence but risk over-fitting to early observations, while smaller values maintain broader exploration at the cost of slower adaptation to productive rules.
+
+\begin{algorithm}[htbp]
+\caption{Bandit Weight Update for Grammar Rule Selection}
+\label{alg:bandit-update}
+\begin{algorithmic}[1]
+\Require Rules $R_1, \ldots, R_K$ for non-terminal $NT$, learning rate $\eta$, weights $w_1, \ldots, w_K$
+\For{each fuzzing iteration $t$}
+    \State Compute probabilities: $p_i \gets w_i / \sum_{j=1}^{K} w_j$ for all $i$
+    \State Sample rule $R_i$ with probability $p_i$
+    \State Generate input $x$ using $R_i$ in the parse tree
+    \State Execute $x$ on the target; observe coverage bitmap $B_t$
+    \If{$B_t$ contains new edges not in $B_{t-1}$}
+        \State $r_i \gets 1$ \Comment{Positive reward: new coverage}
+    \Else
+        \State $r_i \gets 0$ \Comment{No reward}
+    \EndIf
+    \State Update weight: $w_i \gets w_i \times \exp\left(\eta \cdot r_i / p_i\right)$
+    \State Rebuild alias table with updated weights
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+The importance-weighted update $\exp(\eta \cdot r_i / p_i)$ compensates for the fact that rules sampled with lower probability provide more informative feedback when they succeed. A rule sampled with probability $p_i = 0.01$ that triggers new coverage receives an update proportional to $1/0.01 = 100$, while a rule sampled with probability $p_i = 0.5$ receives an update proportional to $1/0.5 = 2$. This ensures that rare but productive rules can rapidly increase their sampling probability.
+
+\subsection{Uniform Baseline}
+
+The uniform baseline serves as the experimental control. All rules maintain a fixed weight of 1.0 throughout the campaign, and no weight updates occur regardless of coverage feedback. This corresponds to standard grammar-based fuzzing without adaptive sampling, where every production rule for a given non-terminal has equal probability of selection. Comparing the bandit policy against this uniform baseline isolates the contribution of adaptive weight updates to fuzzing effectiveness.
+
+\section{Harness Construction}
+\label{sec:harness}
+
+\subsection{AFL Fork Server Protocol}
+
+The harness uses the \texttt{\_\_AFL\_INIT()} macro from AFL~\cite{afl} to implement fork-server mode. This is distinct from AFL's persistent mode (\texttt{\_\_AFL\_LOOP}), which Nautilus does not support. In fork-server mode, the parent process loads the SQLite amalgamation into memory, initializes the in-memory database, and then waits for instructions from the fuzzer. For each test case, the parent forks a child process. The child inherits the pre-initialized state, reads the SQL input file, executes it via \texttt{sqlite3\_exec}, and exits. The parent collects the child's exit status and coverage bitmap, then reports results back to the fuzzer coordinator.
+
+The database starts empty because the grammar generates self-contained multi-statement SQL that creates its own schema via the Schema-Setup non-terminal before issuing queries. This design eliminates the need for a pre-loaded schema in the harness itself, simplifying the harness code and ensuring that every test case is independently reproducible.
+
+Listing~\ref{lst:harness} shows a simplified version of the harness implementation. The \texttt{setup\_db} constructor opens the in-memory database before \texttt{\_\_AFL\_INIT()} establishes the fork point. Each forked child reads one SQL file and executes it, then exits.
+
+\begin{lstlisting}[language=C, caption={Simplified SQLite harness for AFL fork-server mode. The database is opened before the fork point; each child executes one SQL input.}, label=lst:harness, basicstyle=\ttfamily\small, numbers=left]
+#include "sqlite3.h"
+
+static sqlite3 *db = NULL;
+
+__attribute__((constructor))
+static void setup_db(void) {
+    sqlite3_open(":memory:", &db);
+}
+
+int main(int argc, char **argv) {
+    __AFL_INIT();  /* Fork point */
+
+    size_t sql_len = 0;
+    char *sql = read_input(argv[1], &sql_len);
+    if (sql) {
+        char *errmsg = NULL;
+        sqlite3_exec(db, sql, NULL, NULL, &errmsg);
+        if (errmsg) sqlite3_free(errmsg);
+        free(sql);
+    }
+    sqlite3_close(db);
+    return 0;
+}
+\end{lstlisting}
+
+\subsection{Compilation and Instrumentation}
+
+The harness is compiled using \texttt{afl-clang-fast} with AddressSanitizer (ASan) and UndefinedBehaviorSanitizer (UBSan) enabled. The SQLite amalgamation is compiled as part of the same translation unit, ensuring full instrumentation of all SQLite internals. Additional compile-time flags enable optional SQLite features: \texttt{SQLITE\_ENABLE\_FTS3}, \texttt{SQLITE\_ENABLE\_FTS5}, \texttt{SQLITE\_ENABLE\_RTREE}, \texttt{SQLITE\_ENABLE\_JSON1}, and \texttt{SQLITE\_DEBUG}. The \texttt{SQLITE\_DEBUG} flag enables internal assertion checks that fire \texttt{SIGTRAP} on invariant violations, providing an additional oracle beyond sanitizer-detected errors.
+
+\subsection{Oracle Classification}
+
+The harness produces different exit signals depending on the type of error detected. Table~\ref{tab:oracle} defines the classification scheme. ASan violations (buffer overflows, use-after-free, double-free) cause the process to exit with code 223, configured via the \texttt{ASAN\_OPTIONS=exitcode=223} environment variable. UBSan violations (integer overflow, null pointer dereference, shift out of bounds) cause exit code 1, configured via \texttt{UBSAN\_OPTIONS=halt\_on\_error=1,exitcode=1}. SQLite debug assertions fire \texttt{SIGTRAP} (signal 5), which the fork server detects as exit code 133. Normal execution and SQL semantic errors both produce exit code 0 and are not classified as bugs.
+
+\begin{table}[htbp]
+\caption{Oracle classification of harness exit signals. Each signal type corresponds to a distinct vulnerability class.}
+\label{tab:oracle}
+\centering
+\begin{tabular}{llll}
+\toprule
+\textbf{Signal} & \textbf{Exit Code} & \textbf{Classification} & \textbf{Action} \\
+\midrule
+ASan violation & 223 & Memory error & Save to \texttt{crashes/} \\
+UBSan violation & 1 & Undefined behavior & Save to \texttt{crashes/} \\
+SIGTRAP (signal 5) & 133 & Debug assertion & Save to \texttt{signaled/} \\
+Normal exit & 0 & No bug & Discard \\
+SQL error & 0 & Semantic error & Ignore \\
+Timeout & --- & Hang & Save to \texttt{timeout/} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Triage Pipeline}
+\label{sec:triage}
+
+The triage pipeline transforms raw crash data from a fuzzing campaign into actionable vulnerability reports. A typical hour-long campaign may produce hundreds of crashing inputs, many of which trigger the same underlying bug. The pipeline performs four stages: stack-hash deduplication, CVE signature matching, fidelity scoring, and crash minimization.
+
+\subsection{Stack-Hash Deduplication}
+
+Stack-hash deduplication identifies unique root causes among the collected crashes. For each crashing input, the pipeline replays the input under GDB with the harness binary, captures the top 5 stack frames at the crash point, filters out frames belonging to system libraries (libc, libasan, libubsan, libpthread) and the harness wrapper, and retains only SQLite-internal frames. Each retained frame is encoded as a \texttt{function:file:line} triple. The pipeline then computes a SHA-256 hash of the concatenated filtered frames. Crashes that produce identical hashes are considered manifestations of the same root cause and are grouped into a single cluster.
+
+The filtering step is essential because sanitizer runtime frames and C library frames appear in every crash regardless of root cause. By removing these frames, the algorithm focuses on the SQLite-specific call stack that distinguishes one bug from another. The use of the top 5 frames rather than the full stack provides a balance between precision (distinguishing genuinely different bugs) and recall (grouping diverse triggers of the same underlying fault).
+
+Algorithm~\ref{alg:dedup} formalizes the deduplication procedure. The output is a set of clusters, each containing a representative crash, its top frame, and the count of duplicate crashes sharing that root cause.
+
+\begin{algorithm}[htbp]
+\caption{Stack-Hash Crash Deduplication}
+\label{alg:dedup}
+\begin{algorithmic}[1]
+\Require Set of crash files $C = \{c_1, \ldots, c_n\}$, harness binary $H$
+\Ensure Set of unique root-cause clusters
+\For{each crash file $c_i \in C$}
+    \State $\text{frames} \gets \Call{RunGDB}{H, c_i}$ \Comment{Top 5 frames}
+    \State $\text{filtered} \gets \Call{FilterFrames}{\text{frames}}$ \Comment{Remove libc, ASan, harness}
+    \State $\text{hash}_i \gets \text{SHA-256}(\text{Join}(\text{filtered}))$
+\EndFor
+\State $\text{clusters} \gets \Call{GroupBy}{\{(\text{hash}_i, c_i)\}_{i=1}^n}{\text{hash}}$
+\State \Return clusters sorted by decreasing size
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{CVE Signature Matching}
+
+CVE signature matching determines whether a crashing input corresponds to a known vulnerability. Each target CVE has a signature defined as a conjunction of structural regex patterns. A crash matches a CVE signature if and only if every required pattern finds at least one occurrence in the SQL input text. The patterns encode structural requirements rather than byte-level identity, using case-insensitive matching with flexible whitespace.
+
+For example, CVE-2020-13434~\cite{cve202013434} requires two structural patterns: a \texttt{printf} function call and an INT32 boundary value (2147483647 or 2147483648). A crash input matches this signature if it contains both \texttt{printf(} and a number matching the regex \texttt{-?214748364[7-8]}. CVE-2020-9327~\cite{cve20209327} requires four structural patterns: a GENERATED column definition, a \texttt{coalesce} function call, a JOIN or comma-join, and a CREATE VIEW statement. Only inputs containing all four patterns simultaneously are classified as CVE-2020-9327 matches.
+
+Table~\ref{tab:cve-signatures} summarizes the required structural patterns for each target CVE. The pattern count varies from 2 (CVE-2019-19646, CVE-2020-13434) to 5 (CVE-2020-13435), reflecting the complexity of the conditions needed to trigger each vulnerability.
+
+\begin{table}[htbp]
+\caption{CVE signature patterns. Each CVE requires all listed structural patterns to be present simultaneously in the SQL input for a match.}
+\label{tab:cve-signatures}
+\centering
+\begin{tabular}{lrl}
+\toprule
+\textbf{CVE} & \textbf{Patterns} & \textbf{Required Structural Elements} \\
+\midrule
+CVE-2020-15358 & 3 & CREATE VIEW with ORDER BY, INTERSECT in WHERE, \\
+               &   & implicit JOIN (comma-separated FROM) \\
+CVE-2020-13871 & 3 & EXCEPT, multi-column ORDER BY, scalar subquery \\
+CVE-2020-13435 & 5 & NATURAL JOIN, coalesce(), window OVER(), \\
+               &   & UNIQUE column, IN subquery \\
+CVE-2020-13434 & 2 & printf() call, INT32 boundary value \\
+CVE-2020-9327  & 4 & GENERATED column, coalesce(), JOIN, CREATE VIEW \\
+CVE-2019-19646 & 2 & GENERATED column, PRAGMA integrity\_check \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Fidelity Scoring}
+
+Not all crashes are deterministically reproducible. Heap layout non-determinism, timing-dependent behavior, and ASLR can cause a crash to reproduce intermittently. The fidelity scoring stage replays each unique crash (after deduplication) a fixed number of times $N$ and records what fraction of replays reproduce the crash. Crashes that reproduce at least 80\% of the time are classified as high-fidelity and are prioritized for further analysis and CVE confirmation. Low-fidelity crashes (below 80\%) may indicate environment-dependent issues or false positives from sanitizer instrumentation.
+
+\subsection{Crash Minimization}
+
+The crash minimization stage iteratively removes SQL statements from a crashing input while preserving the crash behavior. Starting from the full multi-statement input, the algorithm removes one statement at a time and replays the reduced input. If the crash still reproduces, the removal is kept; otherwise, it is reverted. This process continues until no further statements can be removed without losing the crash. The result is a minimal reproducer that contains only the SQL statements necessary to trigger the vulnerability, which is useful for root-cause analysis and CVE confirmation.
+
+\section{CVE Target Selection}
+\label{sec:cve-targets}
+
+The evaluation targets four SQLite versions containing six confirmed CVEs. Table~\ref{tab:cve-targets} lists each version, its associated CVEs, the vulnerability type, and the grammar patterns required to reach the vulnerability. These versions were selected according to three criteria. First, each version must contain at least one confirmed CVE with an available proof-of-concept input that can validate the fuzzer's detection capability. Second, the CVEs must span diverse vulnerability classes to demonstrate the system's breadth. Third, the CVEs must be triggerable through SQL input alone (no file system manipulation or special configuration required).
+
+\begin{table}[htbp]
+\caption{Target SQLite versions and their CVEs. The ``Required Patterns'' column lists the grammar non-terminals whose composition is necessary to construct a triggering input.}
+\label{tab:cve-targets}
+\centering
+\begin{tabular}{lllp{5.5cm}}
+\toprule
+\textbf{Version} & \textbf{CVE} & \textbf{Vulnerability Type} & \textbf{Required Patterns} \\
+\midrule
+3.30.1 & CVE-2019-19646 & Infinite loop & Schema-Setup (S2: generated column), Validation-Op (PRAGMA integrity\_check) \\
+\addlinespace
+3.31.1 & CVE-2020-13434 & Integer overflow (stack) & Boundary-Func-Call (printf + INT32\_MAX) \\
+\addlinespace
+3.31.1 & CVE-2020-9327 & Uninitialized pointer & Schema-Setup (S2: self-ref genCol), S4 (VIEW), coalesce(), JOIN \\
+\addlinespace
+3.32.0 & CVE-2020-13435 & Null pointer deref & Stress-Query (Q3: NATURAL JOIN), coalesce(), window OVER(), UNIQUE, IN subquery \\
+\addlinespace
+3.32.2 & CVE-2020-15358 & Heap buffer overread & Schema-Setup (S4: VIEW+ORDER BY), Stress-Query (Q5: INTERSECT), implicit JOIN \\
+\addlinespace
+3.32.2 & CVE-2020-13871 & Use-after-free & Stress-Query (Q5: EXCEPT), multi-column ORDER BY, window functions, scalar subquery \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The selected CVEs span six distinct vulnerability classes: infinite loop (denial of service), integer overflow leading to stack corruption, uninitialized pointer read, null pointer dereference, heap buffer overread, and use-after-free. This diversity exercises different parts of the SQLite codebase: the VDBE bytecode engine (CVE-2019-19646), the printf implementation (CVE-2020-13434), the query planner's column resolution (CVE-2020-9327), the WHERE clause optimizer (CVE-2020-13435), the ORDER BY flattening logic (CVE-2020-15358), and the expression evaluator's memory management (CVE-2020-13871).
+
+The grammar design in Section~\ref{sec:grammar-design} ensures that all six CVEs are reachable through composition of available non-terminals. CVE-2020-13434 is the simplest, requiring only the Boundary-Func-Call non-terminal with the correct format specifier and boundary value. CVE-2020-13435 is the most complex, requiring five distinct structural elements to co-occur in a single input. The varying complexity levels provide a spectrum for evaluating how effectively the bandit policy concentrates sampling on productive rule combinations compared to uniform random sampling.
