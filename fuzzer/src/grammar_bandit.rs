@@ -210,7 +210,7 @@ impl GrammarBandit {
             };
 
             self.groups[gi].alpha += normalized;
-            if raw_reward == 0.0 {
+            if self.reward_ema > 0.1 && raw_reward < self.reward_ema * 0.5 {
                 self.groups[gi].beta += 1.0;
             }
             self.groups[gi].last_reward = raw_reward;
@@ -365,12 +365,53 @@ mod tests {
         let alpha_before = 5.0_f32;
         let beta_before = 2.0_f32;
 
-        let norm_reward = 0.0_f32;
+        // Zero reward is always below 50% of any positive EMA → beta increments
+        let raw_reward = 0.0_f32;
+        let reward_ema = 5.0_f32;
+
+        let norm_reward = if reward_ema > 0.1 {
+            (raw_reward / reward_ema).min(2.0)
+        } else {
+            0.0
+        };
         let alpha_after = alpha_before + norm_reward;
-        let beta_after = beta_before + 1.0;
+        let mut beta_after = beta_before;
+        if reward_ema > 0.1 && raw_reward < reward_ema * 0.5 {
+            beta_after += 1.0;
+        }
 
         assert_eq!(alpha_after, alpha_before, "alpha unchanged on zero reward");
-        assert_eq!(beta_after, 3.0, "beta increments on zero reward");
+        assert_eq!(beta_after, 3.0, "beta increments on below-average reward");
+    }
+
+    #[test]
+    fn test_below_average_reward_increments_beta() {
+        // Simulate: reward_ema = 10.0, raw_reward = 3.0 (below 50% of EMA)
+        // Beta SHOULD increment because this is below-average performance.
+        let reward_ema = 10.0_f32;
+        let raw_reward = 3.0_f32;
+
+        let mut alpha = 5.0_f32;
+        let mut beta = 2.0_f32;
+
+        // New logic: beta increments when raw_reward < reward_ema * 0.5
+        let normalized = (raw_reward / reward_ema).min(2.0);
+        alpha += normalized;
+
+        if raw_reward < reward_ema * 0.5 {
+            beta += 1.0;
+        }
+
+        assert!(beta > 2.0, "beta should increment for below-average reward, got {}", beta);
+        assert!((alpha - 5.3).abs() < 0.01, "alpha should still get partial credit, got {}", alpha);
+
+        // Verify: above-average does NOT increment beta
+        let mut beta2 = 2.0_f32;
+        let raw_reward2 = 8.0_f32;
+        if raw_reward2 < reward_ema * 0.5 {
+            beta2 += 1.0;
+        }
+        assert_eq!(beta2, 2.0, "above-average reward should NOT increment beta");
     }
 
     #[test]
