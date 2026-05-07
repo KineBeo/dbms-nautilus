@@ -19,6 +19,7 @@ const BOOST_MULTIPLIER: f32 = 2.0;
 const DECAY_FACTOR: f32 = 0.95;
 const WEIGHT_MIN: f32 = 0.01;
 const WEIGHT_MAX: f32 = 100.0;
+const BETA_DECAY: f32 = 0.995;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum RuleGroup {
@@ -202,6 +203,12 @@ impl GrammarBandit {
 
             const EMA_ALPHA: f32 = 0.1;
             self.reward_ema = EMA_ALPHA * raw_reward + (1.0 - EMA_ALPHA) * self.reward_ema;
+
+            // Decay all groups toward prior (1.0, 1.0) — handles non-stationarity
+            for gs in self.groups.iter_mut() {
+                gs.alpha = 1.0 + (gs.alpha - 1.0) * BETA_DECAY;
+                gs.beta = 1.0 + (gs.beta - 1.0) * BETA_DECAY;
+            }
 
             let normalized = if self.reward_ema > 0.1 {
                 (raw_reward / self.reward_ema).min(2.0)
@@ -412,6 +419,36 @@ mod tests {
             beta2 += 1.0;
         }
         assert_eq!(beta2, 2.0, "above-average reward should NOT increment beta");
+    }
+
+    #[test]
+    fn test_alpha_beta_decay() {
+        // After many rounds, alpha/beta should decay toward prior (1.0, 1.0)
+        let mut alpha = 50.0_f32;
+        let mut beta = 20.0_f32;
+
+        let decay_rate: f32 = 0.995;
+        let prior_alpha: f32 = 1.0;
+        let prior_beta: f32 = 1.0;
+
+        // Apply 100 decay rounds
+        for _ in 0..100 {
+            alpha = prior_alpha + (alpha - prior_alpha) * decay_rate;
+            beta = prior_beta + (beta - prior_beta) * decay_rate;
+        }
+
+        // 0.995^100 ≈ 0.606 → alpha ≈ 1 + 49*0.606 ≈ 30.7
+        assert!(alpha < 50.0, "alpha should decay from 50, got {}", alpha);
+        assert!(alpha > 20.0, "alpha should not decay too fast, got {}", alpha);
+        assert!(beta < 20.0, "beta should decay from 20, got {}", beta);
+        assert!(beta > 10.0, "beta should not decay too fast, got {}", beta);
+
+        // After 1000 rounds: 0.995^1000 ≈ 0.0067 → nearly reset to prior
+        let mut alpha2 = 50.0_f32;
+        for _ in 0..1000 {
+            alpha2 = prior_alpha + (alpha2 - prior_alpha) * decay_rate;
+        }
+        assert!((alpha2 - 1.0).abs() < 1.0, "after 1000 decays, alpha should approach prior, got {}", alpha2);
     }
 
     #[test]
