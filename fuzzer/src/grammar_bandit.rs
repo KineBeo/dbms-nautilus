@@ -138,7 +138,10 @@ impl GrammarBandit {
         let group_headers: Vec<String> = (0..NUM_GROUPS)
             .map(|i| {
                 let g = RuleGroup::from_index(i).unwrap();
-                format!("alpha_{0},beta_{0},count_{0},last_reward_{0}", g.name())
+                format!(
+                    "alpha_{0},beta_{0},count_{0},last_reward_{0},mean_{0}",
+                    g.name()
+                )
             })
             .collect();
         writeln!(
@@ -231,7 +234,11 @@ impl GrammarBandit {
             RuleGroup::from_index(selected).unwrap().name()
         );
         for gs in &self.groups {
-            line.push_str(&format!(",{:.4},{:.4},{},{:.2}", gs.alpha, gs.beta, gs.selection_count, gs.last_reward));
+            let mean = gs.alpha / (gs.alpha + gs.beta);
+            line.push_str(&format!(
+                ",{:.4},{:.4},{},{:.2},{:.4}",
+                gs.alpha, gs.beta, gs.selection_count, gs.last_reward, mean
+            ));
         }
         line.push_str(&format!(",{:.4},{}", self.reward_ema, total_coverage));
         line.push('\n');
