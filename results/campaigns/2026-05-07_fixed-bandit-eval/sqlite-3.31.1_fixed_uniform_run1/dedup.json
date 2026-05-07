@@ -1,0 +1,27 @@
+{
+  "total_crashes": 166,
+  "unique_root_causes": 3,
+  "clusters": [
+    {
+      "hash": "46c777bce526fab7b7cd6fc4d355aeee81a7f6f620a1d7548d3b927b5dbc0aac",
+      "count": 135,
+      "representative": "5_000000260",
+      "top_frame": "sqlite3Fts5ConfigParse:././../cve_builds/sqlite-3.31.1/sqlite3.c:210506",
+      "example_sql": "CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c2, b, b);\nWITH RECURSIVE q AS (SELECT r.* ORDER BY (CURRENT_DATE) ASC NULLS LAST, CURRENT_DATE ASC NULLS FIRST, TRUE LIMIT CURRENT_TIMESTAMP IN (C"
+    },
+    {
+      "hash": "556a7e573a8906d3f82f1d21c8bf01aedf9af33b0410f3e9ca76c7391772f69a",
+      "count": 16,
+      "representative": "5_000001629",
+      "top_frame": "sqlite3_str_vappendf:././../cve_builds/sqlite-3.31.1/sqlite3.c:28804",
+      "example_sql": "SELECT printf('%.*g', 2147483647, 0.01);\nSELECT printf('%lld', 0, '');\nCREATE TABLE IF NOT EXISTS p(a INTEGER, b AS(b) UNIQUE);\nSELECT DISTINCT CURRENT_TIMESTAMP || (VALUES (NULL, NULL)) FROM q , q NO"
+    },
+    {
+      "hash": "313104fa0a1ebe79bba871eab7b3c3be8abb4b745c3a2a8abdba817c4f340961",
+      "count": 15,
+      "representative": "5_000001601",
+      "top_frame": "sqlite3_str_vappendf:././../cve_builds/sqlite-3.31.1/sqlite3.c:28841",
+      "example_sql": "SELECT printf('%.*f', 2147483647, 1e308);"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "total_crashes": 184,
+  "unique_root_causes": 4,
+  "clusters": [
+    {
+      "hash": "46c777bce526fab7b7cd6fc4d355aeee81a7f6f620a1d7548d3b927b5dbc0aac",
+      "count": 149,
+      "representative": "5_000000111",
+      "top_frame": "sqlite3Fts5ConfigParse:././../cve_builds/sqlite-3.31.1/sqlite3.c:210506",
+      "example_sql": "CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c2);\nEXPLAIN QUERY PLAN SELECT t1.*, p.* FROM q AS a WHERE CAST(NOT CURRENT_TIME OR NULL NOTNULL AS INT) GROUP BY CASE RAISE(IGNORE) ->> TRUE IS NO"
+    },
+    {
+      "hash": "313104fa0a1ebe79bba871eab7b3c3be8abb4b745c3a2a8abdba817c4f340961",
+      "count": 18,
+      "representative": "5_000001084",
+      "top_frame": "sqlite3_str_vappendf:././../cve_builds/sqlite-3.31.1/sqlite3.c:28841",
+      "example_sql": "SELECT printf('%.*f', 2147483647, 1e308);\nCREATE TABLE IF NOT EXISTS p(b INTEGER, c2 GENERATED ALWAYS AS (a * a) NOT NULL, rowid DATE);\nINSERT INTO p DEFAULT VALUES;\nSELECT CURRENT_TIME AS s452_ FROM "
+    },
+    {
+      "hash": "556a7e573a8906d3f82f1d21c8bf01aedf9af33b0410f3e9ca76c7391772f69a",
+      "count": 13,
+      "representative": "5_000000924",
+      "top_frame": "sqlite3_str_vappendf:././../cve_builds/sqlite-3.31.1/sqlite3.c:28804",
+      "example_sql": "SELECT printf('%.*g', -2147483649, 0.01);"
+    },
+    {
+      "hash": "f001e39dd7d820b33538dcee22f3186b5d04780bb984095fde3b7de777a93ef0",
+      "count": 4,
+      "representative": "5_000108561",
+      "top_frame": "alsoAnInt:././../cve_builds/sqlite-3.31.1/sqlite3.c:85071",
+      "example_sql": "CREATE TABLE IF NOT EXISTS p(c1 REAL NOT NULL);\nINSERT INTO p VALUES (TRUE || TRUE || TRUE || TRUE || TRUE || TRUE || TRUE || TRUE || TRUE || TRUE || TRUE || TRUE || TRUE || TRUE || TRUE || TRUE || TR"
+    }
+  ]
+}
