@@ -50,6 +50,24 @@ class CrashCluster:
 
 
 def classify_crash(exit_code: int, stderr: str) -> tuple[str, str | None]:
+    if "runtime error:" in stderr:
+        m = re.search(r"runtime error:\s*(.+)", stderr)
+        if m:
+            kind = m.group(1).strip()
+            if "signed integer overflow" in kind or "integer overflow" in kind:
+                return ("ubsan", "signed-integer-overflow")
+            if "null pointer" in kind:
+                return ("ubsan", "null-pointer")
+            if "misaligned address" in kind:
+                return ("ubsan", "misaligned-access")
+            if "outside the range of representable values" in kind:
+                return ("ubsan", "float-cast-overflow")
+            if "shift exponent" in kind:
+                return ("ubsan", "shift-exponent")
+            if "member access within null" in kind:
+                return ("ubsan", "null-member-access")
+            return ("ubsan", "ubsan-other")
+        return ("ubsan", "ubsan-other")
     if exit_code == -1:
         return ("timeout", None)
     if exit_code == -5:
@@ -67,18 +85,6 @@ def classify_crash(exit_code: int, stderr: str) -> tuple[str, str | None]:
             return ("asan", "null-dereference")
         return ("asan", "asan-other")
     if exit_code == 1:
-        m = re.search(r"runtime error:\s*(.+)", stderr)
-        if m:
-            kind = m.group(1).strip()
-            if "integer overflow" in kind:
-                return ("ubsan", "integer-overflow")
-            if "null pointer" in kind:
-                return ("ubsan", "null-pointer")
-            if "shift exponent" in kind:
-                return ("ubsan", "shift-exponent")
-            if "signed integer overflow" in kind:
-                return ("ubsan", "signed-integer-overflow")
-            return ("ubsan", "ubsan-other")
         return ("ubsan", "ubsan-other")
     if exit_code == 0:
         return ("debug_assert", None)
