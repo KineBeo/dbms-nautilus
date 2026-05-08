@@ -143,15 +143,46 @@ python3 "$SCRIPT_DIR/capture_coverage.py" "$WORKDIR" \
     || echo "[run_eval] warning: coverage capture failed (non-fatal)"
 
 # ----------------------------------------------------------------
-# Auto-triage: classify + dedup crashes
+# Auto-triage: classify + dedup crashes (3-harness pipeline)
 # ----------------------------------------------------------------
-echo "[run_eval] classifying crashes..."
+
+# Pass 1: AFL harness (same as fuzzing — baseline classification)
+echo "[run_eval] classifying crashes (afl harness)..."
 python3 "$ROOT/triage/classify.py" "$WORKDIR" \
     --harness "$HARNESS_BIN" \
     --output "$WORKDIR/triage.json" \
     --dedup-dir "$WORKDIR/dedup" \
     --report "$WORKDIR/triage_report.md" \
-    || echo "[run_eval] warning: crash classification failed (non-fatal)"
+    || echo "[run_eval] warning: afl classification failed (non-fatal)"
+
+# Pass 2: Test harness (ASan+UBSan, no AFL — cleaner sanitizer output)
+TEST_HARNESS="$ROOT/harness/test/sqlite_harness_${VERSION}_test"
+if [[ -f "$TEST_HARNESS" ]]; then
+    echo "[run_eval] classifying crashes (test harness)..."
+    python3 "$ROOT/triage/classify.py" "$WORKDIR" \
+        --harness "$TEST_HARNESS" \
+        --output "$WORKDIR/triage_test.json" \
+        --dedup-dir "$WORKDIR/dedup_test" \
+        --report "$WORKDIR/triage_report_test.md" \
+        || echo "[run_eval] warning: test classification failed (non-fatal)"
+else
+    echo "[run_eval] skipping test harness (not built: $TEST_HARNESS)"
+fi
+
+# Pass 3: Nosanit harness (no sanitizers — production-like)
+# Crashes here = real exploitable bugs, not just sanitizer findings
+NOSANIT_HARNESS="$ROOT/harness/nosanit/sqlite_harness_${VERSION}_nosanit"
+if [[ -f "$NOSANIT_HARNESS" ]]; then
+    echo "[run_eval] classifying crashes (nosanit harness)..."
+    python3 "$ROOT/triage/classify.py" "$WORKDIR" \
+        --harness "$NOSANIT_HARNESS" \
+        --output "$WORKDIR/triage_nosanit.json" \
+        --dedup-dir "$WORKDIR/dedup_nosanit" \
+        --report "$WORKDIR/triage_report_nosanit.md" \
+        || echo "[run_eval] warning: nosanit classification failed (non-fatal)"
+else
+    echo "[run_eval] skipping nosanit harness (not built: $NOSANIT_HARNESS)"
+fi
 
 # ----------------------------------------------------------------
 # Auto-archive: save campaign results to results/campaigns/
