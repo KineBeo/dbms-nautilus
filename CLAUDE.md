@@ -90,6 +90,22 @@ self-contained grammar file that the fuzzer can load directly.
 
 ---
 
+## Crash Evidence Archive
+
+Consolidated bug findings from all campaigns live in `results/crashes/`. Each unique crash has:
+- `trigger.sql` — the SQL that crashes SQLite
+- `stderr.log` — ASan/UBSan output from test/ harness replay
+- `metadata.json` — structured crash info (hash, type, version, CVE, severity)
+- `reproduce.sh` — one-liner to replay
+
+```bash
+python3 scripts/collect_crashes.py --scan-only    # fast, no replay
+python3 scripts/collect_crashes.py                # full with stderr capture
+python3 scripts/collect_crashes.py --incremental  # add new campaigns only
+```
+
+---
+
 ## gstack
 
 For all web browsing, use the `/browse` skill from gstack. Never use `mcp__claude-in-chrome__*` tools.
