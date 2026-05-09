@@ -1,0 +1,26 @@
+{
+  "hash": "b43f365a68048314",
+  "crash_type": "ubsan",
+  "subtype": "signed-integer-overflow",
+  "exit_code": -6,
+  "version": "3.31.1",
+  "error_message": "../cve_builds/sqlite-3.31.1/sqlite3.c:28488:24: runtime error: signed integer overflow: 2147483647 + 341 cannot be represented in type 'int'",
+  "sql_preview": "SELECT printf('%.*f', 2147483647, -1e308);",
+  "campaigns": [
+    "sqlite-3.31.1_bandit_run1",
+    "sqlite-3.31.1_bandit_run2",
+    "sqlite-3.31.1_bandit_run3",
+    "sqlite-3.31.1_bandit_run4",
+    "sqlite-3.31.1_bandit_run5",
+    "sqlite-3.31.1_uniform_run1",
+    "sqlite-3.31.1_uniform_run2",
+    "sqlite-3.31.1_uniform_run3",
+    "sqlite-3.31.1_uniform_run4",
+    "sqlite-3.31.1_uniform_run5"
+  ],
+  "total_count": 244,
+  "sample_file": "5_000000868",
+  "bug_class": "BC003",
+  "cve": "CVE-2020-13434",
+  "severity": "MEDIUM"
+}

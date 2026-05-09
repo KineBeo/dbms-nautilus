@@ -1,0 +1,17 @@
+{
+  "hash": "139f9b760acdec6c",
+  "crash_type": "ubsan",
+  "subtype": "float-cast-overflow",
+  "exit_code": -6,
+  "version": "3.30.1",
+  "error_message": "../cve_builds/sqlite-3.30.1/sqlite3.c:84141:16: runtime error: 1.11111e+135 is outside the range of representable values of type 'long long'",
+  "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 NUMERIC CHECK (CURRENT_DATE)); INSERT INTO p DEFAULT VALUES; PRAGMA quick_check; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts3(a); REPLACE INTO p VALUES (TRUE ||",
+  "campaigns": [
+    "sqlite-3.30.1_bandit_run3"
+  ],
+  "total_count": 1,
+  "sample_file": "5_000147075",
+  "bug_class": "BC004",
+  "cve": null,
+  "severity": "LOW"
+}

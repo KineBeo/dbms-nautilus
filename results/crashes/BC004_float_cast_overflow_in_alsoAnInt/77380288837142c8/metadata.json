@@ -1,0 +1,17 @@
+{
+  "hash": "77380288837142c8",
+  "crash_type": "ubsan",
+  "subtype": "float-cast-overflow",
+  "exit_code": -6,
+  "version": "3.32.0",
+  "error_message": "../cve_builds/sqlite-3.32.0/sqlite3.c:85315:16: runtime error: 1e+23 is outside the range of representable values of type 'long long'",
+  "sql_preview": "CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts3(_rowid_); SELECT CURRENT_TIME AS q__d LIMIT CURRENT_TIME, TRUE || FALSE || FALSE || FALSE || FALSE || FALSE || FALSE || FALSE || FALSE || FALSE || ",
+  "campaigns": [
+    "sqlite-3.32.0_uniform_run5"
+  ],
+  "total_count": 1,
+  "sample_file": "5_000060897",
+  "bug_class": "BC004",
+  "cve": null,
+  "severity": "LOW"
+}

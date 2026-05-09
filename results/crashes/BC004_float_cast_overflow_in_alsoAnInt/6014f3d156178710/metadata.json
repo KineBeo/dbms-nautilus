@@ -1,0 +1,17 @@
+{
+  "hash": "6014f3d156178710",
+  "crash_type": "ubsan",
+  "subtype": "float-cast-overflow",
+  "exit_code": -6,
+  "version": "3.31.1",
+  "error_message": "../cve_builds/sqlite-3.31.1/sqlite3.c:85071:16: runtime error: 3.33733e+71 is outside the range of representable values of type 'long long'",
+  "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 FLOAT NOT NULL); INSERT OR REPLACE INTO p VALUES (hex(hex(random() >> TRUE - TRUE))); SELECT *; SELECT hex(zeroblob(-2147483649));",
+  "campaigns": [
+    "sqlite-3.31.1_uniform_run1"
+  ],
+  "total_count": 1,
+  "sample_file": "5_000145998",
+  "bug_class": "BC004",
+  "cve": null,
+  "severity": "LOW"
+}

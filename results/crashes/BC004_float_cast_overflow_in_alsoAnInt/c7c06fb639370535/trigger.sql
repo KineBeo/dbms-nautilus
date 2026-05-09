@@ -1,0 +1,4 @@
+CREATE TABLE IF NOT EXISTS p(rowid INTEGER NOT NULL);
+CREATE INDEX IF NOT EXISTS idx1 ON p(rowid);
+INSERT INTO p VALUES (random() || TRUE);
+PRAGMA integrity_check;

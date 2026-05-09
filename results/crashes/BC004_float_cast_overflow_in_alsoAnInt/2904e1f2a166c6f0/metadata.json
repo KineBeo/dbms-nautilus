@@ -1,0 +1,18 @@
+{
+  "hash": "2904e1f2a166c6f0",
+  "crash_type": "ubsan",
+  "subtype": "float-cast-overflow",
+  "exit_code": -6,
+  "version": "3.32.0",
+  "error_message": "../cve_builds/sqlite-3.32.0/sqlite3.c:85315:16: runtime error: 1.11111e+21 is outside the range of representable values of type 'long long'",
+  "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 VARCHAR(255) NOT NULL); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; INSERT INTO p SELECT TRUE AS u7gwqv_9__3v_b_bgv_3__5_6_r67_y75991991f7f_o8__q_423__9t8g__3b1_x57nwti__",
+  "campaigns": [
+    "sqlite-3.32.0_uniform_run3",
+    "sqlite-3.32.0_uniform_run4"
+  ],
+  "total_count": 2,
+  "sample_file": "5_000081928",
+  "bug_class": "BC004",
+  "cve": null,
+  "severity": "LOW"
+}

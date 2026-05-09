@@ -108,10 +108,21 @@ def _find_sql_file(dedup_dir: Path, hash_: str) -> Path | None:
 
 
 def _extract_key_function(frames: list[str]) -> str:
-    """Return the first frame that is NOT a 'runtime error:' diagnostic line."""
+    """Return the first frame that is NOT a 'runtime error:' diagnostic line.
+
+    Frames matching ``<no-stack-*>`` are placeholders injected by the triage
+    pipeline when GDB cannot capture a stack trace.  They contain a per-crash
+    hash, so using them verbatim would create one class per crash.  We
+    normalise them to a single ``no_stack`` sentinel so all stack-less crashes
+    of the same subtype land in one class.
+    """
     for frame in frames:
-        if "runtime error:" not in frame and frame.strip():
-            return frame.strip()
+        stripped = frame.strip()
+        if not stripped or "runtime error:" in stripped:
+            continue
+        if stripped.startswith("<no-stack-"):
+            return "no_stack"
+        return stripped
     return "unknown"
 
 
@@ -289,8 +300,7 @@ def _emit_crash_dir(
             try:
                 sql_path = hash_dir / "trigger.sql"
                 result = subprocess.run(
-                    [str(harness_bin)],
-                    input=sql.encode(),
+                    [str(harness_bin), str(sql_path)],
                     capture_output=True,
                     timeout=5,
                 )
@@ -321,7 +331,7 @@ def _emit_crash_dir(
     (hash_dir / "metadata.json").write_text(json.dumps(metadata, indent=2))
 
     # reproduce.sh
-    harness_path = harness_dir / f"sqlite_harness_test_{entry.version}_test"
+    harness_path = harness_dir / f"sqlite_harness_sqlite-{entry.version}_test"
     reproduce_sh = (
         "#!/usr/bin/env bash\n"
         "# Reproduce crash: run trigger SQL through the test harness\n"
@@ -330,7 +340,7 @@ def _emit_crash_dir(
         f'  echo "Harness not found: $HARNESS" >&2\n'
         f'  exit 1\n'
         f'fi\n'
-        f'"$HARNESS" < trigger.sql\n'
+        f'"$HARNESS" trigger.sql\n'
     )
     repro_file = hash_dir / "reproduce.sh"
     repro_file.write_text(reproduce_sh)
