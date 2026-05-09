@@ -317,3 +317,48 @@ class TestEmitCreatesDirectoryStructure:
         assert "campaigns_scanned" in registry
         assert "classes" in registry
         assert len(registry["classes"]) == 1
+
+
+# ---------------------------------------------------------------------------
+# Integration test on real workdirs
+# ---------------------------------------------------------------------------
+
+class TestIntegrationRealWorkdirs:
+    @pytest.mark.skipif(
+        not Path("workdirs").exists(),
+        reason="workdirs/ not present — skip integration test",
+    )
+    def test_scan_and_emit_on_real_data(self, tmp_path: Path) -> None:
+        """End-to-end: scan real workdirs, emit to temp dir, verify output."""
+        entries = scan_workdirs(Path("workdirs"))
+        assert len(entries) > 0, "Expected at least one crash hash from workdirs"
+
+        classes = group_into_classes(entries)
+        assert len(classes) > 0, "Expected at least one bug class"
+
+        output_dir = tmp_path / "crashes"
+        emit_archive(entries, classes, output_dir, replay=False)
+
+        registry_path = output_dir / "registry.json"
+        assert registry_path.exists()
+        registry = json.loads(registry_path.read_text())
+        assert registry["total_unique_crashes"] > 0
+        assert registry["total_bug_classes"] > 0
+
+        summary_path = output_dir / "registry.md"
+        assert summary_path.exists()
+        assert "Bug Classes" in summary_path.read_text()
+
+        class_dirs = [d for d in output_dir.iterdir() if d.is_dir()]
+        assert len(class_dirs) > 0
+
+        first_class = class_dirs[0]
+        assert (first_class / "README.md").exists()
+
+        hash_dirs = [d for d in first_class.iterdir() if d.is_dir()]
+        if hash_dirs:
+            h = hash_dirs[0]
+            assert (h / "trigger.sql").exists()
+            assert (h / "metadata.json").exists()
+            assert (h / "reproduce.sh").exists()
+            assert (h / "stack_trace.txt").exists()
