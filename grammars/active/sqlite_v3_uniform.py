@@ -1,4 +1,5 @@
 # sqlite_v3.py — Structural Primitives grammar for Nautilus SQLite fuzzing
+# Version: v3.3 (JSON/JSONB expansion)
 # Use with: sqlite_harness_<version> (blank DB)
 #
 # DESIGN: Variant 3 — decomposes DDL+DQL into separate non-terminals
@@ -85,6 +86,13 @@ ctx.rule("Table-Or-Subquery", "{Table-Name} NOT INDEXED")
 ctx.rule("Table-Or-Subquery", "{Table-Name} INDEXED BY {Col-Name}")
 ctx.rule("Table-Or-Subquery", "({Select-Stmt}) AS {Col-Alias}")
 ctx.rule("Table-Or-Subquery", "({Join-Clause})")
+# JSON table-valued functions (virtual table sources)
+ctx.rule("Table-Or-Subquery", "json_each({Json-Literal})")
+ctx.rule("Table-Or-Subquery", "json_each({Expr}, {Json-Path})")
+ctx.rule("Table-Or-Subquery", "json_tree({Json-Literal})")
+ctx.rule("Table-Or-Subquery", "json_tree({Expr}, {Json-Path})")
+ctx.rule("Table-Or-Subquery", "jsonb_each({Json-Literal})")
+ctx.rule("Table-Or-Subquery", "jsonb_tree({Json-Literal})")
 
 # ============================================================
 # LAYER 1: EXPRESSIONS (EBNF _expr, 30+ alternatives)
@@ -510,13 +518,69 @@ ctx.rule("Func-Call", "format({Str-Literal}, {Expr})")
 ctx.rule("Func-Call", "printf({Str-Literal}, {Expr})")
 ctx.rule("Func-Call", "group_concat({Expr})")
 ctx.rule("Func-Call", "group_concat({Expr}, {Str-Literal})")
+# ============================================================
+# JSON/JSONB expansion (v3.3 — targeting json.c in SQLite 3.45+)
+# ============================================================
+
+# Json-Key: short fixed keys for JSON object paths
+ctx.rule("Json-Key", "a")
+ctx.rule("Json-Key", "b")
+ctx.rule("Json-Key", "c")
+ctx.rule("Json-Key", "key")
+
+# Json-Path: JSON path expressions for navigation
+ctx.rule("Json-Path", "'$'")
+ctx.rule("Json-Path", "'$.{Json-Key}'")
+ctx.rule("Json-Path", "'$.{Json-Key}.{Json-Key}'")
+ctx.rule("Json-Path", "'$[{Int-Literal}]'")
+ctx.rule("Json-Path", "'$[#-1]'")
+ctx.rule("Json-Path", "'$.{Json-Key}[{Int-Literal}]'")
+ctx.rule("Json-Path", "'$.{Json-Key}[#-1]'")
+ctx.rule("Json-Path", "'$[0].{Json-Key}'")
+
+# Json-Literal: well-formed JSON strings as function arguments
+# \\{ and \\} escape literal braces so Nautilus doesn't treat them as nonterminals
+ctx.rule("Json-Literal", "'\\{}'")
+ctx.rule("Json-Literal", "'[]'")
+ctx.rule("Json-Literal", "'\\{\"a\":1}'")
+ctx.rule("Json-Literal", "'[1,2,3]'")
+ctx.rule("Json-Literal", "'\\{\"a\":\\{\"b\":1}}'")
+ctx.rule("Json-Literal", "'[\\{\"a\":1},\\{\"b\":2}]'")
+
 # JSON basic forms (Layer 1)
 ctx.rule("Func-Call", "json({Expr})")
 ctx.rule("Func-Call", "json_valid({Expr})")
 ctx.rule("Func-Call", "json_type({Expr})")
-ctx.rule("Func-Call", "json_extract({Expr}, {Str-Literal})")
+ctx.rule("Func-Call", "json_extract({Expr}, {Json-Path})")
 ctx.rule("Func-Call", "json_array({Expr-List})")
 ctx.rule("Func-Call", "json_object({Str-Literal}, {Expr})")
+ctx.rule("Func-Call", "json_object({Str-Literal}, {Expr}, {Str-Literal}, {Expr})")
+
+# JSON text mutation functions
+ctx.rule("Func-Call", "json_insert({Json-Literal}, {Json-Path}, {Expr})")
+ctx.rule("Func-Call", "json_replace({Json-Literal}, {Json-Path}, {Expr})")
+ctx.rule("Func-Call", "json_set({Json-Literal}, {Json-Path}, {Expr})")
+ctx.rule("Func-Call", "json_remove({Json-Literal}, {Json-Path})")
+ctx.rule("Func-Call", "json_patch({Json-Literal}, {Json-Literal})")
+ctx.rule("Func-Call", "json_pretty({Expr})")
+ctx.rule("Func-Call", "json_quote({Expr})")
+
+# JSONB binary output variants (new in SQLite 3.45+)
+ctx.rule("Func-Call", "jsonb({Expr})")
+ctx.rule("Func-Call", "jsonb_array({Expr-List})")
+ctx.rule("Func-Call", "jsonb_object({Str-Literal}, {Expr})")
+ctx.rule("Func-Call", "jsonb_extract({Expr}, {Json-Path})")
+ctx.rule("Func-Call", "jsonb_insert({Json-Literal}, {Json-Path}, {Expr})")
+ctx.rule("Func-Call", "jsonb_replace({Json-Literal}, {Json-Path}, {Expr})")
+ctx.rule("Func-Call", "jsonb_set({Json-Literal}, {Json-Path}, {Expr})")
+ctx.rule("Func-Call", "jsonb_remove({Json-Literal}, {Json-Path})")
+ctx.rule("Func-Call", "jsonb_patch({Json-Literal}, {Json-Literal})")
+
+# JSON analysis functions
+ctx.rule("Func-Call", "json_type({Expr}, {Json-Path})")
+ctx.rule("Func-Call", "json_array_length({Expr})")
+ctx.rule("Func-Call", "json_array_length({Expr}, {Json-Path})")
+ctx.rule("Func-Call", "json_error_position({Expr})")
 
 # Window-specific functions (require OVER clause to be meaningful)
 ctx.rule("Func-Call", "lead({Expr})")
@@ -583,30 +647,36 @@ ctx.rule("Boundary-Float", "-0.0")
 
 # S1: Single table, basic columns
 ctx.rule("Schema-Setup",
-    "CREATE TABLE IF NOT EXISTS p({Col-Def-List})")
+    "CREATE TABLE IF NOT EXISTS p({Col-Def-List})",
+    weight=1.5)
 
 # S2: Table with generated column + constraints
 ctx.rule("Schema-Setup",
-    "CREATE TABLE IF NOT EXISTS p({Col-Def-List-GenCol})")
+    "CREATE TABLE IF NOT EXISTS p({Col-Def-List-GenCol})",
+    weight=3.0)
 
 # S3: Two tables (enables JOINs between p and q)
 ctx.rule("Schema-Setup",
     "CREATE TABLE IF NOT EXISTS p({Col-Def-List});\n"
-    "CREATE TABLE IF NOT EXISTS q({Col-Def-List})")
+    "CREATE TABLE IF NOT EXISTS q({Col-Def-List})",
+    weight=2.5)
 
 # S4: Table + VIEW
 ctx.rule("Schema-Setup",
     "CREATE TABLE IF NOT EXISTS p({Col-Def-List});\n"
-    "CREATE VIEW IF NOT EXISTS v1 AS {Select-Stmt}")
+    "CREATE VIEW IF NOT EXISTS v1 AS {Select-Stmt}",
+    weight=2.0)
 
 # S5: Virtual table (FTS5/FTS3)
 ctx.rule("Schema-Setup",
-    "CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING {Fts-Engine}({Col-Name-List})")
+    "CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING {Fts-Engine}({Col-Name-List})",
+    weight=0.5)
 
 # S6: Table + INDEX
 ctx.rule("Schema-Setup",
     "CREATE TABLE IF NOT EXISTS p({Col-Def-List});\n"
-    "CREATE INDEX IF NOT EXISTS idx1 ON p({Col-Name})")
+    "CREATE INDEX IF NOT EXISTS idx1 ON p({Col-Name})",
+    weight=1.0)
 
 # Col-Def-List with guaranteed generated column
 ctx.rule("Col-Def-List-GenCol",
@@ -639,35 +709,42 @@ ctx.rule("Stress-Query", "{Select-Stmt}")
 # Q2: EXISTS subquery
 ctx.rule("Stress-Query",
     "SELECT {Result-Col-List} FROM {Table-Name} "
-    "WHERE EXISTS ({Select-Stmt})")
+    "WHERE EXISTS ({Select-Stmt})",
+    weight=3.0)
 
 # Q3: NATURAL JOIN
 ctx.rule("Stress-Query",
     "SELECT {Result-Col-List} FROM {Table-Name} "
-    "NATURAL JOIN {Table-Name} WHERE {Expr}")
+    "NATURAL JOIN {Table-Name} WHERE {Expr}",
+    weight=3.0)
 
 # Q4: Recursive CTE
 ctx.rule("Stress-Query",
     "WITH RECURSIVE {Cte-Def} "
-    "SELECT {Result-Col-List} FROM {Table-Name}")
+    "SELECT {Result-Col-List} FROM {Table-Name}",
+    weight=2.5)
 
 # Q5: Compound query (INTERSECT/EXCEPT)
 ctx.rule("Stress-Query",
-    "{Select-Stmt} {Compound-Op} {Select-Stmt}")
+    "{Select-Stmt} {Compound-Op} {Select-Stmt}",
+    weight=2.5)
 
 # Q6: Self-JOIN + expression
 ctx.rule("Stress-Query",
     "SELECT {Result-Col-List} FROM {Table-Name} "
-    "JOIN {Table-Name} {Col-Alias} ON {Expr}")
+    "JOIN {Table-Name} {Col-Alias} ON {Expr}",
+    weight=2.0)
 
 # Q7: Nested subquery chain
 ctx.rule("Stress-Query",
     "SELECT {Result-Col-List} FROM "
-    "(SELECT {Result-Col-List} FROM {Table-Name} WHERE {Expr}) AS sub1")
+    "(SELECT {Result-Col-List} FROM {Table-Name} WHERE {Expr}) AS sub1",
+    weight=1.5)
 
 # Q8: EXPLAIN QUERY PLAN wrapper
 ctx.rule("Stress-Query",
-    "EXPLAIN QUERY PLAN {Select-Stmt}")
+    "EXPLAIN QUERY PLAN {Select-Stmt}",
+    weight=1.5)
 
 # ============================================================
 # LAYER 2: Validation-Op (4 alternatives)
