@@ -647,36 +647,30 @@ ctx.rule("Boundary-Float", "-0.0")
 
 # S1: Single table, basic columns
 ctx.rule("Schema-Setup",
-    "CREATE TABLE IF NOT EXISTS p({Col-Def-List})",
-    weight=1.5)
+    "CREATE TABLE IF NOT EXISTS p({Col-Def-List})")
 
 # S2: Table with generated column + constraints
 ctx.rule("Schema-Setup",
-    "CREATE TABLE IF NOT EXISTS p({Col-Def-List-GenCol})",
-    weight=3.0)
+    "CREATE TABLE IF NOT EXISTS p({Col-Def-List-GenCol})")
 
 # S3: Two tables (enables JOINs between p and q)
 ctx.rule("Schema-Setup",
     "CREATE TABLE IF NOT EXISTS p({Col-Def-List});\n"
-    "CREATE TABLE IF NOT EXISTS q({Col-Def-List})",
-    weight=2.5)
+    "CREATE TABLE IF NOT EXISTS q({Col-Def-List})")
 
 # S4: Table + VIEW
 ctx.rule("Schema-Setup",
     "CREATE TABLE IF NOT EXISTS p({Col-Def-List});\n"
-    "CREATE VIEW IF NOT EXISTS v1 AS {Select-Stmt}",
-    weight=2.0)
+    "CREATE VIEW IF NOT EXISTS v1 AS {Select-Stmt}")
 
 # S5: Virtual table (FTS5/FTS3)
 ctx.rule("Schema-Setup",
-    "CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING {Fts-Engine}({Col-Name-List})",
-    weight=0.5)
+    "CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING {Fts-Engine}({Col-Name-List})")
 
 # S6: Table + INDEX
 ctx.rule("Schema-Setup",
     "CREATE TABLE IF NOT EXISTS p({Col-Def-List});\n"
-    "CREATE INDEX IF NOT EXISTS idx1 ON p({Col-Name})",
-    weight=1.0)
+    "CREATE INDEX IF NOT EXISTS idx1 ON p({Col-Name})")
 
 # Col-Def-List with guaranteed generated column
 ctx.rule("Col-Def-List-GenCol",
@@ -709,42 +703,35 @@ ctx.rule("Stress-Query", "{Select-Stmt}")
 # Q2: EXISTS subquery
 ctx.rule("Stress-Query",
     "SELECT {Result-Col-List} FROM {Table-Name} "
-    "WHERE EXISTS ({Select-Stmt})",
-    weight=3.0)
+    "WHERE EXISTS ({Select-Stmt})")
 
 # Q3: NATURAL JOIN
 ctx.rule("Stress-Query",
     "SELECT {Result-Col-List} FROM {Table-Name} "
-    "NATURAL JOIN {Table-Name} WHERE {Expr}",
-    weight=3.0)
+    "NATURAL JOIN {Table-Name} WHERE {Expr}")
 
 # Q4: Recursive CTE
 ctx.rule("Stress-Query",
     "WITH RECURSIVE {Cte-Def} "
-    "SELECT {Result-Col-List} FROM {Table-Name}",
-    weight=2.5)
+    "SELECT {Result-Col-List} FROM {Table-Name}")
 
 # Q5: Compound query (INTERSECT/EXCEPT)
 ctx.rule("Stress-Query",
-    "{Select-Stmt} {Compound-Op} {Select-Stmt}",
-    weight=2.5)
+    "{Select-Stmt} {Compound-Op} {Select-Stmt}")
 
 # Q6: Self-JOIN + expression
 ctx.rule("Stress-Query",
     "SELECT {Result-Col-List} FROM {Table-Name} "
-    "JOIN {Table-Name} {Col-Alias} ON {Expr}",
-    weight=2.0)
+    "JOIN {Table-Name} {Col-Alias} ON {Expr}")
 
 # Q7: Nested subquery chain
 ctx.rule("Stress-Query",
     "SELECT {Result-Col-List} FROM "
-    "(SELECT {Result-Col-List} FROM {Table-Name} WHERE {Expr}) AS sub1",
-    weight=1.5)
+    "(SELECT {Result-Col-List} FROM {Table-Name} WHERE {Expr}) AS sub1")
 
 # Q8: EXPLAIN QUERY PLAN wrapper
 ctx.rule("Stress-Query",
-    "EXPLAIN QUERY PLAN {Select-Stmt}",
-    weight=1.5)
+    "EXPLAIN QUERY PLAN {Select-Stmt}")
 
 # ============================================================
 # LAYER 2: Validation-Op (4 alternatives)
