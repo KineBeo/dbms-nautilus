@@ -64,8 +64,13 @@ impl Context {
     }
 
     pub fn add_rule(&mut self, nt: &str, format: &[u8]) -> RuleID {
+        self.add_rule_weighted(nt, format, 1.0)
+    }
+
+    pub fn add_rule_weighted(&mut self, nt: &str, format: &[u8], weight: f32) -> RuleID {
         let rid = self.rules.len().into();
-        let rule = Rule::from_format(self, nt, format);
+        let mut rule = Rule::from_format(self, nt, format);
+        rule.set_weight(weight);
         let ntid = self.aquire_nt_id(nt);
         self.rules.push(rule);
         self.nts_to_rules
@@ -76,8 +81,13 @@ impl Context {
     }
 
     pub fn add_script(&mut self, nt: &str, nts: Vec<String>, script: PyObject) -> RuleID {
+        self.add_script_weighted(nt, nts, script, 1.0)
+    }
+
+    pub fn add_script_weighted(&mut self, nt: &str, nts: Vec<String>, script: PyObject, weight: f32) -> RuleID {
         let rid = self.rules.len().into();
-        let rule = Rule::from_script(self, nt, nts, script);
+        let mut rule = Rule::from_script(self, nt, nts, script);
+        rule.set_weight(weight);
         let ntid = self.aquire_nt_id(nt);
         self.rules.push(rule);
         self.nts_to_rules
@@ -88,8 +98,13 @@ impl Context {
     }
 
     pub fn add_regex(&mut self, nt: &str, regex: &str) -> RuleID {
+        self.add_regex_weighted(nt, regex, 1.0)
+    }
+
+    pub fn add_regex_weighted(&mut self, nt: &str, regex: &str, weight: f32) -> RuleID {
         let rid = self.rules.len().into();
-        let rule = Rule::from_regex(self, nt, regex);
+        let mut rule = Rule::from_regex(self, nt, regex);
+        rule.set_weight(weight);
         let ntid = self.aquire_nt_id(nt);
         self.rules.push(rule);
         self.nts_to_rules
@@ -276,16 +291,91 @@ impl Context {
             100 * 0
         };
 
-        if let Some(opt) = self.get_applicable_rules(max_len, nt, p_include_short_rules).choose(&mut thread_rng())  {
-            *opt
-        } else if let Some(opt) = self.get_applicable_rules(max_len, nt, 100).choose(&mut thread_rng()) {
-            *opt
+        let applicable: Vec<RuleID> = self
+            .get_applicable_rules(max_len, nt, p_include_short_rules)
+            .copied()
+            .collect();
+
+        let applicable = if applicable.is_empty() {
+            self.get_applicable_rules(max_len, nt, 100)
+                .copied()
+                .collect::<Vec<_>>()
         } else {
+            applicable
+        };
+
+        if applicable.is_empty() {
             panic!(
                 "there is no way to derive {} within {} steps",
                 self.nt_ids_to_name[&nt], max_len
-            )
+            );
         }
+
+        // Weighted random selection
+        let total_weight: f32 = applicable
+            .iter()
+            .map(|&rid| {
+                let idx: usize = rid.into();
+                self.rules[idx].weight()
+            })
+            .sum();
+
+        if total_weight <= 0.0 {
+            // Fallback: uniform
+            return applicable.into_iter().choose(&mut thread_rng()).expect("non-empty");
+        }
+
+        let mut threshold = thread_rng().gen::<f32>() * total_weight;
+        for rid in &applicable {
+            let idx: usize = (*rid).into();
+            threshold -= self.rules[idx].weight();
+            if threshold <= 0.0 {
+                return *rid;
+            }
+        }
+        *applicable.last().expect("non-empty")
+    }
+
+    /// Phase 2 API: read current weights for all rules of a nonterminal.
+    pub fn get_weights_for_nt(&self, nt: NTermID) -> Vec<(RuleID, f32)> {
+        self.nts_to_rules[&nt]
+            .iter()
+            .map(|&rid| {
+                let idx: usize = rid.into();
+                (rid, self.rules[idx].weight())
+            })
+            .collect()
+    }
+
+    /// Phase 2 API: update the sampling weight for a specific rule.
+    pub fn set_weight(&mut self, rule_id: RuleID, weight: f32) {
+        let idx: usize = rule_id.into();
+        self.rules[idx].set_weight(weight.max(0.001));
+    }
+
+    /// Phase 2 bandit API: multiply all rule weights for a nonterminal by a factor.
+    /// Preserves relative weights within the group. Clamps each result to [0.01, 100.0].
+    pub fn scale_weights_for_nt(&mut self, nt: NTermID, multiplier: f32) {
+        if let Some(rule_ids) = self.nts_to_rules.get(&nt) {
+            let rule_ids = rule_ids.clone();
+            for rid in rule_ids {
+                let idx: usize = rid.into();
+                let new_w = (self.rules[idx].weight() * multiplier).clamp(0.01, 100.0);
+                self.rules[idx].set_weight(new_w);
+            }
+        }
+    }
+
+    /// Phase 2 bandit API: reset all rule weights for a nonterminal to their base values.
+    pub fn reset_weights_for_nt(&mut self, nt: NTermID, base_weights: &[(RuleID, f32)]) {
+        for &(rid, base_w) in base_weights {
+            let idx: usize = rid.into();
+            self.rules[idx].set_weight(base_w.clamp(0.01, 100.0));
+        }
+    }
+
+    pub fn all_nt_ids(&self) -> Vec<(NTermID, String)> {
+        self.nt_ids_to_name.iter().map(|(&id, name)| (id, name.clone())).collect()
     }
 
     pub fn get_random_len_for_ruleid(&self, _rule_id: &RuleID) -> usize {

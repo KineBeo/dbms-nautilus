@@ -1,0 +1,47 @@
+{
+  "E1-attribution-baseline": {
+    "hypothesis": "Per-rule attribution reveals weight inefficiency in old grammar",
+    "campaigns": [],
+    "conclusion": "34.5% weight wasted, R25 crash magnet at 21.9x"
+  },
+  "E2-v3-ab-test": {
+    "hypothesis": "Structural primitives grammar finds real crashes without PoC contamination",
+    "campaigns": [
+      "2026-04-28_v3.0_sqlite-3.31.1_15m_baseline"
+    ],
+    "conclusion": "1508 queue (+6%), 131 crashes (all real), but 92% FTS5"
+  },
+  "E3-weight-tuning": {
+    "hypothesis": "",
+    "campaigns": [
+      "2026-04-28_v3.1_sqlite-3.31.1_15m_run1"
+    ],
+    "conclusion": null
+  },
+  "E4-oracle-test": {
+    "hypothesis": "",
+    "campaigns": [
+      "2026-04-29_v3.1_sqlite-3.31.1_15m_oracle_test"
+    ],
+    "conclusion": null
+  },
+  "E5-cross-version": {
+    "hypothesis": "",
+    "campaigns": [
+      "2026-04-30_v3.1_sqlite-3.30.1_15m_cross_v1",
+      "2026-04-30_v3.1_sqlite-3.32.0_15m_cross_v1",
+      "2026-04-30_v3.1_sqlite-3.32.2_15m_cross_v1"
+    ],
+    "conclusion": null
+  },
+  "E6-cross-version-30m": {
+    "hypothesis": "",
+    "campaigns": [
+      "2026-04-30_v3.1_sqlite-3.30.1_30m_cross_30m",
+      "2026-04-30_v3.1_sqlite-3.31.1_30m_cross_30m",
+      "2026-04-30_v3.1_sqlite-3.32.0_30m_cross_30m",
+      "2026-04-30_v3.1_sqlite-3.32.2_30m_cross_30m"
+    ],
+    "conclusion": null
+  }
+}

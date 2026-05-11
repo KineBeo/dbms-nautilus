@@ -1,0 +1,17 @@
+{
+  "hash": "1dfbd00b4e94e6f1",
+  "crash_type": "ubsan",
+  "subtype": "float-cast-overflow",
+  "exit_code": -6,
+  "version": "3.32.0",
+  "error_message": "../cve_builds/sqlite-3.32.0/sqlite3.c:85315:16: runtime error: 1.11111e+24 is outside the range of representable values of type 'long long'",
+  "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 VARCHAR(255) PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(c1 INT); INSERT INTO p SELECT CURRENT_TIME ORDER BY CURRENT_TIME DESC NULLS FIRST LIMIT TRUE || TRUE || TRUE || ",
+  "campaigns": [
+    "sqlite-3.32.0_uniform_run4"
+  ],
+  "total_count": 1,
+  "sample_file": "5_000280009",
+  "bug_class": "BC004",
+  "cve": null,
+  "severity": "LOW"
+}

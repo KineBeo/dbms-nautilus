@@ -1,0 +1,12 @@
+{
+  "template": "CREATE TABLE {Table-Name}({Col-Def-List}, {Col-Name} AS({GenCol-Expr}) UNIQUE);\nREPLACE INTO {Table-Name} VALUES({Literal})",
+  "feature_tag": "generated_col_unique_replace_null",
+  "weight": 3.0,
+  "notes": "Exercises generated column with UNIQUE constraint combined with REPLACE INTO triggering memIsValid assertion",
+  "bug_id": "MR-SQLITE-0163",
+  "sql_sha256": "fae5f2818c7c04fce8de3dce751f326a150a8ccf0058b0f3461cdc929b9bebf3",
+  "prompt_version": 1,
+  "model": "claude-sonnet-4-6",
+  "created_at": "2026-04-20T00:53:23Z",
+  "status": "ok"
+}

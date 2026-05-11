@@ -1,0 +1,4 @@
+CREATE TABLE IF NOT EXISTS p(_rowid_ INTEGER PRIMARY KEY);
+INSERT INTO p SELECT ALL * FROM p LIMIT hex(hex(hex(hex(hex(CURRENT_TIME)))));
+SELECT *;
+SELECT hex(zeroblob(0));

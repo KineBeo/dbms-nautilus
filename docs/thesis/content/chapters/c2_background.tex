@@ -1,0 +1,134 @@
+\chapter{Background}
+\label{chap:background}
+
+This chapter establishes the theoretical and technical foundations upon which this thesis builds. We begin with the nature of software vulnerabilities and the Common Vulnerabilities and Exposures (CVE) system, then proceed through fuzzing fundamentals, grammar-based input generation, coverage-guided feedback mechanisms, multi-armed bandit algorithms for adaptive selection, and sanitizer-based bug oracles. The chapter concludes with a survey of related work that positions this thesis within the broader landscape of automated vulnerability discovery.
+
+\section{Software Vulnerabilities and CVEs}
+\label{sec:bg-vulnerabilities}
+
+A software vulnerability is a flaw in a program's design, implementation, or configuration that can be exploited to violate the system's security policy. The Common Vulnerabilities and Exposures (CVE) system, maintained by the MITRE Corporation and catalogued in the National Vulnerability Database (NVD), assigns each publicly disclosed vulnerability a unique identifier of the form CVE-YYYY-NNNNN, enabling unambiguous cross-referencing across advisories, patches, and research publications.
+
+Several vulnerability classes are particularly relevant to database management systems implemented in C. Buffer overflows, both heap-based and stack-based, occur when a program writes data beyond the bounds of an allocated memory region, potentially overwriting adjacent data structures or control flow metadata. Use-after-free vulnerabilities arise when a program continues to reference a memory region after it has been deallocated, leading to undefined behavior when the freed region is subsequently reallocated for a different purpose. Integer overflows occur when arithmetic operations produce results that exceed the representable range of the target data type, causing silent wraparound that can cascade into incorrect buffer size calculations. Null pointer dereferences result from attempting to access memory through an invalid (null) pointer, typically causing immediate program termination. Undefined behavior encompasses a broad category of operations that the C language standard leaves unspecified, permitting compilers to generate arbitrary code for such cases.
+
+SQLite \cite{sqlite} exemplifies the intersection of widespread deployment and memory safety challenges. As an embedded database engine written in approximately 150,000 lines of C code, SQLite is deployed in virtually every smartphone, web browser, and operating system worldwide, with an estimated three trillion active installations. Despite rigorous testing infrastructure including the OSSFuzz continuous fuzzing platform, SQLite has a documented history of memory safety vulnerabilities. This thesis targets six CVEs across four SQLite versions, summarized in Table~\ref{tab:target-cves}.
+
+\begin{table}[H]
+\centering
+\caption{Summary of target CVEs used in this thesis for evaluating grammar-based fuzzing effectiveness.}
+\label{tab:target-cves}
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{CVE ID} & \textbf{Version} & \textbf{Type} & \textbf{Description} \\
+\midrule
+CVE-2019-19646 \cite{cve201919646} & 3.30.1 & Infinite loop & \texttt{PRAGMA integrity\_check} with self-referential generated column \\
+CVE-2020-9327 \cite{cve20209327} & 3.31.1 & Uninitialized pointer & Generated column self-reference \\
+CVE-2020-13434 \cite{cve202013434} & 3.31.1 & Integer overflow & \texttt{printf} with \texttt{INT32\_MAX} precision \\
+CVE-2020-13435 \cite{cve202013435} & 3.32.0 & Null pointer deref & \texttt{NATURAL JOIN} with \texttt{coalesce} and window function \\
+CVE-2020-13871 \cite{cve202013871} & 3.32.2 & Use-after-free & \texttt{EXCEPT} with window functions in subquery \\
+CVE-2020-15358 \cite{cve202015358} & 3.32.2 & Heap buffer overread & \texttt{INTERSECT} in \texttt{WHERE} with \texttt{VIEW} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+These vulnerabilities span the full spectrum of memory safety issues in C programs: from integer arithmetic errors (CVE-2020-13434) through pointer safety violations (CVE-2020-9327, CVE-2020-13435, CVE-2020-13871) to spatial memory safety failures (CVE-2020-15358) and algorithmic denial-of-service (CVE-2019-19646). Each requires specific SQL constructs to trigger, making them ideal targets for evaluating whether grammar-based fuzzing can systematically discover such patterns.
+
+\section{Fuzzing}
+\label{sec:bg-fuzzing}
+
+\textbf{\textit{Definition 2.1:}} \textit{Fuzzing is an automated software testing technique that generates a large number of semi-valid inputs to a program under test, monitors the program's execution for anomalous behavior (crashes, hangs, assertion failures, sanitizer violations), and iteratively refines its input generation strategy based on feedback from prior executions.}
+
+The fuzzing landscape can be taxonomized along two orthogonal axes: the degree of program analysis employed and the input generation strategy. Along the analysis axis, black-box fuzzers generate inputs without any knowledge of the program's internal structure, relying solely on random mutation or grammar-based generation with no execution feedback. White-box fuzzers employ heavyweight program analysis techniques such as symbolic execution and constraint solving to reason about program paths and generate inputs that satisfy specific path constraints. Greybox fuzzers occupy the middle ground, employing lightweight instrumentation to observe program behavior (typically branch coverage) without the computational expense of full symbolic analysis \cite{fuzzingsurvey}.
+
+Along the generation axis, mutation-based fuzzers begin with a seed corpus of valid inputs and apply random modifications such as bit flips, byte insertions, arithmetic operations on integer fields, and block splicing between seeds. Generation-based fuzzers construct inputs from scratch according to a model of the expected input format, typically a grammar or protocol specification, without requiring seed inputs.
+
+The coverage feedback loop constitutes the central mechanism of modern greybox fuzzing. The program under test is instrumented at compile time to record which code edges are exercised during execution. For each generated input, the fuzzer executes the instrumented program, collects coverage information, and determines whether the input exercised previously unseen edges. Inputs that discover new coverage are retained in the corpus and serve as seeds for subsequent mutations, creating a directed exploration of the program's state space. This feedback mechanism, pioneered by AFL \cite{afl} and adopted by libFuzzer \cite{libfuzzer}, transforms fuzzing from random input generation into a systematic search procedure that progressively penetrates deeper into program logic.
+
+\section{Grammar-Based Fuzzing}
+\label{sec:bg-grammar-fuzzing}
+
+\textbf{\textit{Definition 2.2:}} \textit{A context-free grammar is a tuple $G = (N, \Sigma, P, S)$ where $N$ is a finite set of non-terminal symbols, $\Sigma$ is a finite set of terminal symbols disjoint from $N$, $P \subseteq N \times (N \cup \Sigma)^*$ is a finite set of production rules, and $S \in N$ is the start symbol.}
+
+A derivation tree (also called a parse tree) represents the process by which a grammar generates a string. The root node is labelled with the start symbol $S$. Each internal node is labelled with a non-terminal $A \in N$, and its children correspond to the symbols on the right-hand side of one production rule $A \to \alpha$ where $\alpha \in (N \cup \Sigma)^*$. Leaf nodes are labelled with terminal symbols from $\Sigma$. The string generated by a derivation tree is obtained by concatenating the leaf nodes in left-to-right order, a process sometimes called unparsing.
+
+Grammar-guided fuzzing generates test inputs by sampling production rules to construct a derivation tree, then unparsing the tree to obtain a concrete string. At each non-terminal node during tree construction, the fuzzer selects one of the applicable production rules according to some selection strategy (uniform random, weighted, or adaptive). This process guarantees that every generated input is syntactically valid with respect to the grammar, eliminating the primary failure mode of mutation-based fuzzers on structured inputs where the vast majority of random mutations produce syntactically invalid strings that are rejected by the parser before reaching deeper program logic.
+
+Tree-level mutations operate on existing derivation trees from the corpus to generate new inputs while preserving syntactic validity. Three fundamental tree mutations are commonly employed. Random mutation selects a non-terminal node in an existing tree and replaces the entire subtree rooted at that node with a freshly generated subtree for the same non-terminal. Random recursion identifies a recursive non-terminal (one that can derive itself through a chain of productions) and either adds recursion levels by expanding the recursive production additional times, or removes recursion levels by replacing the recursive subtree with a base case. Splice mutation selects two trees from the corpus, identifies compatible non-terminal nodes (nodes with the same non-terminal label), and swaps the subtrees rooted at those nodes between the two trees.
+
+Nautilus \cite{nautilus} represents the key prior work that this thesis extends. Nautilus combines grammar-based input generation with AFL-style coverage feedback, yielding a grammar-based greybox fuzzer. The central insight of Nautilus is that grammar-based generation ensures syntactic validity, freeing the coverage-guided search to focus on semantic exploration rather than wasting effort on inputs rejected by the parser. Nautilus uses a Python-based grammar specification DSL and maintains a corpus of derivation trees rather than flat strings. It applies tree-level mutations (random, recursive, splice) to corpus trees, guided by coverage feedback that retains trees exercising new edges. Nautilus discovered 49 previously unknown bugs in mruby, PHP, and Lua interpreters.
+
+The following listing illustrates the grammar specification format used by Nautilus and adopted in this thesis:
+
+\begin{lstlisting}[language=Python, caption={Fragment of a SQL grammar specification in the Nautilus Python DSL.}, label={lst:grammar-example}]
+ctx.rule("Stmt", "SELECT {Expr} FROM {Table}")
+ctx.rule("Expr", "{Col}")
+ctx.rule("Expr", "{Func}({Expr})")
+ctx.rule("Table", "t1")
+ctx.rule("Func", "coalesce")
+ctx.rule("Col", "c1")
+\end{lstlisting}
+
+In Listing~\ref{lst:grammar-example}, non-terminals are enclosed in curly braces within rule definitions. The grammar defines a start symbol \texttt{Stmt} that derives \texttt{SELECT} queries, with recursive expression generation through function application. Nautilus traverses the grammar top-down from the start symbol, selecting rules at each non-terminal to build a complete derivation tree.
+
+\section{Coverage-Guided Feedback}
+\label{sec:bg-coverage}
+
+The AFL (American Fuzzy Lop) fork server model \cite{afl} provides an efficient mechanism for repeated program execution during fuzzing. Rather than spawning a new process for each test input (incurring the overhead of process creation, dynamic linking, and initialization for every execution), the fork server model loads the target program once into a parent process, then creates child processes via the \texttt{fork()} system call for each test case. The child inherits the fully initialized program state and executes the test input, while the parent waits for the child to terminate and collects the result. This amortizes the expensive initialization cost across all test executions, typically improving throughput by an order of magnitude.
+
+Edge coverage instrumentation tracks transitions between basic blocks during program execution. At compile time, each basic block is assigned a random identifier. At runtime, each branch transition from a source block to a target block is recorded by computing a hash of the (source, target) pair and incrementing the corresponding entry in a shared memory bitmap. The bitmap is a fixed-size array, typically 64KB to 2MB, where each byte represents a hashed edge. The byte values saturate at 255 to prevent overflow while still providing frequency information through bucketed counting (the hit count is classified into buckets: 1, 2, 3, 4--7, 8--15, 16--31, 32--127, 128--255).
+
+The coverage-guided selection mechanism determines which inputs are retained in the fuzzer's corpus. After executing a test input, the fuzzer compares the resulting bitmap against the global coverage map accumulated from all prior executions. If the input exercised at least one previously unseen edge (a byte position that was zero in the global map is now non-zero, or an existing entry transitions to a new hit-count bucket), the input is classified as interesting and added to the corpus queue. This queue serves as the seed pool for subsequent mutation cycles, directing the fuzzer toward program regions that have received less exploration.
+
+The fork server architecture provides a second crucial advantage beyond amortizing initialization: it isolates crashes. When a child process triggers a segmentation fault, assertion failure, or sanitizer violation, the child terminates abnormally while the parent process remains unaffected and can immediately fork the next child for the subsequent test case. The parent communicates with the fuzzer through a pair of pipes (control and status), reporting each child's exit status (normal termination, signal-based termination, or timeout).
+
+\section{Multi-Armed Bandit Algorithms}
+\label{sec:bg-bandit}
+
+\textbf{\textit{Definition 2.3:}} \textit{The multi-armed bandit problem is defined by a set of $K$ arms (actions). At each discrete round $t = 1, 2, \ldots, T$, the player selects an arm $i_t \in \{1, \ldots, K\}$ and receives a reward $r_t \in [0, 1]$. The player's goal is to minimize cumulative regret, defined as $R_T = \max_{i} \sum_{t=1}^{T} \mu_i - \sum_{t=1}^{T} r_{i_t}$, where $\mu_i$ is the expected reward of arm $i$. The regret quantifies the difference between the cumulative reward of the best fixed arm in hindsight and the cumulative reward actually obtained by the player's strategy.}
+
+The fundamental challenge in bandit problems is the exploration-exploitation tradeoff. Exploitation favors selecting arms that have yielded high rewards in past rounds, maximizing immediate expected reward. Exploration favors selecting arms with uncertain reward distributions, acquiring information that may reveal superior arms. Any optimal strategy must balance these competing objectives.
+
+The UCB1 (Upper Confidence Bound) algorithm addresses the stochastic bandit setting where each arm's rewards are drawn independently from a fixed but unknown distribution. UCB1 selects the arm maximizing $\bar{x}_i + \sqrt{\frac{2 \ln t}{n_i}}$, where $\bar{x}_i$ is the empirical mean reward of arm $i$, $t$ is the current round, and $n_i$ is the number of times arm $i$ has been selected. The second term is a confidence bonus that decreases as an arm is played more frequently, naturally balancing exploration and exploitation. UCB1 achieves logarithmic regret, which is optimal for the stochastic setting.
+
+The EXP3 algorithm (Exponential-weight algorithm for Exploration and Exploitation) \cite{exp3} addresses the adversarial bandit setting where rewards are not assumed to be stochastic but may be chosen by an adversary. EXP3 maintains a weight vector $w^t \in \mathbb{R}^K$ and selects arms according to a probability distribution that mixes the normalized weight vector with uniform exploration. Specifically, the sampling probability for arm $i$ at round $t$ is:
+\begin{equation}
+p_i^t = (1 - \gamma) \frac{w_i^t}{\sum_{j=1}^K w_j^t} + \frac{\gamma}{K}
+\end{equation}
+where $\gamma \in (0, 1]$ is the exploration parameter. After observing reward $r_t$ for the selected arm $i_t$, EXP3 computes an importance-weighted reward estimate $\hat{r}_i^t = r_t / p_i^t$ (only for the selected arm; estimates for unselected arms are zero) and updates the weight:
+\begin{equation}
+w_i^{t+1} = w_i^t \cdot \exp\left(\frac{\eta \cdot \hat{r}_i^t}{K}\right)
+\end{equation}
+where $\eta$ is the learning rate. The importance weighting corrects for the selection bias inherent in observing rewards only for the chosen arm, producing an unbiased reward estimate in expectation.
+
+The application of bandit algorithms to grammar-based fuzzing proceeds by treating each production rule for a given non-terminal as one arm. The reward signal is derived from coverage feedback: when a generated input discovers new edge coverage, the production rules used in constructing that input's derivation tree receive positive reward. This framing is inherently non-stochastic because the coverage landscape evolves as the fuzzer explores, specifically, a rule that leads to new coverage early in the campaign provides diminishing returns as those regions become fully explored. The adversarial setting of EXP3 is therefore more appropriate than the stochastic assumptions of UCB1.
+
+Efficient sampling from the resulting weighted categorical distribution is achieved through the alias method \cite{loadeddice}, which enables $O(1)$ sampling after $O(K)$ preprocessing. The alias method constructs a table of $K$ entries, each containing a probability threshold and an alias index. Sampling requires generating one uniform random number, selecting a table entry, comparing against the threshold, and returning either the entry's own arm or its alias. This constant-time sampling is critical when production rules must be sampled millions of times per fuzzing campaign.
+
+\section{Sanitizers as Oracles}
+\label{sec:bg-sanitizers}
+
+Many software bugs cause silent memory corruption rather than immediate program crashes. Without instrumentation, a heap buffer overflow may overwrite adjacent data without triggering a segmentation fault, a use-after-free may read stale but valid-looking data from a reallocated region, and an integer overflow may produce an incorrect but non-crashing result. Sanitizers transform these silent bugs into detectable signals by adding runtime instrumentation that checks the validity of each memory access or arithmetic operation.
+
+AddressSanitizer (ASan) \cite{asan} instruments all memory accesses (loads and stores) to detect spatial and temporal memory safety violations. ASan maintains a shadow memory region that tracks the accessibility state of each byte in the program's address space. On every memory access, ASan consults the shadow memory to verify that the accessed bytes are currently allocated and accessible. ASan detects heap-buffer-overflow (accessing beyond an allocated heap object's bounds), stack-buffer-overflow (overflowing a stack-allocated buffer), use-after-free (accessing memory that has been deallocated), and double-free (deallocating an already-freed pointer). The typical runtime overhead of ASan is approximately 2x, making it practical for use during fuzzing campaigns. In this thesis's harness configuration, ASan violations cause the program to exit with code 223, distinguishing sanitizer-detected bugs from normal termination.
+
+UndefinedBehaviorSanitizer (UBSan) detects operations that the C and C++ language standards define as undefined behavior. This includes signed integer overflow (wrapping beyond \texttt{INT\_MAX} or below \texttt{INT\_MIN}), null pointer dereference, shift operations with negative or overly large shift amounts, division by zero, and misaligned pointer access. UBSan's runtime overhead is minimal, approximately 20\%, because it instruments only specific operation types rather than all memory accesses. When a violation is detected, UBSan reports the violation and terminates with exit code 1.
+
+SQLite provides additional bug detection through compile-time debug assertions enabled by the \texttt{SQLITE\_DEBUG} preprocessor flag. These assertions check internal invariants such as database page consistency, B-tree structure validity, and memory allocator state. When an assertion fails, SQLite raises \texttt{SIGTRAP} (signal 5), providing a detection mechanism for logical errors that do not necessarily involve memory safety violations.
+
+The oracle classification scheme employed in this thesis combines these detection mechanisms into a unified framework. An execution resulting in exit code 223 indicates an ASan-detected memory safety violation and is classified as a confirmed crash. Exit code 1 from UBSan indicates undefined behavior. Signal 5 indicates a SQLite debug assertion failure. All other non-zero exit codes from semantic SQL errors (such as syntax errors or constraint violations that SQLite handles gracefully) are classified as expected behavior and ignored, as they represent correct error handling rather than bugs.
+
+\section{Related Work}
+\label{sec:bg-related}
+
+Nautilus \cite{nautilus} is the foundational system that this thesis extends. Developed by Aschermann et al., Nautilus combines context-free grammar specifications with AFL-style coverage-guided feedback to create a grammar-based greybox fuzzer. The system represents inputs as derivation trees and applies three tree-level mutations: random mutation (replacing a subtree with a freshly generated one), random recursion (expanding or collapsing recursive productions), and splice (exchanging compatible subtrees between two corpus trees). Nautilus discovered 49 previously unknown bugs across mruby, PHP, and Lua, demonstrating that grammar-based generation eliminates the syntactic validity barrier that limits byte-level mutational fuzzers on structured inputs. This thesis extends Nautilus by replacing uniform random rule selection with adaptive selection via multi-armed bandit algorithms, investigating whether intelligent production rule prioritization can accelerate vulnerability discovery.
+
+Superion \cite{superion} extends AFL with grammar-aware mutations for JavaScript and XML inputs. Unlike Nautilus, which generates inputs from scratch using a grammar, Superion parses existing seed inputs into abstract syntax trees and applies grammar-aware mutations that preserve syntactic validity. Superion's approach requires a parser for the input language, which is more complex to implement but allows it to leverage existing high-quality seed corpora. The key distinction from the approach in this thesis is that Superion operates on parsed representations of existing inputs rather than generating from a production grammar, making it complementary to but distinct from generation-based approaches.
+
+Grimoire \cite{grimoire} synthesizes input structure without requiring an explicit grammar specification. Grimoire observes how coverage changes in response to input fragments and infers structural relationships between input components. By combining fragments that independently trigger coverage improvements, Grimoire can generate structured inputs that exercise complex program paths without manual grammar engineering. While Grimoire eliminates the grammar specification effort, it provides less control over the generated input structure and cannot easily encode domain-specific patterns such as the CVE-triggering SQL constructs targeted in this thesis.
+
+Squirrel \cite{squirrel} is a DBMS-specific fuzzer that ensures SQL validity through abstract syntax tree mutations combined with type-aware generation. Squirrel maintains a full SQL parser and type system, enabling it to generate queries that are not only syntactically valid but also semantically meaningful (referencing existing tables, using compatible types in operations). Squirrel was tested on SQLite, MySQL, MariaDB, and PostgreSQL, discovering 63 previously unknown bugs. The key advantage of Squirrel over grammar-based approaches is semantic awareness; however, this comes at the cost of requiring a complete SQL parser and type system implementation for each target DBMS, whereas this thesis's grammar-based approach requires only a context-free grammar specification.
+
+SQLsmith \cite{sqlsmith} is a random SQL query generator that constructs complex, valid SQL queries without coverage feedback. SQLsmith connects to the target database, introspects the schema, and generates queries that reference actual tables and columns with correct types. SQLsmith has discovered bugs in PostgreSQL, SQLite, and other databases through the sheer structural complexity of its generated queries. However, without coverage guidance, SQLsmith cannot direct its generation toward unexplored program regions, relying instead on random structural diversity to incidentally trigger bugs.
+
+AFL \cite{afl} and libFuzzer \cite{libfuzzer} represent the state of the art in general-purpose coverage-guided greybox fuzzing. Both employ byte-level mutations (bit flips, arithmetic operations, block insertion and deletion, dictionary token substitution) guided by edge coverage feedback. AFL operates as an external process that communicates with the target through a fork server, while libFuzzer runs in-process as a library linked with the target. Both are highly effective for binary formats and protocols but struggle with structured inputs like SQL, where the vast majority of random byte-level mutations produce syntactically invalid inputs that are rejected by the parser before reaching deeper program logic. Empirical studies show that general-purpose fuzzers achieve less than 1\% syntactic validity rate on SQL inputs, motivating grammar-based approaches.
+
+This thesis positions itself at the intersection of grammar-based generation (Nautilus) and adaptive algorithm selection (multi-armed bandits). Unlike Squirrel, it does not require a full SQL parser; a Python-defined context-free grammar suffices to ensure syntactic validity. Unlike Grimoire, it uses an explicit grammar for full control over the structural patterns that the fuzzer can generate, enabling deliberate encoding of CVE-triggering patterns as production rules. Unlike SQLsmith, it employs coverage-guided feedback to direct generation toward unexplored program regions. The key novelty is the application of multi-armed bandit algorithms (specifically EXP3) to adaptively select production rules during grammar-based generation, investigating whether exploitation of historically productive rules outperforms uniform exploration. As the experimental results in Chapter~\ref{chap:experiments} demonstrate, this investigation yields the counterintuitive finding that uniform selection often matches or exceeds adaptive selection, suggesting that in the coverage-guided fuzzing setting, the coverage feedback loop itself provides sufficient exploitation pressure and additional rule-level exploitation may be redundant or even harmful.

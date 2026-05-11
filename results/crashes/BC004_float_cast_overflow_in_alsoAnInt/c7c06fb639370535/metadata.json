@@ -1,0 +1,17 @@
+{
+  "hash": "c7c06fb639370535",
+  "crash_type": "ubsan",
+  "subtype": "float-cast-overflow",
+  "exit_code": -6,
+  "version": "3.31.1",
+  "error_message": "../cve_builds/sqlite-3.31.1/sqlite3.c:85071:16: runtime error: -1.71938e+19 is outside the range of representable values of type 'long long'",
+  "sql_preview": "CREATE TABLE IF NOT EXISTS p(rowid INTEGER NOT NULL); CREATE INDEX IF NOT EXISTS idx1 ON p(rowid); INSERT INTO p VALUES (random() || TRUE); PRAGMA integrity_check;",
+  "campaigns": [
+    "sqlite-3.31.1_bandit_run1"
+  ],
+  "total_count": 1,
+  "sample_file": "5_000239089",
+  "bug_class": "BC004",
+  "cve": null,
+  "severity": "LOW"
+}

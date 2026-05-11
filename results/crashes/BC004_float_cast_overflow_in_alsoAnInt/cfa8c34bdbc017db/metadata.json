@@ -1,0 +1,18 @@
+{
+  "hash": "cfa8c34bdbc017db",
+  "crash_type": "ubsan",
+  "subtype": "float-cast-overflow",
+  "exit_code": -6,
+  "version": "3.32.0",
+  "error_message": "../cve_builds/sqlite-3.32.0/sqlite3.c:85315:16: runtime error: inf is outside the range of representable values of type 'long long'",
+  "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 REAL DEFAULT FALSE); CREATE INDEX IF NOT EXISTS idx1 ON p(c3); INSERT OR FAIL INTO p VALUES (TRUE || TRUE || TRUE || TRUE || TRUE || TRUE || TRUE || TRUE || TRUE || TRU",
+  "campaigns": [
+    "sqlite-3.32.0_uniform_run4",
+    "sqlite-3.32.0_uniform_run5"
+  ],
+  "total_count": 2,
+  "sample_file": "5_000187036",
+  "bug_class": "BC004",
+  "cve": null,
+  "severity": "LOW"
+}

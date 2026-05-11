@@ -1,0 +1,12 @@
+{
+  "template": "CREATE TABLE {Table-Name}({Col-Name} UNIQUE AS({GenCol-Expr}), {Col-Name}, {Col-Name});\nINSERT INTO {Table-Name}({Col-Name}) VALUES({Literal});\nUPDATE {Table-Name} SET {Col-Name} = {Expr}, {Col-Name} = {Expr} WHERE ({Col-Ref}) >= {Literal}",
+  "feature_tag": "generated_col_unique_update_btree",
+  "weight": 3.0,
+  "notes": "Crash in btree insert triggered by UPDATE with WHERE filter on a UNIQUE generated column; template exercises generated column uniqueness enforcement during DML.",
+  "bug_id": "MR-SQLITE-0157",
+  "sql_sha256": "53234315a91fef72c0990b7d17e80a17ba5fd356050f1268526d863f4382bed1",
+  "prompt_version": 1,
+  "model": "claude-sonnet-4-6",
+  "created_at": "2026-04-20T00:53:23Z",
+  "status": "ok"
+}

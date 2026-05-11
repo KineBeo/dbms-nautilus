@@ -1,0 +1,17 @@
+{
+  "hash": "4a897df9e000b652",
+  "crash_type": "signal",
+  "subtype": "signal-6",
+  "exit_code": -6,
+  "version": "3.30.1",
+  "error_message": "",
+  "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 DATE CHECK (EXISTS (VALUES (TRUE) EXCEPT SELECT * FROM s NOT INDEXED WHERE NULL GROUP BY CURRENT_DATE WINDOW w1 AS () ORDER BY RAISE(IGNORE) COLLATE NOCASE))); CREATE V",
+  "campaigns": [
+    "sqlite-3.30.1_uniform_run4"
+  ],
+  "total_count": 2,
+  "sample_file": "6_000112865",
+  "bug_class": "BC005",
+  "cve": null,
+  "severity": "MEDIUM"
+}

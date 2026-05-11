@@ -1,0 +1,27 @@
+{
+  "hash": "18c7efd9c88d6c67",
+  "crash_type": "ubsan",
+  "subtype": "null-pointer",
+  "exit_code": -6,
+  "version": "3.32.0",
+  "error_message": "../cve_builds/sqlite-3.32.0/sqlite3.c:224711:44: runtime error: applying non-zero offset 8 to null pointer",
+  "sql_preview": "CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c1, c1); INSERT INTO t2 VALUES (RAISE(IGNORE) IS NOT NULL LIKE CURRENT_TIMESTAMP IS NOT NULL == CURRENT_TIME ESCAPE min(TRUE) FILTER (WHERE CURRENT",
+  "campaigns": [
+    "sqlite-3.32.0_bandit_run1",
+    "sqlite-3.32.0_bandit_run2",
+    "sqlite-3.32.0_bandit_run3",
+    "sqlite-3.32.0_bandit_run4",
+    "sqlite-3.32.0_cross_30m",
+    "sqlite-3.32.0_cross_v1",
+    "sqlite-3.32.0_uniform_run1",
+    "sqlite-3.32.0_uniform_run2",
+    "sqlite-3.32.0_uniform_run3",
+    "sqlite-3.32.0_uniform_run4",
+    "sqlite-3.32.0_uniform_run5"
+  ],
+  "total_count": 1991,
+  "sample_file": "5_000000126",
+  "bug_class": "BC001",
+  "cve": null,
+  "severity": "HIGH"
+}

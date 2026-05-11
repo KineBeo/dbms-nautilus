@@ -1,0 +1,27 @@
+{
+  "total_crashes": 149,
+  "unique_root_causes": 3,
+  "clusters": [
+    {
+      "hash": "46c777bce526fab7b7cd6fc4d355aeee81a7f6f620a1d7548d3b927b5dbc0aac",
+      "count": 116,
+      "representative": "5_000000096",
+      "top_frame": "sqlite3Fts5ConfigParse:././../cve_builds/sqlite-3.31.1/sqlite3.c:210506",
+      "example_sql": "CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c3, c3);\nINSERT OR FAIL INTO p VALUES (EXISTS (VALUES (NULL) UNION VALUES (TRUE)) ISNULL IS (CURRENT_TIME) NOT BETWEEN row_number() NOT LIKE NOT NU"
+    },
+    {
+      "hash": "556a7e573a8906d3f82f1d21c8bf01aedf9af33b0410f3e9ca76c7391772f69a",
+      "count": 18,
+      "representative": "5_000000744",
+      "top_frame": "sqlite3_str_vappendf:././../cve_builds/sqlite-3.31.1/sqlite3.c:28804",
+      "example_sql": "SELECT printf('%.*g', 2147483647, 0.01);"
+    },
+    {
+      "hash": "313104fa0a1ebe79bba871eab7b3c3be8abb4b745c3a2a8abdba817c4f340961",
+      "count": 15,
+      "representative": "5_000000545",
+      "top_frame": "sqlite3_str_vappendf:././../cve_builds/sqlite-3.31.1/sqlite3.c:28841",
+      "example_sql": "SELECT printf('%.*f', -2147483649, -1e308);\nSELECT hex(zeroblob(1));\nCREATE TABLE IF NOT EXISTS p(c2 VARCHAR(255) GENERATED ALWAYS AS (FALSE) STORED);\nCREATE TABLE IF NOT EXISTS q(c3 BOOLEAN GENERATED"
+    }
+  ]
+}

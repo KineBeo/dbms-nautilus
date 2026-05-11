@@ -1,0 +1,15 @@
+\begin{center}
+\textbf{\large{Abstract}}
+\end{center}
+\addcontentsline{toc}{chapter}{Abstract}
+\begin{small}
+
+Database management systems (DBMS) are critical infrastructure components, and their vulnerabilities represent serious security threats. Automated vulnerability detection through fuzzing is a promising approach, but existing grammar-based fuzzers apply uniform random sampling over production rules, wasting mutation budget on low-value syntactic paths and failing to prioritize the structural patterns most likely to expose bugs.
+
+This thesis presents a grammar-based greybox fuzzing system targeting SQLite. A structural primitives grammar of 475 rules encodes SQL patterns known to trigger vulnerability classes---including integer overflow in expression trees, use-after-free in query planner optimizations, and memory corruption in aggregate processing---without hardcoding specific proof-of-concept inputs. On top of this grammar, a multi-armed bandit controller using the EXP3 algorithm adaptively selects grammar rules based on coverage feedback from an AFL-compatible fork server, aiming to concentrate mutations on rules that generate coverage-increasing inputs.
+
+Experiments across 53 campaigns on 3 SQLite versions containing 6 known CVEs show that uniform sampling discovers significantly more unique crash classes than the bandit controller (mean 8.6 vs.\ 4.2 per campaign, $p \approx 0.01$, Mann-Whitney U test). Analysis reveals that the bandit converges to exploitation of a small rule subset, starving exploration and reducing grammatical diversity. A grammar gap analysis further shows that 4 of the 6 target CVEs were unreachable until structural primitives for window functions and self-referential generated columns were added in grammar version 3.2, demonstrating that grammar coverage is the dominant factor for vulnerability reachability.
+
+\vspace*{1cm}
+\textbf{Keywords:} Grammar-based Fuzzing, Greybox Fuzzing, DBMS Security, Vulnerability Detection, Multi-Armed Bandit
+\end{small}

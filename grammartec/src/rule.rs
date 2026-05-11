@@ -91,6 +91,7 @@ pub enum Rule {
 pub struct RegExpRule {
     pub nonterm: NTermID,
     pub hir: Hir,
+    pub weight: f32,
 }
 
 impl RegExpRule {
@@ -104,6 +105,7 @@ pub struct ScriptRule {
     pub nonterm: NTermID,
     pub nonterms: Vec<NTermID>,
     pub script: PyObject,
+    pub weight: f32,
 }
 
 impl ScriptRule {
@@ -123,6 +125,7 @@ pub struct PlainRule {
     pub nonterm: NTermID,
     pub children: Vec<RuleChild>,
     pub nonterms: Vec<NTermID>,
+    pub weight: f32,
 }
 
 impl PlainRule {
@@ -144,6 +147,7 @@ impl Clone for ScriptRule {
             nonterm: self.nonterm.clone(),
             nonterms: self.nonterms.clone(),
             script: self.script.clone_ref(py),
+            weight: self.weight,
         }});
     }
 }
@@ -159,6 +163,7 @@ impl Rule {
             nonterm: ctx.aquire_nt_id(nonterm),
             nonterms: nterms.iter().map(|s| ctx.aquire_nt_id(s)).collect(),
             script,
+            weight: 1.0,
         });
     }
 
@@ -175,6 +180,7 @@ impl Rule {
         return Self::RegExp(RegExpRule {
             nonterm: ctx.aquire_nt_id(nonterm),
             hir,
+            weight: 1.0,
         });
     }
 
@@ -202,6 +208,7 @@ impl Rule {
             nonterm: ctx.aquire_nt_id(nonterm),
             children,
             nonterms,
+            weight: 1.0,
         });
     }
 
@@ -212,6 +219,7 @@ impl Rule {
             nonterm: ntermid,
             children,
             nonterms,
+            weight: 1.0,
         });
     }
 
@@ -287,6 +295,22 @@ impl Rule {
             Rule::Plain(r) => r.nonterm,
             Rule::RegExp(r) => r.nonterm,
         };
+    }
+
+    pub fn weight(&self) -> f32 {
+        match self {
+            Rule::Plain(r) => r.weight,
+            Rule::Script(r) => r.weight,
+            Rule::RegExp(r) => r.weight,
+        }
+    }
+
+    pub fn set_weight(&mut self, w: f32) {
+        match self {
+            Rule::Plain(r) => r.weight = w,
+            Rule::Script(r) => r.weight = w,
+            Rule::RegExp(r) => r.weight = w,
+        }
     }
 
     pub fn generate(&self, tree: &mut Tree, ctx: &Context, len: usize) -> usize {

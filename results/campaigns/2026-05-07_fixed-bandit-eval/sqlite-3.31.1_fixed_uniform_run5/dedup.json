@@ -1,0 +1,48 @@
+{
+  "total_crashes": 195,
+  "unique_root_causes": 6,
+  "clusters": [
+    {
+      "hash": "46c777bce526fab7b7cd6fc4d355aeee81a7f6f620a1d7548d3b927b5dbc0aac",
+      "count": 141,
+      "representative": "5_000000006",
+      "top_frame": "sqlite3Fts5ConfigParse:././../cve_builds/sqlite-3.31.1/sqlite3.c:210506",
+      "example_sql": "CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(b);\nINSERT OR REPLACE INTO p VALUES (-NULL);\nSELECT * FROM q NATURAL JOIN q WHERE CURRENT_DATE COLLATE NOCASE;\nCREATE TABLE IF NOT EXISTS p(c1 BOOL"
+    },
+    {
+      "hash": "313104fa0a1ebe79bba871eab7b3c3be8abb4b745c3a2a8abdba817c4f340961",
+      "count": 22,
+      "representative": "5_000000658",
+      "top_frame": "sqlite3_str_vappendf:././../cve_builds/sqlite-3.31.1/sqlite3.c:28841",
+      "example_sql": "SELECT printf('%.*f', 2147483647, -1e308);\nSELECT substr('-_NV-_9-3-', -2147483649, 9223372036854775807);"
+    },
+    {
+      "hash": "556a7e573a8906d3f82f1d21c8bf01aedf9af33b0410f3e9ca76c7391772f69a",
+      "count": 21,
+      "representative": "5_000008537",
+      "top_frame": "sqlite3_str_vappendf:././../cve_builds/sqlite-3.31.1/sqlite3.c:28804",
+      "example_sql": "SELECT printf('%.*g', 2147483647, 0.01);"
+    },
+    {
+      "hash": "fe13af03e32c8234e91edd926384ee7f5092ce68c50e8e564d7c4716fc74a15e",
+      "count": 9,
+      "representative": "5_000113291",
+      "top_frame": "alsoAnInt:././../cve_builds/sqlite-3.31.1/sqlite3.c:85071",
+      "example_sql": "CREATE TABLE IF NOT EXISTS p(b REAL PRIMARY KEY);\nINSERT OR IGNORE INTO p VALUES (CURRENT_TIME LIKE CURRENT_TIME);\nPRAGMA integrity_check;\nCREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts3(c3);\nINS"
+    },
+    {
+      "hash": "8f7fdce59421eaccc1dd3a6fa6d420d777e5d03f5b298359a52b2e505e9a0fe2",
+      "count": 1,
+      "representative": "5_000117495",
+      "top_frame": "alsoAnInt:././../cve_builds/sqlite-3.31.1/sqlite3.c:85071",
+      "example_sql": "CREATE TABLE IF NOT EXISTS p(c2 INTEGER PRIMARY KEY);\nCREATE TABLE IF NOT EXISTS q(c3 TEXT);\nINSERT INTO p VALUES (FALSE || TRUE || TRUE || TRUE || TRUE || TRUE || TRUE || TRUE || TRUE || TRUE || TRUE"
+    },
+    {
+      "hash": "f001e39dd7d820b33538dcee22f3186b5d04780bb984095fde3b7de777a93ef0",
+      "count": 1,
+      "representative": "5_000148921",
+      "top_frame": "alsoAnInt:././../cve_builds/sqlite-3.31.1/sqlite3.c:85071",
+      "example_sql": "CREATE TABLE IF NOT EXISTS p(a FLOAT);\nCREATE VIEW IF NOT EXISTS v1 AS WITH s AS (SELECT *) VALUES (CURRENT_DATE);\nINSERT OR IGNORE INTO p VALUES (CURRENT_TIMESTAMP);\nPRAGMA integrity_check;\nCREATE VI"
+    }
+  ]
+}

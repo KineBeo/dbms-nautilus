@@ -1,8 +1,12 @@
 // Nautilus
 // Copyright (C) 2024  Daniel Teuchert, Cornelius Aschermann, Sergej Schumilo
 
+extern crate candle_core;
+extern crate candle_nn;
 extern crate forksrv;
 extern crate grammartec;
+extern crate rand;
+extern crate rand_distr;
 extern crate serde_json;
 extern crate time as othertime;
 #[macro_use]
@@ -12,25 +16,32 @@ extern crate pyo3;
 extern crate ron;
 
 mod config;
+mod dqn;
 mod fuzzer;
+mod grammar_bandit;
 mod python_grammar_loader;
 mod queue;
+mod rl_hook;
+mod rl_logger;
 mod shared_state;
 mod state;
 
 use config::Config;
+use dqn::DqnTrainer;
 use forksrv::newtypes::SubprocessError;
 use fuzzer::Fuzzer;
+use grammar_bandit::GrammarBandit;
 use grammartec::chunkstore::ChunkStoreWrapper;
 use grammartec::context::Context;
 use queue::{InputState, QueueItem};
+use rl_hook::{DefaultPolicy, DqnPolicy, MutationPolicy, PolicyContext};
 use shared_state::GlobalSharedState;
 use state::FuzzingState;
 
 use clap::{App, Arg};
 use std::fs;
-use std::fs::File;
-use std::io::Read;
+use std::fs::{File, OpenOptions};
+use std::io::{Read, Write};
 use std::path::Path;
 use std::sync::atomic::Ordering;
 use std::sync::{Arc, Mutex};
@@ -41,18 +52,27 @@ fn process_input(
     state: &mut FuzzingState,
     inp: &mut QueueItem,
     config: &Config,
+    policy: &mut dyn MutationPolicy,
+    global_state: &Arc<Mutex<GlobalSharedState>>,
 ) -> Result<(), SubprocessError> {
     match inp.state {
         InputState::Init(start_index) => {
             let end_index = start_index + 200;
 
             if state.minimize(inp, start_index, end_index)? {
-                inp.state = InputState::Det((0, 0));
+                if config.rl_enabled {
+                    // Skip Det when RL controls strategy selection —
+                    // the DQN can choose Det as action=3 in Random mode.
+                    inp.state = InputState::Random;
+                } else {
+                    inp.state = InputState::Det((0, 0));
+                }
             } else {
                 inp.state = InputState::Init(end_index);
             }
         }
         InputState::Det((cycle, start_index)) => {
+            // RL does not control the Det stage — keep existing behaviour.
             let end_index = start_index + 1;
             if state.deterministic_tree_mutation(inp, start_index, end_index)? {
                 if cycle == config.number_of_deterministic_mutations {
@@ -68,9 +88,89 @@ fn process_input(
             state.havoc_recursion(inp)?;
         }
         InputState::Random => {
-            state.splice(inp)?;
-            state.havoc(inp)?;
-            state.havoc_recursion(inp)?;
+            // Snapshot pre-mutation signals from GlobalSharedState
+            let (bits_before, crashes_before, queue_sz_before, total_cov_before) = {
+                let gs = global_state.lock().expect("P2-6_before_lock");
+                let bits = gs.bits_found_by_havoc
+                    + gs.bits_found_by_havoc_rec
+                    + gs.bits_found_by_splice
+                    + gs.bits_found_by_det
+                    + gs.bits_found_by_gen;
+                let crashes = gs.total_found_asan + gs.total_found_sig + gs.total_found_ubsan;
+                let queue_sz = gs.queue.len();
+                let total_cov = gs.bitmaps.get(&false)
+                    .map_or(0, |b| b.iter().filter(|&&x| x != 0).count());
+                (bits, crashes, queue_sz, total_cov)
+            };
+
+            let ctx_before = PolicyContext {
+                coverage_delta: 0,
+                is_crash: false,
+                is_timeout: false,
+                total_coverage: total_cov_before,
+                exec_count: state.fuzzer.execution_count,
+                queue_size: queue_sz_before,
+                strategy_emas: [0.0f32; 5],
+                last_action: None,
+            };
+
+            match policy.select_action(&ctx_before) {
+                None => {
+                    // DefaultPolicy: run all three strategies (original behaviour).
+                    state.splice(inp)?;
+                    state.havoc(inp)?;
+                    state.havoc_recursion(inp)?;
+                }
+                Some(action) => {
+                    // DqnPolicy: dispatch to the single selected strategy.
+                    match action {
+                        0 => state.havoc(inp)?,              // Havoc
+                        1 => state.havoc_recursion(inp)?,    // HavocRec
+                        2 => state.splice(inp)?,             // Splice
+                        3 => {
+                            // Det — run a single deterministic mutation step
+                            state.deterministic_tree_mutation(inp, 0, 1)?;
+                        }
+                        4 => state.generate_random("START")?, // Generate
+                        _ => {
+                            // Unknown action — fall back to default.
+                            state.splice(inp)?;
+                            state.havoc(inp)?;
+                            state.havoc_recursion(inp)?;
+                        }
+                    }
+
+                    // Snapshot post-mutation signals
+                    let (bits_after, crashes_after, queue_sz_after, total_cov_after) = {
+                        let gs = global_state.lock().expect("P2-6_after_lock");
+                        let bits = gs.bits_found_by_havoc
+                            + gs.bits_found_by_havoc_rec
+                            + gs.bits_found_by_splice
+                            + gs.bits_found_by_det
+                            + gs.bits_found_by_gen;
+                        let crashes = gs.total_found_asan + gs.total_found_sig + gs.total_found_ubsan;
+                        let queue_sz = gs.queue.len();
+                        let total_cov = gs.bitmaps.get(&false)
+                            .map_or(0, |b| b.iter().filter(|&&x| x != 0).count());
+                        (bits, crashes, queue_sz, total_cov)
+                    };
+
+                    let coverage_delta = bits_after.saturating_sub(bits_before) as usize;
+                    let is_crash = crashes_after > crashes_before;
+
+                    let ctx_after = PolicyContext {
+                        coverage_delta,
+                        is_crash,
+                        is_timeout: false,
+                        total_coverage: total_cov_after,
+                        exec_count: state.fuzzer.execution_count,
+                        queue_size: queue_sz_after,
+                        strategy_emas: [0.0f32; 5],
+                        last_action: Some(action),
+                    };
+                    policy.observe(action, &ctx_after);
+                }
+            }
         }
     }
     return Ok(());
@@ -81,6 +181,8 @@ fn fuzzing_thread(
     config: Config,
     ctx: Context,
     cks: Arc<ChunkStoreWrapper>,
+    dqn_trainer: Option<Arc<Mutex<DqnTrainer>>>,
+    shared_bandit: Option<Arc<Mutex<GrammarBandit>>>,
 ) {
     let path_to_bin_target = config.path_to_bin_target.to_owned();
     let args = config.arguments.clone();
@@ -98,12 +200,40 @@ fn fuzzing_thread(
     state.ctx = ctx.clone();
     let mut old_execution_count = 0;
     let mut old_executions_per_sec = 0;
+
+    // Build the policy for this thread.
+    let thread_dqn_cfg = dqn::DqnConfig {
+        batch_size: config.rl_batch_size,
+        replay_size: config.rl_replay_size,
+        gamma: config.rl_gamma,
+        lr: config.rl_lr as f64,
+        target_update_freq: config.rl_target_update,
+        train_interval: config.rl_train_interval,
+        epsilon_start: config.rl_epsilon_start,
+        epsilon_end: config.rl_epsilon_end,
+        epsilon_decay: config.rl_epsilon_decay as f32,
+    };
+    let mut dqn_policy_storage: Option<DqnPolicy> = dqn_trainer.map(|trainer| {
+        DqnPolicy::new(trainer, &config.path_to_workdir, &thread_dqn_cfg)
+    });
+    let mut default_policy_storage = DefaultPolicy;
+
+    let policy: &mut dyn MutationPolicy = if let Some(ref mut p) = dqn_policy_storage {
+        p
+    } else {
+        &mut default_policy_storage
+    };
+
+    let mut last_bandit_exec = 0_u64;
+    let mut last_bandit_coverage = 0_usize;
+    let mut last_bandit_crashes = 0_u64;
+
     //Normal mode
     loop {
         let inp = global_state.lock().expect("RAND_2191486322").queue.pop();
         if let Some(mut inp) = inp {
             //If subprocess died restart forkserver
-            if process_input(&mut state, &mut inp, &config).is_err() {
+            if process_input(&mut state, &mut inp, &config, policy, &global_state).is_err() {
                 let args = vec![];
                 let fuzzer = Fuzzer::new(
                     path_to_bin_target.clone(),
@@ -150,6 +280,35 @@ fn fuzzing_thread(
                 .queue
                 .new_round();
         }
+
+        // Bandit weight update: every UPDATE_INTERVAL execs
+        if let Some(ref bandit_arc) = shared_bandit {
+            let exec = state.fuzzer.execution_count;
+            if exec >= last_bandit_exec + grammar_bandit::UPDATE_INTERVAL {
+                let (total_cov, total_crashes) = {
+                    let gs = global_state.lock().expect("bandit_cov");
+                    let cov = gs.bitmaps.get(&false)
+                        .map_or(0, |b| b.iter().filter(|&&x| x != 0).count());
+                    let crashes = gs.total_found_asan + gs.total_found_sig + gs.total_found_ubsan;
+                    (cov, crashes)
+                };
+                let cov_delta = total_cov.saturating_sub(last_bandit_coverage);
+                let crash_delta = total_crashes.saturating_sub(last_bandit_crashes);
+
+                let mut bandit = bandit_arc.lock().expect("bandit_lock");
+                bandit.observe_reward(cov_delta, crash_delta);
+                let mults = bandit.select_group();
+                bandit.log_state(mults.selected, total_cov);
+
+                // Apply multipliers to this thread's local Context
+                grammar_bandit::apply_multipliers(&mut state.ctx, &bandit, &mults);
+
+                last_bandit_exec = exec;
+                last_bandit_coverage = total_cov;
+                last_bandit_crashes = total_crashes;
+            }
+        }
+
         let mut stats = global_state.lock().expect("RAND_2403514078");
         stats.execution_count += state.fuzzer.execution_count - old_execution_count;
         old_execution_count = state.fuzzer.execution_count;
@@ -188,7 +347,6 @@ fn fuzzing_thread(
 }
 
 fn main() {
-    
     pyo3::prepare_freethreaded_python();
 
     //Parse parameters
@@ -214,6 +372,13 @@ fn main() {
                 .short("o")
                 .takes_value(true)
                 .help("Overwrite the workdir specified in the CONFIG"),
+        )
+        .arg(
+            Arg::with_name("policy")
+                .long("policy")
+                .takes_value(true)
+                .possible_values(&["uniform", "bandit", "dqn"])
+                .help("Grammar weight policy: uniform (default), bandit (Thompson Sampling), dqn"),
         )
         .arg(Arg::with_name("cmdline").multiple(true))
         .get_matches();
@@ -302,6 +467,11 @@ fn main() {
 
     my_context.initialize(config.max_tree_size);
 
+    // Override policy from CLI if provided
+    if let Some(policy_str) = matches.value_of("policy") {
+        config.policy = policy_str.to_string();
+    }
+
     //Create output folder
     let folders = [
         "/outputs/signaled",
@@ -314,6 +484,46 @@ fn main() {
             .expect("Could not create folder in workdir");
     }
 
+    // Build a shared DqnTrainer when rl_enabled=true.
+    // All fuzzing threads share the same trainer (replay buffer + network weights).
+    let dqn_cfg = dqn::DqnConfig {
+        batch_size: config.rl_batch_size,
+        replay_size: config.rl_replay_size,
+        gamma: config.rl_gamma,
+        lr: config.rl_lr as f64,
+        target_update_freq: config.rl_target_update,
+        train_interval: config.rl_train_interval,
+        epsilon_start: config.rl_epsilon_start,
+        epsilon_end: config.rl_epsilon_end,
+        epsilon_decay: config.rl_epsilon_decay as f32,
+    };
+    let dqn_trainer: Option<Arc<Mutex<DqnTrainer>>> = if config.rl_enabled {
+        match DqnTrainer::new(&dqn_cfg) {
+            Ok(trainer) => {
+                println!("RL enabled: DQN trainer initialised.");
+                Some(Arc::new(Mutex::new(trainer)))
+            }
+            Err(e) => {
+                eprintln!("WARNING: failed to initialise DqnTrainer ({:?}); RL disabled.", e);
+                None
+            }
+        }
+    } else {
+        None
+    };
+
+    // Build shared GrammarBandit when policy=bandit
+    let shared_bandit: Option<Arc<Mutex<GrammarBandit>>> = if config.policy == "bandit" {
+        let bandit = GrammarBandit::new(&my_context, &config.path_to_workdir);
+        println!("Bandit policy enabled: Thompson Sampling over {} grammar rule groups.", grammar_bandit::NUM_GROUPS);
+        Some(Arc::new(Mutex::new(bandit)))
+    } else {
+        if config.policy == "uniform" {
+            println!("Uniform policy: static grammar weights.");
+        }
+        None
+    };
+
     //Start fuzzing threads
     let mut thread_number = 0;
     let threads = (0..config.number_of_threads).map(|_| {
@@ -321,20 +531,33 @@ fn main() {
         let config = config.clone();
         let ctx = my_context.clone();
         let cks = shared_chunkstore.clone();
+        let trainer = dqn_trainer.clone();
+        let bandit = shared_bandit.clone();
         thread_number += 1;
         thread::Builder::new()
             .name(format!("fuzzer_{}", thread_number))
             .stack_size(config.thread_size)
-            .spawn(move || fuzzing_thread(state, config, ctx, cks))
+            .spawn(move || fuzzing_thread(state, config, ctx, cks, trainer, bandit))
     });
 
     //Start status thread
     let status_thread = {
         let global_state = shared.clone();
         let shared_cks = shared_chunkstore.clone();
+        let status_bandit = shared_bandit.clone();
+        let cov_csv_path = format!("{}/coverage.csv", config.path_to_workdir);
+        let policy_name = config.policy.clone();
         thread::Builder::new()
             .name("status_thread".to_string())
             .spawn(move || {
+                // Initialize coverage CSV
+                {
+                    let mut f = std::fs::File::create(&cov_csv_path)
+                        .expect("failed to create coverage.csv");
+                    writeln!(f, "timestamp_sec,total_edges,total_crashes,exec_count,policy")
+                        .expect("failed to write coverage CSV header");
+                }
+
                 let start_time = Instant::now();
                 thread::sleep(time::Duration::from_secs(1));
                 print!("{}[2J", 27 as char);
@@ -355,6 +578,8 @@ fn main() {
                     let last_timeout;
                     let total_found_asan;
                     let total_found_sig;
+                    let total_edges;
+                    let total_crashes;
                     {
                         let shared_state = global_state.lock().expect("RAND_597319831");
                         execution_count = shared_state.execution_count;
@@ -372,6 +597,11 @@ fn main() {
                         last_timeout = shared_state.last_timeout.clone();
                         total_found_asan = shared_state.total_found_asan;
                         total_found_sig = shared_state.total_found_sig;
+                        total_edges = shared_state.bitmaps.get(&false)
+                            .map_or(0, |b| b.iter().filter(|&&x| x != 0).count());
+                        total_crashes = shared_state.total_found_asan
+                            + shared_state.total_found_sig
+                            + shared_state.total_found_ubsan;
                     }
                     let secs = start_time.elapsed().as_secs();
                     let minutes = secs / 60;
@@ -381,9 +611,9 @@ fn main() {
                     print!("{}[H", 27 as char);
 
                     println!("         _   _             _   _ _             ");
-                    println!("        | \\ | |           | | (_) |            ");
-                    println!("        |  \\| | __ _ _   _| |_ _| |_   _ ___   ");
-                    println!("        | . ` |/ _` | | | | __| | | | | / __|  ");
+                    println!("        | \\ | |           | (_) |            ");
+                    println!("        |  \\| | __ _ _   _| |_ _| | |_ _ ___   ");
+                    println!("        | . ` |/ _` | | | | __| | | | | | / __|  ");
                     println!("        | |\\  | (_| | |_| | |_| | | |_| \\__ \\  ");
                     println!("        |_| \\_|\\__,_|\\__,_|\\__|_|_|\\__,_|___/  ");
                     println!("      ");
@@ -473,6 +703,29 @@ fn main() {
                         bits_found_by_havoc_rec
                     );
                     println!("------------------------------------------------------    ");
+
+                    // Bandit status display
+                    if let Some(ref bandit_ref) = status_bandit {
+                        if let Ok(bandit) = bandit_ref.lock() {
+                            println!(
+                                "Bandit weights:  {}                                      ",
+                                bandit.group_weights_summary()
+                            );
+                            println!("------------------------------------------------------    ");
+                        }
+                    }
+
+                    // Coverage CSV row (every second)
+                    {
+                        let secs_elapsed = start_time.elapsed().as_secs();
+                        if let Ok(mut f) = OpenOptions::new().append(true).open(&cov_csv_path) {
+                            let _ = writeln!(
+                                f, "{},{},{},{},{}",
+                                secs_elapsed, total_edges, total_crashes, execution_count, policy_name
+                            );
+                        }
+                    }
+
                     //println!("Global bitmap: {:?}", global_state.lock().expect("RAND_1887203473").bitmaps.get(&false).expect("RAND_1887203473"));
                     thread::sleep(time::Duration::from_secs(1));
                 }
