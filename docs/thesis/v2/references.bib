@@ -1,0 +1,223 @@
+% ============================================================
+% references.bib — Bibliography for DBMS-Nautilus thesis v2
+% ============================================================
+
+% --------------- Grammar-based / coverage-guided fuzzing ---------------
+
+@inproceedings{nautilus,
+  author    = {Cornelius Aschermann and Tommaso Frassetto and Thorsten Holz
+               and Patrick Jauernig and Christoph Cloosters and Ahmad-Reza Sadeghi},
+  title     = {{NAUTILUS}: Fishing for Deep Bugs with Grammars},
+  booktitle = {Proceedings of the Network and Distributed System Security Symposium (NDSS)},
+  year      = {2019},
+  publisher = {Internet Society},
+}
+
+@misc{afl,
+  author       = {Michal Zalewski},
+  title        = {American Fuzzy Lop},
+  year         = {2014},
+  howpublished = {\url{https://lcamtuf.coredump.cx/afl/}},
+}
+
+@inproceedings{superion,
+  author    = {Junjie Wang and Bihuan Chen and Lei Wei and Yang Liu},
+  title     = {Superion: Grammar-Aware Greybox Fuzzing},
+  booktitle = {Proceedings of the 41st International Conference on Software Engineering (ICSE)},
+  year      = {2019},
+  publisher = {IEEE / ACM},
+  pages     = {724--735},
+}
+
+@inproceedings{grimoire,
+  author    = {Tim Blazytko and Cornelius Aschermann and Moritz Schl{\"o}gel
+               and Ali Nawrocki and Steffen Kornmaier and Thorsten Holz},
+  title     = {{GRIMOIRE}: Synthesizing Structure while Fuzzing},
+  booktitle = {Proceedings of the 28th USENIX Security Symposium},
+  year      = {2019},
+  publisher = {USENIX Association},
+  pages     = {1985--2002},
+}
+
+@misc{libfuzzer,
+  author       = {{LLVM Project}},
+  title        = {{libFuzzer} -- a Library for Coverage-Guided Fuzz Testing},
+  howpublished = {\url{https://llvm.org/docs/LibFuzzer.html}},
+}
+
+@inproceedings{mopt,
+  author    = {Chenyang Lyu and Shouling Ji and Chao Zhang and Yuwei Li
+               and Wei-Han Lee and Yu Song and Raheem Beyah},
+  title     = {{MOPT}: Optimized Mutation Scheduling for Fuzzers},
+  booktitle = {Proceedings of the 28th USENIX Security Symposium},
+  year      = {2019},
+  publisher = {USENIX Association},
+  pages     = {1949--1966},
+}
+
+@inproceedings{ecofuzz,
+  author    = {Tai Yue and Pengfei Wang and Yong Tang and Enze Wang and Bo Yu
+               and Kai Lu and Xu Zhou},
+  title     = {{EcoFuzz}: Adaptive Energy-Saving Greybox Fuzzing as a Variant
+               of the Adversarial Multi-Armed Bandit},
+  booktitle = {Proceedings of the 29th USENIX Security Symposium},
+  year      = {2020},
+  publisher = {USENIX Association},
+  pages     = {2307--2324},
+}
+
+% --------------- Database fuzzing ---------------
+
+@inproceedings{squirrel,
+  author    = {Rui Zhong and Yongheng Chen and Hong Wen and Hangfan Zhang
+               and Wenke Lee and Dinghao Wu and Peng Liu},
+  title     = {Squirrel: Testing Database Management Systems with Language
+               Validity and Coverage Feedback},
+  booktitle = {Proceedings of the 2020 ACM SIGSAC Conference on Computer and
+               Communications Security (CCS)},
+  year      = {2020},
+  publisher = {ACM},
+  pages     = {955--970},
+}
+
+@misc{sqlsmith,
+  author       = {Andreas Seltenreich},
+  title        = {{SQLsmith}: A Random {SQL} Query Generator},
+  year         = {2015},
+  howpublished = {\url{https://github.com/anse1/sqlsmith}},
+}
+
+@inproceedings{sqlright,
+  author    = {Rui Zhong and Yongheng Chen and Hong Hu and Hangfan Zhang
+               and Wenke Lee and Dinghao Wu},
+  title     = {{SQLRight}: Enabling Coverage-based SQL Fuzzing with
+               Side-channel Analysis},
+  booktitle = {Proceedings of the 31st USENIX Security Symposium},
+  year      = {2022},
+  publisher = {USENIX Association},
+}
+
+@inproceedings{griffin,
+  author    = {Jie Fu and Jingzhou Fu and Qingchao Shen and Zhiyong Wu
+               and Jianwei Zhuge},
+  title     = {{Griffin}: Grammar-Free DBMS Fuzzing},
+  booktitle = {Proceedings of the 37th IEEE/ACM International Conference on
+               Automated Software Engineering (ASE)},
+  year      = {2022},
+  publisher = {ACM},
+}
+
+@inproceedings{sqlancer,
+  author    = {Manuel Rigger and Zhendong Su},
+  title     = {Testing Database Engines via Pivoted Query Synthesis},
+  booktitle = {Proceedings of the 14th USENIX Symposium on Operating Systems
+               Design and Implementation (OSDI)},
+  year      = {2020},
+  publisher = {USENIX Association},
+  pages     = {667--682},
+}
+
+@inproceedings{dynsql,
+  author    = {Zu-Ming Jiang and Jia-Ju Bai and Zhendong Su},
+  title     = {{DynSQL}: Stateful Fuzzing for Database Management Systems
+               with Complex and Valid SQL Query Generation},
+  booktitle = {Proceedings of the 32nd USENIX Security Symposium},
+  year      = {2023},
+  publisher = {USENIX Association},
+}
+
+% --------------- Target software ---------------
+
+@misc{sqlite,
+  author       = {D. Richard Hipp and Dan Kennedy and Joe Mistachkin},
+  title        = {{SQLite}},
+  year         = {2000},
+  note         = {Version 3.x},
+  howpublished = {\url{https://www.sqlite.org/}},
+}
+
+% --------------- Sanitizers / oracles ---------------
+
+@inproceedings{asan,
+  author    = {Konstantin Serebryany and Derek Bruening and Alexander Potapenko
+               and Dmitriy Vyukov},
+  title     = {{AddressSanitizer}: A Fast Address Sanity Checker},
+  booktitle = {Proceedings of the 2012 USENIX Annual Technical Conference (ATC)},
+  year      = {2012},
+  publisher = {USENIX Association},
+  pages     = {309--318},
+}
+
+% --------------- Weighted sampling algorithm ---------------
+
+@article{loadeddice,
+  author  = {Michael D. Vose},
+  title   = {A Linear Algorithm for Generating Random Numbers with a Given
+             Distribution},
+  journal = {IEEE Transactions on Software Engineering},
+  volume  = {17},
+  number  = {9},
+  year    = {1991},
+  pages   = {972--975},
+}
+
+% --------------- Survey ---------------
+
+@article{fuzzingsurvey,
+  author  = {Valentin J. M. Man{\`e}s and HyungSeok Han and Choongwoo Han
+             and Sang Kil Cha and Manuel Egele and Edward J. Schwartz
+             and Maverick Woo},
+  title   = {The Art, Science, and Engineering of Fuzzing: {A} Survey},
+  journal = {IEEE Transactions on Software Engineering},
+  volume  = {47},
+  number  = {11},
+  year    = {2021},
+  pages   = {2312--2331},
+}
+
+% --------------- CVE entries ---------------
+
+@misc{cve201919646,
+  author       = {{MITRE}},
+  title        = {{CVE-2019-19646}},
+  year         = {2019},
+  howpublished = {\url{https://nvd.nist.gov/vuln/detail/CVE-2019-19646}},
+  note         = {SQLite \texttt{expr.c} aggregate query infinite loop},
+}
+
+@misc{cve202013434,
+  author       = {{MITRE}},
+  title        = {{CVE-2020-13434}},
+  year         = {2020},
+  howpublished = {\url{https://nvd.nist.gov/vuln/detail/CVE-2020-13434}},
+  note         = {SQLite \texttt{printf} integer overflow},
+}
+
+@misc{cve20209327,
+  author       = {{MITRE}},
+  title        = {{CVE-2020-9327}},
+  year         = {2020},
+  howpublished = {\url{https://nvd.nist.gov/vuln/detail/CVE-2020-9327}},
+  note         = {SQLite generated column uninitialized pointer},
+}
+
+@misc{cve202013435,
+  author       = {{MITRE}},
+  title        = {{CVE-2020-13435}},
+  year         = {2020},
+  howpublished = {\url{https://nvd.nist.gov/vuln/detail/CVE-2020-13435}},
+}
+
+@misc{cve202013871,
+  author       = {{MITRE}},
+  title        = {{CVE-2020-13871}},
+  year         = {2020},
+  howpublished = {\url{https://nvd.nist.gov/vuln/detail/CVE-2020-13871}},
+}
+
+@misc{cve202015358,
+  author       = {{MITRE}},
+  title        = {{CVE-2020-15358}},
+  year         = {2020},
+  howpublished = {\url{https://nvd.nist.gov/vuln/detail/CVE-2020-15358}},
+}

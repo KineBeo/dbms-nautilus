@@ -1,0 +1,16 @@
+\begin{center}
+\textbf{\large{Tóm tắt}}
+\end{center}
+\addcontentsline{toc}{chapter}{Tóm tắt}
+
+\begin{small}
+
+Hệ quản trị cơ sở dữ liệu (DBMS) là thành phần hạ tầng quan trọng, và các lỗ hổng trong chúng đặt ra mối đe dọa an ninh nghiêm trọng. Phát hiện lỗ hổng tự động thông qua kiểm thử mờ (fuzzing) là một hướng tiếp cận đầy triển vọng, tuy nhiên các công cụ fuzzing dựa trên ngữ pháp hiện tại áp dụng lấy mẫu ngẫu nhiên đồng đều trên các luật sinh, dẫn đến lãng phí ngân sách đột biến vào các đường dẫn cú pháp có giá trị thấp.
+
+Khóa luận này trình bày DBMS-Nautilus, một hệ thống kiểm thử mờ hộp xám dựa trên ngữ pháp nhắm vào SQLite. Một ngữ pháp nguyên thủy cấu trúc gồm 520 luật sinh mã hóa các mẫu SQL được biết là kích hoạt các lớp lỗ hổng -- bao gồm tràn số nguyên, sử dụng sau giải phóng, và lỗi bộ nhớ -- mà không mã hóa cứng các đầu vào chứng minh khái niệm cụ thể. Ngữ pháp phát triển qua bốn phiên bản (v3.0 đến v3.3), mỗi phiên bản được cải tiến dựa trên bằng chứng từ phân tích phủ mã và sự cố.
+
+Thực nghiệm trên 4 phiên bản SQLite chứa 6 CVE đã xác nhận cho thấy DBMS-Nautilus phát hiện lại 3 trong 6 CVE mục tiêu thông qua tổ hợp ngữ pháp, và phát hiện thêm 7 lớp lỗi mới chưa được báo cáo trước đó trên 89 mẫu sự cố duy nhất. Phân tích khoảng trống ngữ pháp cho thấy 4 trong 6 CVE không thể đạt được cho đến khi các nguyên thủy cấu trúc cho hàm cửa sổ và cột tự tham chiếu được thêm vào phiên bản v3.2, chứng minh rằng thiết kế ngữ pháp là yếu tố quyết định hàng đầu cho khả năng phát hiện lỗ hổng.
+
+\vspace*{1cm}
+\textbf{Từ khóa}: Kiểm thử mờ dựa trên ngữ pháp, Kiểm thử mờ hộp xám, An ninh DBMS, Phát hiện lỗ hổng, SQLite
+\end{small}
