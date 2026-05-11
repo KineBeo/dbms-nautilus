@@ -5,4 +5,4 @@ if [ ! -f "$HARNESS" ]; then
   echo "Harness not found: $HARNESS" >&2
   exit 1
 fi
-"$HARNESS" trigger.sql
+"$HARNESS" test_trigger.sql
