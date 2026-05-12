@@ -39,6 +39,43 @@ In Listing~\ref{lst:sql-grammar}, the non-terminal \texttt{Stmt} can derive eith
 \texttt{Stmt} $\to$ \texttt{SELECT \{Expr\} FROM \{Table\}} $\to$ \texttt{SELECT \{Func\}(\{Expr\}) FROM t1} $\to$ \texttt{SELECT printf(\{Expr\}) FROM t1} $\to$ \texttt{SELECT printf(c1) FROM t1}
 \end{center}
 
+Figure~\ref{fig:derivation-tree} shows the corresponding derivation tree. Each internal node is labelled with a non-terminal, and its children correspond to the symbols on the right-hand side of the production rule applied at that node. Leaf nodes carry terminal symbols. Reading the leaves left to right produces the generated string \texttt{SELECT printf(c1) FROM t1}.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    level distance=1.3cm,
+    sibling distance=2.2cm,
+    every node/.style={font=\small},
+    nonterminal/.style={rectangle, rounded corners=3pt, draw=black!60,
+        fill=blue!8, minimum width=1.2cm, minimum height=0.6cm,
+        align=center, font=\small\itshape},
+    terminal/.style={font=\small\ttfamily, text=black!80},
+    edge from parent/.style={draw=black!50, thick},
+]
+\node[nonterminal] {Stmt}
+    child { node[terminal] {SELECT} }
+    child { node[nonterminal] {Expr}
+        child { node[nonterminal] {Func}
+            child { node[terminal] {printf} }
+        }
+        child { node[terminal] {(} }
+        child { node[nonterminal] {Expr}
+            child { node[nonterminal] {Col}
+                child { node[terminal] {c1} }
+            }
+        }
+        child { node[terminal] {)} }
+    }
+    child { node[terminal] {FROM} }
+    child { node[nonterminal] {Table}
+        child { node[terminal] {t1} }
+    };
+\end{tikzpicture}
+\caption{Derivation tree for the SQL query \texttt{SELECT printf(c1) FROM t1}, generated from the grammar in Listing~\ref{lst:sql-grammar}. Internal nodes (rounded boxes) are non-terminals; leaf nodes are terminal symbols. The generated string is obtained by reading leaves left to right.}
+\label{fig:derivation-tree}
+\end{figure}
+
 The key property is that every string derivable from this grammar is a syntactically valid SQL fragment. By designing the grammar to cover relevant SQL constructs --- window functions, generated columns, subqueries, set operations --- the generation process is guaranteed to produce inputs that pass the DBMS parser and reach the deeper query planning and execution stages where vulnerabilities reside.
 
 Once a derivation tree exists, \textit{tree-level mutations} can generate new inputs while preserving syntactic validity. Three fundamental mutations are commonly employed:
