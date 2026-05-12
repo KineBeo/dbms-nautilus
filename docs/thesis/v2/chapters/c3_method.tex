@@ -116,8 +116,7 @@ Triage Pipeline & Python & \texttt{triage/} & Crash dedup, CVE matching, reporti
 \end{table}
 
 %% ====================================================================
-\section{Structural Primitives Philosophy}
-\label{sec:primitives-philosophy}
+\section{Grammar Design}
 \label{sec:grammar-design}
 %% ====================================================================
 
@@ -135,19 +134,15 @@ Constraint~(a) prevents the fuzzer from trivially replaying known attacks, ensur
 
 The tension between constraints (b) and (c) is the central design challenge. Too few non-terminals and the fuzzer lacks the vocabulary to reach target vulnerabilities. Too many non-terminals and the input space becomes so large that the probability of assembling the right combination within a finite campaign drops below a useful threshold. The grammar evolution process described in Section~\ref{sec:grammar-evolution} addresses this tension through iterative refinement guided by experimental feedback.
 
-%% ====================================================================
-\section{Layer Decomposition}
+\subsection{Two-Layer Architecture}
 \label{sec:layer-decomposition}
-%% ====================================================================
 
 The grammar employs a two-layer architecture that separates atomic SQL constructs from composed vulnerability-triggering patterns.
 
-\subsection{Layer 1: SQL Atoms}
-
+\paragraph{Layer 1: SQL Atoms.}
 Layer~1 defines the SQL primitives: over 30 expression alternatives (arithmetic, comparison, logical, string, subquery), SELECT/FROM/WHERE/JOIN clauses, window functions with frame specifications, common table expressions, DML statements (INSERT, UPDATE, DELETE), DDL statements (CREATE TABLE, VIEW, INDEX, TRIGGER), function calls (aggregate, scalar, window-specific), and terminal literals (integers, floats, strings, blobs, boundary values). These constitute the atomic building blocks of SQL.
 
-\subsection{Layer 2: Composed Shapes}
-
+\paragraph{Layer 2: Composed Shapes.}
 Layer~2 composes Layer~1 primitives into four high-level shapes. The \texttt{Schema-Setup} non-terminal provides six schema construction alternatives. The \texttt{Stress-Query} non-terminal provides eight query patterns designed to exercise complex query planning paths. The \texttt{Validation-Op} non-terminal provides four verification operations that check internal database consistency. The \texttt{Boundary-Func-Call} non-terminal provides function calls with boundary values targeting integer overflow and buffer overread conditions.
 
 Listing~\ref{lst:schema-setup} shows the Layer~2 Schema-Setup alternatives. Each alternative creates a different database schema topology that enables distinct classes of vulnerability-triggering queries. The weights assigned to each rule reflect the empirical importance of each schema pattern for triggering bugs: the generated-column schema (S2) receives the highest weight of 3.0 because generated columns are involved in two of the six target CVEs.
