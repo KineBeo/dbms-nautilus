@@ -1,13 +1,13 @@
 \chapter{Experiments and Evaluation}
 \label{chap:experiments}
 
-This chapter presents the empirical evaluation of DBMS-Nautilus, structured around two research questions that address the effectiveness of compositional grammar engineering for vulnerability discovery. Section~\ref{sec:setup} describes the experimental setup, including hardware, campaign parameters, and evaluation metrics. Section~\ref{sec:rq1} investigates whether the grammar can rediscover known CVEs through compositional generation of structural primitives. Section~\ref{sec:rq2} examines whether the fuzzer discovers previously unreported bugs beyond the target CVEs. Section~\ref{sec:coverage} presents coverage analysis across grammar versions. Section~\ref{sec:threats} discusses threats to validity.
+This chapter presents the empirical evaluation of DBMS-Nautilus, structured around two research questions that address the effectiveness of compositional grammar engineering for vulnerability discovery. Section~\ref{sec:setup} describes the experimental setup, including hardware, campaign parameters, and evaluation metrics. Section~\ref{sec:rq1} investigates whether the grammar can rediscover known CVEs through compositional generation of structural primitives. Section~\ref{sec:rq2} examines whether the fuzzer discovers previously unreported bugs beyond the target CVEs. Section~\ref{sec:threats} discusses threats to validity.
 
 
 \section{Experimental Setup}
 \label{sec:setup}
 
-All experiments were conducted on a standard development workstation equipped with an Intel Core i7 processor, 16~GB of RAM, and running Ubuntu 22.04 LTS. The fuzzer was compiled with Rust 1.77 in release mode, and all SQLite harness binaries were compiled with Clang~14 using AddressSanitizer (ASan) and UndefinedBehaviorSanitizer (UBSan) instrumentation as described in Chapter~\ref{chap:method}.
+All experiments were conducted on a standard development workstation equipped with an Intel Core i7 processor, 16~GB of RAM, and running Ubuntu 22.04 LTS. The fuzzer was compiled with Rust 1.77 in release mode, and all SQLite harness binaries were compiled with Clang~14 using AddressSanitizer (ASan) and UndefinedBehaviorSanitizer (UBSan) instrumentation. ASan detects memory safety violations (buffer overflows, use-after-free) and causes the process to exit with code 223. UBSan detects undefined behavior (integer overflow, null pointer dereference) and causes exit code 1. SQLite debug assertions fire SIGTRAP (signal~5), detected as exit code 133. Normal execution and SQL semantic errors produce exit code 0 and are not classified as bugs.
 
 Table~\ref{tab:params} summarizes the campaign parameters used across all experiments. Campaign durations ranged from 15 to 60 minutes depending on the experiment's objective: shorter campaigns for iterative grammar development and ablation, longer campaigns for coverage saturation analysis and final evaluation. A single fuzzing thread was used in all campaigns to eliminate concurrency-related variance and ensure reproducibility.
 
@@ -50,7 +50,7 @@ The first research question evaluates whether the compositional grammar approach
 
 \subsection{Methodology}
 
-Campaigns were run on four CVE-bearing SQLite versions (3.30.1, 3.31.1, 3.32.0, 3.32.2) using grammar versions v3.0 through v3.2. Each crash was triaged through the automated pipeline described in Chapter~\ref{chap:method}: the crashing input was replayed against the corresponding SQLite harness with ASan/UBSan instrumentation, the stack trace was extracted, and a stack hash was computed from the top 5 frames. Crashes were then checked against the CVE signature library, which contains structural regex patterns derived from the published stack traces of each target CVE. A crash was counted as a CVE rediscovery if its stack trace matched the corresponding CVE signature with at least 80\% fidelity (matching frames divided by total signature frames).
+Campaigns were run on four CVE-bearing SQLite versions (3.30.1, 3.31.1, 3.32.0, 3.32.2) using grammar versions v3.0 through v3.2. Each crash was triaged through an automated pipeline: the crashing input was replayed against the corresponding SQLite harness with ASan/UBSan instrumentation, the stack trace was extracted, and a stack hash was computed from the top 5 frames (filtering out system library and sanitizer runtime frames to retain only SQLite-internal frames). Crashes were then checked against the CVE signature library, which contains structural regex patterns derived from the published stack traces of each target CVE. A crash was counted as a CVE rediscovery if its stack trace matched the corresponding CVE signature with at least 80\% fidelity (matching frames divided by total signature frames).
 
 \subsection{Results}
 
@@ -203,35 +203,6 @@ This bug class contains 21 unique hashes across 2 versions (3.30.1 and 3.31.1). 
 To confirm that the discovered bugs are genuine defects in the tested SQLite versions and not artifacts of the harness or grammar, a verification campaign was conducted on SQLite 3.53.0 (the latest stable release at the time of evaluation). A 1-hour campaign with the v3.3 grammar (520 rules, including JSON/JSONB expansion) on SQLite 3.53.0 produced zero crashes, confirming that all 10 bug classes have been patched in the current release. This provides evidence that the discovered bugs are real defects that existed in the historical versions and were subsequently fixed by the SQLite development team.
 
 As a complementary check, a 1-minute verification run on SQLite 3.31.1 with the same v3.3 grammar produced 12 crashes and 3 unique UBSan bug classes, confirming that the grammar remains effective at triggering known vulnerabilities in the older versions.
-
-
-\section{Coverage Analysis}
-\label{sec:coverage}
-
-This section examines how grammar evolution affects code coverage, providing insight into the relationship between grammar expressiveness and the fraction of the target program that the fuzzer exercises.
-
-\subsection{Coverage Improvement Across Grammar Versions}
-
-The grammar evolution from v3.0 to v3.3 produced measurable improvements in code coverage. On SQLite 3.31.1, grammar v3.0 established a baseline edge count representing the code paths reachable through the initial set of structural primitives (basic statement shapes, schema templates, and query types). Version v3.2's addition of window function and generated column primitives expanded the reachable code, particularly in the window function engine (\texttt{window.c}), the query planner's column resolution logic, and the generated column evaluation paths. These additions directly enabled the discovery of BC002 (CVE-2020-13871) and BC005, both of which reside in window function code paths that were unreachable under v3.0.
-
-On SQLite 3.53.0, the v3.3 grammar achieved 30{,}627 edges in a 1-hour campaign --- a 17\% improvement over the 26{,}210 edges achieved by v3.2 on the same version and campaign duration. This improvement of 4{,}417 new edges is directly attributable to the 45 JSON/JSONB function rules added in v3.3, which exercise the \texttt{json.c} module's parsing, path traversal, and modification functions. The coverage increase confirms that the JSON grammar expansion successfully reaches code paths that were previously untouched by the fuzzer.
-
-\subsection{Coverage Saturation Dynamics}
-
-On SQLite 3.53.0 with the v3.3 grammar during a 1-hour campaign, coverage exhibited a characteristic logarithmic saturation pattern:
-
-\begin{itemize}
-    \item \textbf{50\% of final coverage} was reached within 10 seconds.
-    \item \textbf{90\% of final coverage} was reached within 20 minutes.
-    \item \textbf{95\% of final coverage} was reached within 37 minutes.
-    \item \textbf{99\% of final coverage} was reached within 50 minutes.
-\end{itemize}
-
-This saturation curve is characteristic of grammar-based fuzzers operating on well-structured targets. The grammar quickly exercises the main code paths --- the SQL parser, query planner, VDBE execution engine, and primary storage routines --- within the first seconds of the campaign. Subsequent coverage gains come from increasingly rare production rule combinations that reach less-frequently-exercised code paths such as edge cases in type coercion, unusual JOIN orderings, or rarely-used aggregate function configurations. The diminishing returns after 20 minutes suggest that for grammar development iterations, 15-minute campaigns provide sufficient feedback on whether new grammar rules reach their intended code paths, while longer campaigns are needed primarily for discovering bugs that require rare compositional combinations (as demonstrated by BC010/CVE-2020-9327, which was found only once across all campaigns).
-
-\subsection{Cross-Version Coverage}
-
-Edge counts vary significantly across SQLite versions, reflecting differences in code size and feature availability. Older versions (3.30.1) have fewer total reachable edges than newer versions (3.32.2, 3.53.0) due to the accumulation of features --- JSON functions, new window function variants, and additional virtual table implementations --- across releases. However, the relative coverage improvement from grammar evolution (v3.0 to v3.2) was consistent in direction across all tested versions: each version showed increased edge coverage when the grammar was expanded with new structural primitives. This consistency suggests that the structural-primitive methodology generalizes across SQLite releases --- the same grammar additions that expand coverage on one version also expand coverage on other versions, because the added primitives exercise code modules (window functions, generated columns) that are present across the tested version range.
 
 
 \section{Threats to Validity}
