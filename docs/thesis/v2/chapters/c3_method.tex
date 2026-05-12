@@ -160,7 +160,84 @@ The grammar employs a two-layer architecture that separates atomic SQL construct
 Layer~1 defines the SQL primitives: over 30 expression alternatives (arithmetic, comparison, logical, string, subquery), SELECT/FROM/WHERE/JOIN clauses, window functions with frame specifications, common table expressions, DML statements (INSERT, UPDATE, DELETE), DDL statements (CREATE TABLE, VIEW, INDEX, TRIGGER), function calls (aggregate, scalar, window-specific), and terminal literals (integers, floats, strings, blobs, boundary values). These constitute the atomic building blocks of SQL.
 
 \paragraph{Layer 2: Composed Shapes.}
-Layer~2 composes Layer~1 primitives into four high-level shapes. The \texttt{Schema-Setup} non-terminal provides six schema construction alternatives. The \texttt{Stress-Query} non-terminal provides eight query patterns designed to exercise complex query planning paths. The \texttt{Validation-Op} non-terminal provides four verification operations that check internal database consistency. The \texttt{Boundary-Func-Call} non-terminal provides function calls with boundary values targeting integer overflow and buffer overread conditions.
+Layer~2 composes Layer~1 primitives into four high-level shapes. The \texttt{Schema-Setup} non-terminal provides six schema construction alternatives. The \texttt{Stress-Query} non-terminal provides eight query patterns designed to exercise complex query planning paths. The \texttt{Validation-Op} non-terminal provides four verification operations that check internal database consistency. The \texttt{Boundary-Func-Call} non-terminal provides function calls with boundary values targeting integer overflow and buffer overread conditions. Figure~\ref{fig:two-layer} illustrates this composition hierarchy.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    node distance=0.8cm and 0.6cm,
+    every node/.style={font=\small},
+    l1box/.style={rectangle, rounded corners=3pt, draw=black!50, thick,
+        fill=blue!8, minimum width=2.2cm, minimum height=0.7cm, align=center,
+        font=\small},
+    l2box/.style={rectangle, rounded corners=3pt, draw=black!50, thick,
+        fill=green!10, minimum width=2.6cm, minimum height=0.8cm, align=center,
+        font=\small},
+    topbox/.style={rectangle, rounded corners=4pt, draw=black!70, thick,
+        fill=orange!12, minimum width=2.8cm, minimum height=0.9cm, align=center,
+        font=\small\bfseries},
+    comp/.style={->, >=stealth, thick, color=black!60},
+    optcomp/.style={->, >=stealth, thick, color=black!40, dashed},
+    uses/.style={->, >=stealth, color=black!40, thin},
+]
+    % === Top: Sql-Stmt ===
+    \node[topbox] (sqlstmt) {Sql-Stmt};
+
+    % === Layer 2: Composed Shapes (4 boxes in 2x2 grid) ===
+    \node[l2box, below left=1.4cm and 2.4cm of sqlstmt] (schema) {\texttt{Schema-Setup}};
+    \node[l2box, right=0.5cm of schema] (stress) {\texttt{Stress-Query}};
+    \node[l2box, right=0.5cm of stress] (valid) {\texttt{Validation-Op}};
+    \node[l2box, right=0.5cm of valid] (boundary) {\texttt{Boundary-Func-Call}};
+
+    % === Layer 1: SQL Atoms (8 boxes in 2 rows) ===
+    \node[l1box, below left=1.8cm and 3.2cm of stress] (expr) {\texttt{Expr}};
+    \node[l1box, right=0.3cm of expr] (tname) {\texttt{Table-Name}};
+    \node[l1box, right=0.3cm of tname] (coldef) {\texttt{Col-Def}};
+    \node[l1box, right=0.3cm of coldef] (colname) {\texttt{Col-Name}};
+    \node[l1box, right=0.3cm of colname] (funccall) {\texttt{Func-Call}};
+    \node[l1box, below=0.3cm of expr] (joinc) {\texttt{Join-Clause}};
+    \node[l1box, right=0.3cm of joinc] (winfunc) {\texttt{Window-Func}};
+    \node[l1box, right=0.3cm of winfunc] (literal) {\texttt{Literal}};
+    \node[font=\small\itshape, color=black!50, right=0.3cm of literal] (ellipsis) {$\cdots$ (30+ non-terminals)};
+
+    % === Sql-Stmt → Layer 2 connections ===
+    \draw[comp] (sqlstmt.south) -- ++(0,-0.4) -| (schema.north);
+    \draw[comp] (sqlstmt.south) -- ++(0,-0.4) -| (stress.north);
+    \draw[optcomp] (sqlstmt.south) -- ++(0,-0.4) -| (valid.north);
+    \draw[optcomp] (sqlstmt.south) -- ++(0,-0.4) -| (boundary.north);
+
+    % === Layer 2 → Layer 1 connections ===
+    % Schema-Setup → Col-Def, Table-Name, Expr
+    \draw[uses] (schema.south) -- ++(0,-0.3) -| (coldef.north);
+    \draw[uses] (schema.south) -- ++(0,-0.3) -| (tname.north);
+    \draw[uses] (schema.south) -- ++(0,-0.3) -| (expr.north);
+
+    % Stress-Query → Expr, Table-Name, Join-Clause, Window-Func
+    \draw[uses] (stress.south) -- ++(0,-0.3) -| (expr.north);
+    \draw[uses] (stress.south) -- ++(0,-0.3) -| (tname.north);
+    \draw[uses] (stress.south) -- ++(0,-0.5) -| (joinc.north);
+    \draw[uses] (stress.south) -- ++(0,-0.5) -| (winfunc.north);
+
+    % Validation-Op → Expr, Table-Name
+    \draw[uses] (valid.south) -- ++(0,-0.3) -| (expr.north);
+    \draw[uses] (valid.south) -- ++(0,-0.3) -| (tname.north);
+
+    % Boundary-Func-Call → Func-Call, Literal
+    \draw[uses] (boundary.south) -- ++(0,-0.5) -| (funccall.north);
+    \draw[uses] (boundary.south) -- ++(0,-0.5) -| (literal.north);
+
+    % === Layer zone backgrounds ===
+    \begin{scope}[on background layer]
+        \node[fit=(schema)(boundary), rounded corners=8pt, draw=black!15, fill=green!4,
+            inner sep=10pt, label={[font=\scriptsize\bfseries, text=black!50]above left:Layer 2: Composed Shapes}] {};
+        \node[fit=(expr)(funccall)(joinc)(ellipsis), rounded corners=8pt, draw=black!15, fill=blue!4,
+            inner sep=10pt, label={[font=\scriptsize\bfseries, text=black!50]above left:Layer 1: SQL Atoms}] {};
+    \end{scope}
+
+\end{tikzpicture}
+\caption{Two-layer grammar architecture. The start symbol \texttt{Sql-Stmt} composes Layer~2 shapes (solid arrows for primary, dashed for optional). Each Layer~2 shape references Layer~1 atoms (thin arrows). Layer~1 contains over 30 non-terminals defining SQL primitives; eight representative ones are shown.}
+\label{fig:two-layer}
+\end{figure}
 
 Listing~\ref{lst:schema-setup} shows the Layer~2 Schema-Setup alternatives. Each alternative creates a different database schema topology that enables distinct classes of vulnerability-triggering queries. The weights assigned to each rule reflect the empirical importance of each schema pattern for triggering bugs: the generated-column schema (S2) receives the highest weight of 3.0 because generated columns are involved in two of the six target CVEs.
 
