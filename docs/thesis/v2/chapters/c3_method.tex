@@ -13,28 +13,66 @@ DBMS-Nautilus is a closed-loop fuzzing pipeline where coverage feedback from eac
 \begin{figure}[htbp]
 \centering
 \begin{tikzpicture}[
-    node distance=1.4cm,
-    comp/.style={rectangle, draw, rounded corners, minimum width=3.2cm, minimum height=1.0cm, text centered, align=center, font=\small},
-    arrow/.style={->, >=stealth, thick},
-    lbl/.style={font=\scriptsize, fill=white, inner sep=1pt}
+    node distance=1.6cm and 2.8cm,
+    box/.style={rectangle, draw=black!70, rounded corners=4pt, thick,
+        minimum width=3.4cm, minimum height=1.6cm, align=center,
+        font=\small, fill=#1, inner sep=6pt},
+    box/.default={blue!6},
+    numbox/.style={circle, fill=black!75, text=white, font=\footnotesize\bfseries,
+        inner sep=0pt, minimum size=16pt},
+    dataflow/.style={->, >=stealth, thick, color=black!70},
+    feedback/.style={->, >=stealth, thick, color=black!40, dashed},
+    lbl/.style={font=\scriptsize, fill=white, inner sep=2pt, text=black!70},
 ]
-    % Components in a flow
-    \node[comp] (grammar) {\textbf{1} Grammar Engine\\(Python DSL + PyO3)};
-    \node[comp, right=2.0cm of grammar] (gen) {\textbf{2} Generation\\+ Mutation};
-    \node[comp, below=of gen] (exec) {\textbf{3} Fork Server\\+ SQLite Harness};
-    \node[comp, left=2.0cm of exec] (feedback) {\textbf{4} Coverage\\Feedback + Queue};
-    \node[comp, below=1.8cm of feedback] (triage) {\textbf{5} Triage Pipeline};
+    % === Top row: components 1 and 2 ===
+    \node[box] (grammar) {Grammar Engine\\[2pt]{\scriptsize Python DSL + PyO3}};
+    \node[box, right=of grammar] (gen) {Generation\\+ Mutation\\[2pt]{\scriptsize tree ops + unparse}};
 
-    % Main loop
-    \draw[arrow] (grammar) -- node[lbl, above] {rules + weights} (gen);
-    \draw[arrow] (gen) -- node[lbl, right] {SQL string (file)} (exec);
-    \draw[arrow] (exec) -- node[lbl, below] {bitmap + exit status} (feedback);
-    \draw[arrow] (feedback) -- node[lbl, left] {interesting inputs} (gen);
+    % === Right side: component 3 ===
+    \node[box=orange!8, below=of gen] (exec) {Fork Server\\+ SQLite Harness\\[2pt]{\scriptsize ASan + UBSan}};
 
-    % Triage branch
-    \draw[arrow] (exec.south) -- ++(0,-0.5) -| node[lbl, below left] {crashes} (triage.east);
+    % === Left side: component 4 ===
+    \node[box=green!8, below=of grammar] (feedback) {Coverage Feedback\\+ Queue\\[2pt]{\scriptsize shared memory bitmap}};
+
+    % === Below: component 5 (triage) ===
+    \node[box=red!6, below=1.2cm of exec] (triage) {Triage Pipeline\\[2pt]{\scriptsize dedup + CVE matching}};
+
+    % === Numbered circles ===
+    \node[numbox] at ([xshift=-12pt, yshift=12pt]grammar.north west) {1};
+    \node[numbox] at ([xshift=-12pt, yshift=12pt]gen.north west) {2};
+    \node[numbox] at ([xshift=-12pt, yshift=12pt]exec.north west) {3};
+    \node[numbox] at ([xshift=-12pt, yshift=12pt]feedback.north west) {4};
+    \node[numbox] at ([xshift=-12pt, yshift=12pt]triage.north west) {5};
+
+    % === Main loop arrows (clockwise: 1→2→3→4→2) ===
+    % 1 → 2: rules + weights
+    \draw[dataflow] (grammar.east) -- node[lbl, above] {rules + weights} (gen.west);
+
+    % 2 → 3: SQL string
+    \draw[dataflow] (gen.south) -- node[lbl, right] {SQL string} (exec.north);
+
+    % 3 → 4: bitmap + exit status
+    \draw[dataflow] (exec.west) -- node[lbl, below] {bitmap + exit} (feedback.east);
+
+    % 4 → 2: feedback loop (interesting inputs)
+    \draw[feedback] (feedback.north) -- node[lbl, left] {interesting inputs} (grammar.south);
+    \draw[feedback] (feedback.north east) -- node[lbl, above right=-1pt, pos=0.4] {queue} (gen.south west);
+
+    % === Crash branch: 3 → 5 ===
+    \draw[dataflow, color=red!50!black!60] (exec.south) -- node[lbl, right] {crashes} (triage.north);
+
+    % === Dashed box around the feedback loop ===
+    \begin{scope}[on background layer]
+        \draw[rounded corners=10pt, draw=black!20, fill=black!2, thick]
+            ([xshift=-22pt, yshift=22pt]grammar.north west)
+            rectangle
+            ([xshift=22pt, yshift=-10pt]feedback.south east -| exec.east);
+    \end{scope}
+    \node[font=\scriptsize\itshape, text=black!40]
+        at ([yshift=28pt]$(grammar.north)!0.5!(gen.north)$) {fuzzing loop};
+
 \end{tikzpicture}
-\caption{Architecture of DBMS-Nautilus. Components 1--4 form a closed feedback loop: the grammar defines the input space, generation constructs SQL from derivation trees, the fork server executes each input against an instrumented SQLite harness, and coverage feedback retains inputs that discover new edges. Component 5 analyzes crashes after each campaign.}
+\caption{Architecture of DBMS-Nautilus. Components \textbf{1}--\textbf{4} form a closed feedback loop (dashed region): the grammar defines the input space, generation constructs SQL from derivation trees, the fork server executes each input against an instrumented SQLite build, and coverage feedback retains inputs that discover new edges. Component \textbf{5} analyzes crashes after each campaign.}
 \label{fig:architecture}
 \end{figure}
 
