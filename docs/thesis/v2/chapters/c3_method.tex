@@ -3,12 +3,14 @@
 
 As discussed in Chapter~\ref{chap:background}, byte-level fuzzers cannot effectively test database engines because random mutations produce parser-rejected inputs that never reach deep program logic. Grammar-based fuzzers solve the syntactic validity problem but treat all SQL constructs equally, with no knowledge of which structural patterns are most likely to trigger vulnerabilities. This chapter presents DBMS-Nautilus, a grammar-based greybox fuzzing system that combines Nautilus-style coverage-guided generation~\cite{nautilus} with a domain-specific SQL grammar engineered to target vulnerability-triggering code paths in SQLite.
 
-Section~\ref{sec:overview} describes the system architecture. Section~\ref{sec:grammar-design} presents the grammar design methodology, which constitutes the core contribution of this work. Section~\ref{sec:crash-pipeline} covers the crash analysis pipeline.
+Section~\ref{sec:overview} provides a high-level overview of the system and its components. Section~\ref{sec:grammar-design} presents the grammar design methodology, which constitutes the core contribution of this work. Section~\ref{sec:grammar-evolution} describes the evidence-driven process of iterative grammar refinement.
 
 \section{System Overview}
 \label{sec:overview}
 
-DBMS-Nautilus is a closed-loop fuzzing pipeline where coverage feedback from each execution guides subsequent input generation. The system consists of five components, illustrated in Figure~\ref{fig:architecture}: a grammar engine that defines the space of possible SQL inputs, a generation and mutation module that constructs derivation trees, an execution layer (fork server and harness) that runs each input against an instrumented SQLite build, a coverage feedback mechanism that identifies inputs exercising new code paths, and a triage pipeline that analyzes crashes after each campaign.
+DBMS-Nautilus is a grammar-based greybox fuzzer designed specifically for database engines. It combines the coverage-guided fuzzing loop of Nautilus~\cite{nautilus} with a domain-specific SQL grammar that encodes structural patterns associated with known vulnerability classes. Where existing SQL fuzzers such as SQLsmith~\cite{sqlsmith} generate random queries against an existing database, or Squirrel~\cite{squirrel} maintains an internal schema model to ensure semantic validity, DBMS-Nautilus takes a different approach: the grammar itself generates complete, self-contained SQL programs that create their own schema, populate data, and issue queries --- all starting from an empty in-memory database. This self-contained design means every test case is independently reproducible, requires no external database state, and can be replayed in isolation for crash confirmation.
+
+The system consists of five components organized into a closed feedback loop, illustrated in Figure~\ref{fig:architecture}. Components 1 through 4 form the fuzzing loop: the grammar defines what SQL can be generated, the generation module constructs concrete inputs, the execution layer runs each input against an instrumented SQLite build, and the coverage feedback mechanism decides which inputs are worth keeping. Component 5, the triage pipeline, operates after a campaign completes to analyze collected crashes.
 
 \begin{figure}[htbp]
 \centering
@@ -77,46 +79,22 @@ DBMS-Nautilus is a closed-loop fuzzing pipeline where coverage feedback from eac
 \end{figure}
 
 \paragraph{Grammar Engine.}
-The grammar engine loads a SQL grammar specification written in Python via the PyO3 foreign function interface. Each grammar file defines production rules using the \texttt{ctx.rule()} API, where non-terminals are enclosed in curly braces (e.g., \texttt{ctx.rule("Stmt", "SELECT \{Expr\} FROM \{Table\}")}). The engine builds a rule table from the parsed grammar and supports weighted sampling over production rules, allowing certain rules to be selected more frequently than others (Section~\ref{sec:grammar-design} describes how weights are assigned).
+The grammar engine defines the space of SQL inputs that the fuzzer can produce. It loads a context-free grammar specification written as a Python script, where each production rule maps a non-terminal to a string pattern containing terminal symbols and references to other non-terminals. Rules can carry numeric weights that bias the sampling distribution, allowing the grammar designer to make certain SQL constructs more likely to appear than others. The grammar engine is the component that distinguishes DBMS-Nautilus from general-purpose grammar fuzzers: by encoding SQL-specific structural patterns and weighting them toward vulnerability-relevant constructs, it concentrates the fuzzer's effort on the most productive regions of the input space. Section~\ref{sec:grammar-design} describes the grammar design methodology in detail.
 
 \paragraph{Generation and Mutation.}
-On each iteration, the fuzzer either generates a fresh derivation tree from the grammar or selects an existing tree from the queue and applies a mutation. Three tree-level mutations are used: random mutation (replace a subtree with a freshly generated one for the same non-terminal), random recursion (expand or collapse recursive productions), and splice mutation (swap compatible subtrees between two queue trees). The resulting tree is unparsed into a concrete SQL string by reading its leaf nodes left to right.
+The generation and mutation module transforms grammar rules into concrete SQL strings. On each iteration, it either builds a fresh derivation tree by expanding non-terminals according to the grammar, or takes an existing tree from the queue and applies a structural mutation --- replacing a subtree, expanding or collapsing recursive productions, or splicing subtrees between two trees. The result is unparsed into a SQL string by reading leaf nodes left to right. This tree-level approach ensures that every generated input is syntactically valid with respect to the grammar, avoiding the wasted executions that plague byte-level mutators when applied to structured languages like SQL.
 
 \paragraph{Fork Server and Harness.}
-The SQL string is written to a temporary file and passed as a command-line argument to the SQLite harness. The fork server, following the AFL protocol~\cite{afl}, loads the harness once into a parent process and creates child processes via \texttt{fork()} for each test case. Each child inherits the initialized program state, reads the SQL file, executes it via \texttt{sqlite3\_exec()}, and exits. The parent collects the child's exit status and reads the shared memory coverage bitmap. This fork-based execution eliminates the overhead of process creation on every test case, achieving thousands of executions per second. SQLite is compiled from source using \texttt{afl-clang-fast} with AddressSanitizer and UndefinedBehaviorSanitizer instrumentation, enabling the detection of memory safety violations and undefined behavior during execution.
+The fork server and harness form the execution layer that runs each generated SQL input against a real SQLite build. The harness opens an empty in-memory SQLite database, then uses the AFL fork-server protocol~\cite{afl} to efficiently create a child process for each test case without the overhead of full process initialization. Each child executes one SQL input and exits. SQLite is compiled with AddressSanitizer (ASan) and UndefinedBehaviorSanitizer (UBSan) instrumentation, which act as oracles: ASan detects memory safety violations such as buffer overflows and use-after-free, while UBSan detects undefined behavior such as integer overflow and null pointer dereference. Without these sanitizers, many vulnerabilities would execute silently without any observable failure.
 
 \paragraph{Coverage Feedback and Queue.}
-After each execution, the fuzzer compares the resulting coverage bitmap against the global coverage map accumulated from all prior executions. The bitmap is a shared memory region where each byte represents a hashed edge (basic block transition) in SQLite's control flow graph. If the input exercised at least one previously unseen edge, it is classified as interesting and added to the queue. This queue serves as the seed pool for subsequent mutations, creating a directed search that progressively steers generation toward unexplored program regions. This feedback loop is what makes DBMS-Nautilus a \textit{greybox} fuzzer rather than a purely generative one.
+The coverage feedback mechanism is what makes DBMS-Nautilus a \textit{greybox} fuzzer rather than a purely generative one. After each execution, the fuzzer checks whether the input exercised any previously unseen control-flow edges in SQLite. If it did, the input is classified as \textit{interesting} and added to the queue, which serves as the seed pool for subsequent mutations. Over time, this feedback loop steers generation toward unexplored program regions, progressively expanding coverage into deeper and more complex code paths. Without coverage feedback, the fuzzer would generate inputs uniformly from the grammar with no awareness of which inputs are actually reaching new code --- a strictly less efficient strategy, as the experiments in Chapter~\ref{chap:experiments} demonstrate.
 
 \paragraph{Triage Pipeline.}
-After a campaign completes, the triage pipeline processes all collected crashes. It deduplicates crashes by stack hash, matches them against known CVE signatures, and scores reproduction fidelity. Section~\ref{sec:crash-pipeline} describes this pipeline in detail.
+The triage pipeline operates after a fuzzing campaign completes. It processes the collected crashing inputs to determine how many distinct bugs were found, whether any correspond to known CVEs, and how reliably each crash reproduces. This post-campaign analysis transforms raw crash data into actionable vulnerability reports. Chapter~\ref{chap:experiments} describes the triage methodology in detail.
 
-A key design decision in DBMS-Nautilus is that the harness starts with an empty in-memory database. Unlike SQLsmith~\cite{sqlsmith}, which connects to an existing database and introspects its schema to generate valid queries, or Squirrel~\cite{squirrel}, which maintains a schema model during fuzzing, DBMS-Nautilus requires no external database state. Instead, the grammar itself generates complete, self-contained SQL that includes schema creation (via the \texttt{Schema-Setup} non-terminal) before issuing queries. Each test case creates its own tables, inserts its own data, and runs its own queries --- making every execution independently reproducible without any setup beyond the empty database. This design simplifies the harness, eliminates dependencies on pre-loaded state, and ensures that any crashing input can be replayed in isolation.
-
-Listing~\ref{lst:harness} shows the harness implementation. The \texttt{setup\_db()} constructor opens the in-memory database before the \texttt{\_\_AFL\_INIT()} fork point, so every child process inherits the initialized (but empty) database handle. Each child reads one SQL file, executes it, and exits.
-
-\begin{lstlisting}[language=C, caption={SQLite harness for AFL fork-server mode. The database is opened before the fork point; each child executes one SQL input from a file.}, label=lst:harness, basicstyle=\ttfamily\small, numbers=left]
-#include "sqlite3.h"
-static sqlite3 *db = NULL;
-
-__attribute__((constructor))
-static void setup_db(void) {
-    sqlite3_open(":memory:", &db);
-}
-
-int main(int argc, char **argv) {
-    __AFL_INIT();  /* Fork point */
-    char *sql = read_input(argv[1]);
-    if (sql) {
-        char *errmsg = NULL;
-        sqlite3_exec(db, sql, NULL, NULL, &errmsg);
-        if (errmsg) sqlite3_free(errmsg);
-        free(sql);
-    }
-    sqlite3_close(db);
-    return 0;
-}
-\end{lstlisting}
+\paragraph{Self-Contained Test Cases.}
+A key design decision is that every test case begins from an empty database. The grammar generates multi-statement SQL programs that first create tables and insert data (via the \texttt{Schema-Setup} non-terminal), then issue the queries that exercise the target code paths. This contrasts with SQLsmith, which requires a pre-populated database and introspects its schema at runtime, and Squirrel, which maintains an evolving schema model during fuzzing. The self-contained approach has three advantages: the harness requires no setup beyond opening an empty database, every crashing input can be replayed in isolation without reconstructing external state, and the grammar retains full control over which schema patterns appear in each test case.
 
 Table~\ref{tab:components} summarizes the five components, their implementation languages, and their roles in the pipeline.
 
@@ -128,7 +106,7 @@ Table~\ref{tab:components} summarizes the five components, their implementation 
 \toprule
 \textbf{Component} & \textbf{Language} & \textbf{Module} & \textbf{Role} \\
 \midrule
-Grammar Engine & Rust & \texttt{grammartec/} & Load grammar, weighted rule sampling \\
+Grammar Engine & Rust + Python & \texttt{grammartec/} & Load grammar, weighted rule sampling \\
 Generation + Mutation & Rust & \texttt{fuzzer/} & Build and mutate derivation trees \\
 Fork Server + Harness & Rust + C & \texttt{forksrv/}, \texttt{harness/} & Execute SQL against instrumented SQLite \\
 Coverage Feedback & Rust & \texttt{fuzzer/} & Track edges, maintain queue \\
@@ -140,6 +118,7 @@ Triage Pipeline & Python & \texttt{triage/} & Crash dedup, CVE matching, reporti
 %% ====================================================================
 \section{Structural Primitives Philosophy}
 \label{sec:primitives-philosophy}
+\label{sec:grammar-design}
 %% ====================================================================
 
 The grammar encodes SQL structural patterns that trigger vulnerability classes rather than specific proof-of-concept inputs. This ``zero PoC contamination'' principle ensures that the fuzzer discovers bugs through compositional exploration rather than replaying known attacks. For example, the CVE-2020-13434 integer overflow~\cite{cve202013434} requires both a \texttt{printf} function call and an INT32 boundary value. Rather than encoding the exact PoC \texttt{SELECT printf('\%.*g', 2147483647, 0.01)}, the grammar provides independent non-terminals for format specifiers (\texttt{Format-Spec}), boundary integers (\texttt{Boundary-Int}), and function call syntax (\texttt{Boundary-Func-Call}). The fuzzer must compose these building blocks into a triggering combination through random generation and mutation, demonstrating genuine discovery capability.
@@ -295,7 +274,7 @@ This episode illustrates a general principle of grammar engineering for fuzzing:
 
 \subsection{v3.1 to v3.2: Structural Expansion (475 Rules)}
 
-The second refinement addressed structural gaps that prevented the grammar from reaching four of the six target CVEs. A systematic gap analysis compared the structural requirements of each CVE (as documented in Table~\ref{tab:cve-signatures} in Section~\ref{sec:triage-cve}) against the non-terminals available in v3.1. The analysis revealed that:
+The second refinement addressed structural gaps that prevented the grammar from reaching four of the six target CVEs. A systematic gap analysis compared the structural requirements of each CVE (as documented in Table~\ref{tab:cve-reachability}) against the non-terminals available in v3.1. The analysis revealed that:
 
 \begin{itemize}
     \item CVE-2020-9327 required self-referential generated columns (a generated column whose expression references another generated column in the same table), which v3.1 could not express.
@@ -327,148 +306,3 @@ Grammar evolution operates on two orthogonal axes. \emph{Weight tuning} controls
 
 Both axes are necessary. Weight tuning without structural coverage leaves CVEs unreachable regardless of campaign duration --- if the grammar cannot express window functions, no weight adjustment will produce an input containing \texttt{OVER} clauses. Conversely, structural expansion without weight tuning can lead to dominance of one grammar region, as demonstrated by the FTS saturation in v3.0. Effective grammar engineering requires alternating between these two modes of refinement: expanding structure when gap analysis reveals missing building blocks, and tuning weights when crash analysis reveals imbalanced sampling.
 
-%% ====================================================================
-\section{Harness Construction}
-\label{sec:harness}
-%% ====================================================================
-
-\subsection{AFL Fork Server Protocol}
-
-The harness uses the \texttt{\_\_AFL\_INIT()} macro from AFL~\cite{afl} to implement fork-server mode. This is distinct from AFL's persistent mode (\texttt{\_\_AFL\_LOOP}), which Nautilus does not support. In fork-server mode, the parent process loads the SQLite amalgamation into memory, initializes the in-memory database, and then waits for instructions from the fuzzer. For each test case, the parent forks a child process. The child inherits the pre-initialized state, reads the SQL input file, executes it via \texttt{sqlite3\_exec}, and exits. The parent collects the child's exit status and coverage bitmap, then reports results back to the fuzzer coordinator.
-
-The database starts empty because the grammar generates self-contained multi-statement SQL that creates its own schema via the \texttt{Schema-Setup} non-terminal before issuing queries. This design eliminates the need for a pre-loaded schema in the harness itself, simplifying the harness code and ensuring that every test case is independently reproducible.
-
-Listing~\ref{lst:harness} shows a simplified version of the harness implementation. The \texttt{setup\_db} constructor opens the in-memory database before \texttt{\_\_AFL\_INIT()} establishes the fork point. Each forked child reads one SQL file and executes it, then exits.
-
-\begin{lstlisting}[language=C, caption={Simplified SQLite harness for AFL fork-server mode. The database is opened before the fork point; each child executes one SQL input.}, label=lst:harness, basicstyle=\ttfamily\small, numbers=left]
-#include "sqlite3.h"
-
-static sqlite3 *db = NULL;
-
-__attribute__((constructor))
-static void setup_db(void) {
-    sqlite3_open(":memory:", &db);
-}
-
-int main(int argc, char **argv) {
-    __AFL_INIT();  /* Fork point */
-
-    size_t sql_len = 0;
-    char *sql = read_input(argv[1], &sql_len);
-    if (sql) {
-        char *errmsg = NULL;
-        sqlite3_exec(db, sql, NULL, NULL, &errmsg);
-        if (errmsg) sqlite3_free(errmsg);
-        free(sql);
-    }
-    sqlite3_close(db);
-    return 0;
-}
-\end{lstlisting}
-
-\subsection{Compilation and Instrumentation}
-
-The harness is compiled using \texttt{afl-clang-fast} with AddressSanitizer (ASan) and UndefinedBehaviorSanitizer (UBSan) enabled. The SQLite amalgamation is compiled as part of the same translation unit, ensuring full instrumentation of all SQLite internals. Additional compile-time flags enable optional SQLite features: \texttt{SQLITE\_ENABLE\_FTS3}, \texttt{SQLITE\_ENABLE\_FTS5}, \texttt{SQLITE\_ENABLE\_RTREE}, \texttt{SQLITE\_ENABLE\_JSON1}, and \texttt{SQLITE\_DEBUG}. The \texttt{SQLITE\_DEBUG} flag enables internal assertion checks that fire \texttt{SIGTRAP} on invariant violations, providing an additional oracle beyond sanitizer-detected errors.
-
-\subsection{Three Harness Types}
-
-Three harness variants are compiled for different stages of the analysis pipeline:
-
-\begin{itemize}
-    \item \textbf{\texttt{afl/}} --- the primary fuzzing harness, compiled with \texttt{afl-clang-fast} for AFL coverage instrumentation. Used during fuzzing campaigns.
-    \item \textbf{\texttt{test/}} --- the triage harness, compiled with ASan and UBSan but without AFL instrumentation. Used to replay and classify crashes during the triage pipeline.
-    \item \textbf{\texttt{nosanit/}} --- the production-mode harness, compiled without any sanitizer instrumentation. Used to assess whether a crash is exploitable under realistic (non-sanitized) conditions.
-\end{itemize}
-
-%% ====================================================================
-\section{Oracle Classification}
-\label{sec:oracle}
-%% ====================================================================
-
-The harness produces different exit signals depending on the type of error detected. Table~\ref{tab:oracle} defines the classification scheme. ASan violations (buffer overflows, use-after-free, double-free) cause the process to exit with code 223, configured via the \texttt{ASAN\_OPTIONS=exitcode=223} environment variable. UBSan violations (integer overflow, null pointer dereference, shift out of bounds) cause exit code 1, configured via \texttt{UBSAN\_OPTIONS=halt\_on\_error=1,exitcode=1}. SQLite debug assertions fire \texttt{SIGTRAP} (signal~5), which the fork server detects as exit code 133. Normal execution and SQL semantic errors both produce exit code 0 and are not classified as bugs.
-
-\begin{table}[htbp]
-\caption{Oracle classification of harness exit signals. Each signal type corresponds to a distinct vulnerability class.}
-\label{tab:oracle}
-\centering
-\begin{tabular}{llll}
-\toprule
-\textbf{Signal} & \textbf{Exit Code} & \textbf{Classification} & \textbf{Action} \\
-\midrule
-ASan violation & 223 & Memory error & Save to \texttt{crashes/} \\
-UBSan violation & 1 & Undefined behavior & Save to \texttt{crashes/} \\
-SIGTRAP (signal 5) & 133 & Debug assertion & Save to \texttt{signaled/} \\
-Normal exit & 0 & No bug & Discard \\
-SQL error & 0 & Semantic error & Ignore \\
-Timeout & --- & Hang & Save to \texttt{timeout/} \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-%% ====================================================================
-\section{Triage Pipeline}
-\label{sec:triage}
-%% ====================================================================
-
-The triage pipeline transforms raw crash data from a fuzzing campaign into actionable vulnerability reports. A typical hour-long campaign may produce hundreds of crashing inputs, many of which trigger the same underlying bug. The pipeline performs four stages: stack-hash deduplication, CVE signature matching, fidelity scoring, and crash minimization.
-
-\subsection{Stack-Hash Deduplication}
-
-Stack-hash deduplication identifies unique root causes among the collected crashes. For each crashing input, the pipeline replays the input under GDB with the \texttt{test/} harness binary, captures the top 5 stack frames at the crash point, filters out frames belonging to system libraries (\texttt{libc}, \texttt{libasan}, \texttt{libubsan}, \texttt{libpthread}) and the harness wrapper, and retains only SQLite-internal frames. Each retained frame is encoded as a \texttt{function:file:line} triple. The pipeline then computes a SHA-256 hash of the concatenated filtered frames. Crashes that produce identical hashes are considered manifestations of the same root cause and are grouped into a single cluster.
-
-The filtering step is essential because sanitizer runtime frames and C library frames appear in every crash regardless of root cause. By removing these frames, the algorithm focuses on the SQLite-specific call stack that distinguishes one bug from another. The use of the top 5 frames rather than the full stack provides a balance between precision (distinguishing genuinely different bugs) and recall (grouping diverse triggers of the same underlying fault).
-
-Algorithm~\ref{alg:dedup} formalizes the deduplication procedure. The output is a set of clusters, each containing a representative crash, its top frame, and the count of duplicate crashes sharing that root cause.
-
-\begin{algorithm}[htbp]
-\caption{Stack-Hash Crash Deduplication}
-\label{alg:dedup}
-\begin{algorithmic}[1]
-\Require Set of crash files $C = \{c_1, \ldots, c_n\}$, harness binary $H$
-\Ensure Set of unique root-cause clusters
-\For{each crash file $c_i \in C$}
-    \State $\text{frames} \gets \Call{RunGDB}{H, c_i}$ \Comment{Top 5 frames}
-    \State $\text{filtered} \gets \Call{FilterFrames}{\text{frames}}$ \Comment{Remove libc, ASan, harness}
-    \State $\text{hash}_i \gets \text{SHA-256}(\text{Join}(\text{filtered}))$
-\EndFor
-\State $\text{clusters} \gets \Call{GroupBy}{\{(\text{hash}_i, c_i)\}_{i=1}^n}{\text{hash}}$
-\State \Return clusters sorted by decreasing size
-\end{algorithmic}
-\end{algorithm}
-
-\subsection{CVE Signature Matching}
-\label{sec:triage-cve}
-
-CVE signature matching determines whether a crashing input corresponds to a known vulnerability. Each target CVE has a signature defined as a conjunction of structural regex patterns. A crash matches a CVE signature if and only if every required pattern finds at least one occurrence in the SQL input text. The patterns encode structural requirements rather than byte-level identity, using case-insensitive matching with flexible whitespace.
-
-For example, CVE-2020-13434~\cite{cve202013434} requires two structural patterns: a \texttt{printf} function call and an INT32 boundary value (2147483647 or 2147483648). A crash input matches this signature if it contains both \texttt{printf(} and a number matching the regex \texttt{-?214748364[7-8]}. CVE-2020-9327~\cite{cve20209327} requires four structural patterns: a GENERATED column definition, a \texttt{coalesce} function call, a JOIN or comma-join, and a CREATE VIEW statement. Only inputs containing all four patterns simultaneously are classified as CVE-2020-9327 matches.
-
-Table~\ref{tab:cve-signatures} summarizes the required structural patterns for each target CVE. The pattern count varies from 2 (CVE-2019-19646, CVE-2020-13434) to 5 (CVE-2020-13435), reflecting the complexity of the conditions needed to trigger each vulnerability.
-
-\begin{table}[htbp]
-\caption{CVE signature patterns. Each CVE requires all listed structural patterns to be present simultaneously in the SQL input for a match.}
-\label{tab:cve-signatures}
-\centering
-\begin{tabular}{lrl}
-\toprule
-\textbf{CVE} & \textbf{Patterns} & \textbf{Required Structural Elements} \\
-\midrule
-CVE-2020-15358 & 3 & CREATE VIEW with ORDER BY, INTERSECT in WHERE, \\
-               &   & implicit JOIN (comma-separated FROM) \\
-CVE-2020-13871 & 3 & EXCEPT, multi-column ORDER BY, scalar subquery \\
-CVE-2020-13435 & 5 & NATURAL JOIN, coalesce(), window OVER(), \\
-               &   & UNIQUE column, IN subquery \\
-CVE-2020-13434 & 2 & printf() call, INT32 boundary value \\
-CVE-2020-9327  & 4 & GENERATED column, coalesce(), JOIN, CREATE VIEW \\
-CVE-2019-19646 & 2 & GENERATED column, PRAGMA integrity\_check \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\subsection{Fidelity Scoring}
-
-Not all crashes are deterministically reproducible. Heap layout non-determinism, timing-dependent behavior, and ASLR can cause a crash to reproduce intermittently. The fidelity scoring stage replays each unique crash (after deduplication) a fixed number of times $N$ and records what fraction of replays reproduce the crash. Crashes that reproduce at least 80\% of the time are classified as high-fidelity and are prioritized for further analysis and CVE confirmation. Low-fidelity crashes (below 80\%) may indicate environment-dependent issues or false positives from sanitizer instrumentation.
-
-\subsection{Crash Minimization}
-
-The crash minimization stage iteratively removes SQL statements from a crashing input while preserving the crash behavior. Starting from the full multi-statement input, the algorithm removes one statement at a time and replays the reduced input. If the crash still reproduces, the removal is kept; otherwise, it is reverted. This process continues until no further statements can be removed without losing the crash. The result is a minimal reproducer that contains only the SQL statements necessary to trigger the vulnerability, which is useful for root-cause analysis and CVE confirmation.
