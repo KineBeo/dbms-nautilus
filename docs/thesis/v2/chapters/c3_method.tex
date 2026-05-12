@@ -134,6 +134,23 @@ Constraint~(a) prevents the fuzzer from trivially replaying known attacks, ensur
 
 The tension between constraints (b) and (c) is the central design challenge. Too few non-terminals and the fuzzer lacks the vocabulary to reach target vulnerabilities. Too many non-terminals and the input space becomes so large that the probability of assembling the right combination within a finite campaign drops below a useful threshold. The grammar evolution process described in Section~\ref{sec:grammar-evolution} addresses this tension through iterative refinement guided by experimental feedback.
 
+\subsection{Cross-Pollination of Structural Patterns}
+\label{sec:cross-pollination}
+
+The grammar's structural patterns originate from root-cause analysis of known CVEs, but they are deliberately not labeled or isolated per CVE. Each non-terminal encodes a SQL structural affordance --- a syntactic shape that participates in one or more vulnerability-triggering code paths --- without indicating which specific vulnerability it targets. This anonymity is not an oversight but a design choice: it ensures that the grammar captures the \emph{structural category} of a vulnerability rather than a single instance, and it enables the cross-pollination effect described below.
+
+Cross-pollination arises because a single non-terminal serves multiple CVEs simultaneously, and a single CVE requires patterns from multiple independent non-terminals. Consider the \texttt{Schema-Setup} non-terminal and its alternative S2, which creates tables with generated columns. Generated columns are a structural prerequisite for CVE-2020-9327~\cite{cve20209327}, a null pointer dereference triggered during column resolution when a self-referential generated column creates a circular dependency, and also for CVE-2019-19646~\cite{cve201919646}, an infinite loop triggered by \texttt{PRAGMA integrity\_check} on tables containing generated columns. When the fuzzer selects S2, it is not targeting either CVE specifically. It is constructing a schema that happens to enable multiple vulnerability-triggering paths, and the subsequent choice of query pattern determines which path --- if any --- is actually exercised. The grammar designer encoded the structural observation that generated columns stress the column resolver and the integrity checker; which specific failure mode materializes depends on the full composition of the generated input.
+
+A similar overlap occurs in the query layer. The \texttt{Stress-Query} non-terminal includes a NATURAL JOIN pattern (Q3) that is required for CVE-2020-13435~\cite{cve202013435}, where a NATURAL JOIN combined with window functions and a \texttt{coalesce} call triggers a null dereference in the query planner's column name resolution logic. However, NATURAL JOIN also exercises the query planner's join optimization logic more broadly, stressing the column matching algorithm that pairs columns across tables by name. Any bug in this matching logic --- not only the specific null dereference documented in CVE-2020-13435 --- becomes reachable when Q3 is selected. The non-terminal is thus more general than the CVE that motivated its inclusion.
+
+The \texttt{Boundary-Func-Call} non-terminal provides an especially clear illustration of cross-pollination at the terminal level. The \texttt{printf} alternative with format specifiers and boundary integers directly targets CVE-2020-13434~\cite{cve202013434}, an integer overflow in SQLite's printf implementation when the width argument exceeds INT32\_MAX. However, the boundary integer terminals defined for this purpose --- 2147483647, 2147483648, $-$2147483648, and 9223372036854775807 --- also participate in float cast overflows and numeric conversion null dereferences that were not anticipated during grammar design. The grammar provides the boundary values because they are structurally relevant to printf overflow; the fuzzer discovers that the same values are structurally relevant to entirely different code paths through independent composition.
+
+The compositional power of cross-pollination emerges from the independence of non-terminal selections. On each generated input, the fuzzer independently selects a \texttt{Schema-Setup} variant, a \texttt{Stress-Query} variant, and optionally a \texttt{Boundary-Func-Call} or \texttt{Validation-Op}. Because these selections are governed by independent weighted distributions, the fuzzer explores the Cartesian product of all Layer~2 shapes --- producing combinations that the grammar designer never explicitly planned. A single generated input might combine S2 (generated columns) with Q3 (NATURAL JOIN) and a printf boundary call, yielding a three-way composition that no individual CVE analysis would have prescribed. This input exercises a unique intersection of SQLite's generated column processor, join optimizer, and printf implementation simultaneously, creating opportunities to discover bugs at the interfaces between these subsystems.
+
+This cross-pollination property has two important consequences for the evaluation of the fuzzer's effectiveness. First, any CVE rediscovery constitutes a genuine compositional achievement rather than a scripted replay. To trigger CVE-2020-13434, for example, the fuzzer must independently select the \texttt{Boundary-Func-Call} non-terminal (rather than \texttt{Stress-Query} or \texttt{Validation-Op}), then select the printf alternative (rather than substr or zeroblob), then select the \texttt{\%.*g} format specifier, and then select a boundary integer that exceeds INT32\_MAX --- all while also selecting a schema setup that does not interfere with the query. Each selection is a probabilistic choice from a weighted distribution, and the correct combination is one point in a large combinatorial space.
+
+Second, the grammar discovers bugs beyond its explicit design targets. The seven non-CVE bug classes reported in Chapter~\ref{chap:experiments} --- including FTS tokenizer null dereferences, float cast overflows, and window function lifecycle errors --- were found because the structural patterns intended for specific CVEs also exercise adjacent code paths that contain previously undocumented defects. The generated column rules intended for CVE-2020-9327 stress the column resolver in ways that also reveal bugs in view materialization. The window function rules intended for CVE-2020-13871 exercise frame boundary computation in ways that also reveal bugs in the \texttt{nth\_value} implementation. This emergent discovery capability is a direct consequence of the cross-pollination design: because the grammar encodes structural affordances rather than CVE-specific sequences, every structural pattern participates in a broader exploration of the code region it touches.
+
 \subsection{Two-Layer Architecture}
 \label{sec:layer-decomposition}
 
@@ -231,6 +248,44 @@ ctx.rule("Boundary-Int", "-2147483648", weight=3.0)  # INT32_MIN
 ctx.rule("Boundary-Int", "9223372036854775807", weight=3.0) # INT64_MAX
 \end{lstlisting}
 
+\subsection{CVE Reachability Analysis}
+\label{sec:cve-reachability}
+
+Table~\ref{tab:cve-structural} maps each target CVE to the structural patterns required to trigger it. A CVE is structurally reachable if and only if the grammar contains non-terminals capable of generating every required pattern. The table reveals the cross-pollination structure of the grammar: no structural pattern is unique to a single CVE, and every CVE requires between two and five patterns drawn from different non-terminal groups.
+
+\begin{table}[htbp]
+\caption{Structural patterns required for each target CVE. Each CVE requires all listed patterns to co-occur in a single generated input. Shared patterns across CVEs demonstrate cross-pollination.}
+\label{tab:cve-structural}
+\centering
+\begin{tabular}{lrl}
+\toprule
+\textbf{CVE} & \textbf{Patterns} & \textbf{Required Structural Elements} \\
+\midrule
+CVE-2019-19646 & 2 & Generated column, PRAGMA integrity\_check \\
+CVE-2020-13434 & 2 & printf() call, INT32 boundary value \\
+CVE-2020-9327  & 4 & Generated column, coalesce(), JOIN, CREATE VIEW \\
+CVE-2020-13435 & 5 & NATURAL JOIN, coalesce(), window OVER(), \\
+               &   & UNIQUE column, IN subquery \\
+CVE-2020-13871 & 3 & EXCEPT, multi-column ORDER BY, scalar subquery \\
+CVE-2020-15358 & 3 & CREATE VIEW with ORDER BY, INTERSECT, \\
+               &   & implicit JOIN (comma-separated FROM) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Generated columns appear in the requirements for both CVE-2019-19646 and CVE-2020-9327, served by a single \texttt{Schema-Setup} alternative (S2). The \texttt{coalesce()} function appears in CVE-2020-9327 and CVE-2020-13435, served by a single \texttt{Func-Call} alternative. Window functions with \texttt{OVER} clauses appear in CVE-2020-13435 and implicitly in CVE-2020-13871 through the window function lifecycle code path. This sharing means that improving the grammar's ability to reach one CVE simultaneously improves its ability to reach others that share structural requirements --- a multiplicative benefit that would not arise if each CVE were targeted by isolated, dedicated grammar rules.
+
+The CVE reachability analysis also reveals the minimum grammar complexity required for full coverage. CVE-2020-13434 requires only two structural elements (printf and a boundary integer), both present in the initial grammar from v3.0. CVE-2020-13435 requires five simultaneous elements including window functions and NATURAL JOIN, which were not added until v3.2. The range from 2 to 5 required patterns per CVE explains why some CVEs are discovered quickly (low combinatorial barrier) while others remain elusive even after extended campaigns (high combinatorial barrier). Section~\ref{sec:grammar-evolution} traces how the grammar evolved to close these structural gaps.
+
+\subsection{Analysis of the Grammar Design Approach}
+\label{sec:grammar-analysis}
+
+The structural primitives methodology offers several advantages over alternative grammar design strategies. The cross-pollination property, described in Section~\ref{sec:cross-pollination}, ensures that the grammar's bug-finding capability scales super-linearly with the number of non-terminals: each new structural pattern participates in combinations with all existing patterns, expanding the reachable input space combinatorially rather than additively. The zero PoC contamination principle guarantees that the grammar remains a genuine testing tool rather than a regression suite --- any vulnerability it triggers is discovered through compositional exploration, providing confidence that the methodology can find bugs that are not yet known.
+
+The composability of the two-layer architecture simplifies grammar extension. Adding a new non-terminal to Layer~1 makes it available to all Layer~2 shapes without modifying existing rules. Adding a new Layer~2 shape creates new compositions with all existing Layer~1 atoms. This modularity means that grammar improvements are local changes with global effects, reducing the effort required to expand the grammar's reach.
+
+However, the approach has significant limitations. First, the grammar design process requires manual domain expertise. Identifying which structural patterns are associated with a vulnerability class demands understanding of both the SQL language specification and the target DBMS's internal architecture. The grammar designer must trace from a CVE's root cause to the SQL constructs that exercise the relevant code path --- an analysis that cannot be fully automated with current techniques. Second, the grammar is sensitive to weight distribution. As demonstrated by the FTS saturation problem in grammar v3.0 (Section~\ref{sec:grammar-evolution}), incorrect weights can concentrate sampling effort on a shallow region of the bug space, starving other regions of exploration budget. Weight tuning requires empirical feedback from actual campaigns, creating a chicken-and-egg problem: the grammar must be run to assess its weights, but running it with poor weights wastes campaign time. Third, the grammar imposes a hard reachability ceiling: it can only discover bugs whose structural prerequisites exist as non-terminals. If a vulnerability requires a SQL construct that the grammar does not encode --- for example, a recursive common table expression or a specific ATTACH DATABASE pattern --- no amount of campaign time or weight tuning will trigger it. The grammar defines the boundary of what the fuzzer can discover; coverage feedback can navigate within that boundary but cannot expand it.
+
 %% ====================================================================
 \section{Grammar Evolution}
 \label{sec:grammar-evolution}
@@ -257,7 +312,7 @@ v3.3 & 2026-05-10 & 520 & +JSON/JSONB expansion (Json-Key, Json-Path, Json-Liter
 
 \subsection{v3.0: Initial Design (449 Rules)}
 
-Version~3.0 established the structural primitives architecture described in Sections~\ref{sec:primitives-philosophy} and~\ref{sec:layer-decomposition}. The grammar comprised 449 production rules organized into the two-layer hierarchy, with Layer~1 providing SQL atoms and Layer~2 composing them into schema-setup, stress-query, validation, and boundary function call shapes. Initial weights were assigned based on domain analysis of which structural patterns are associated with each target CVE. This version served as the baseline for subsequent refinement.
+Version~3.0 established the structural primitives architecture described in Section~\ref{sec:grammar-design}. The grammar comprised 449 production rules organized into the two-layer hierarchy, with Layer~1 providing SQL atoms and Layer~2 composing them into schema-setup, stress-query, validation, and boundary function call shapes. Initial weights were assigned based on domain analysis of which structural patterns are associated with each target CVE. This version served as the baseline for subsequent refinement.
 
 \subsection{v3.0 to v3.1: Weight Rebalancing (449 Rules)}
 
