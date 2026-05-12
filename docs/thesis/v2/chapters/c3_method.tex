@@ -350,6 +350,129 @@ CVE-2020-15358 & 3 & CREATE VIEW with ORDER BY, INTERSECT, \\
 \end{tabular}
 \end{table}
 
+Figure~\ref{fig:cve-matrix} visualizes the same data as a cross-pollination matrix. Each row is a structural pattern category, each column is a target CVE, and filled cells indicate that the pattern is required. The matrix makes the sharing structure immediately visible: generated columns serve two CVEs, coalesce serves two, and window functions participate in two vulnerability paths.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    cell/.style={minimum width=1.4cm, minimum height=0.6cm, align=center, font=\scriptsize},
+    filled/.style={cell, fill=green!25},
+    empty/.style={cell, fill=white},
+    hdr/.style={cell, font=\scriptsize\bfseries, fill=black!8},
+    rhdr/.style={minimum width=3.2cm, minimum height=0.6cm, align=right, font=\scriptsize, fill=black!4},
+]
+    % Column headers (CVEs)
+    \node[hdr] at (3.2+0*1.5, 0) {\rotatebox{45}{\tiny 19646}};
+    \node[hdr] at (3.2+1*1.5, 0) {\rotatebox{45}{\tiny 13434}};
+    \node[hdr] at (3.2+2*1.5, 0) {\rotatebox{45}{\tiny 9327}};
+    \node[hdr] at (3.2+3*1.5, 0) {\rotatebox{45}{\tiny 13435}};
+    \node[hdr] at (3.2+4*1.5, 0) {\rotatebox{45}{\tiny 13871}};
+    \node[hdr] at (3.2+5*1.5, 0) {\rotatebox{45}{\tiny 15358}};
+
+    % Row labels and cells
+    % Row 1: Generated column
+    \node[rhdr] at (1.6, -0.7) {Generated column};
+    \node[filled] at (3.2+0*1.5, -0.7) {$\bullet$};
+    \node[empty]  at (3.2+1*1.5, -0.7) {};
+    \node[filled] at (3.2+2*1.5, -0.7) {$\bullet$};
+    \node[empty]  at (3.2+3*1.5, -0.7) {};
+    \node[empty]  at (3.2+4*1.5, -0.7) {};
+    \node[empty]  at (3.2+5*1.5, -0.7) {};
+
+    % Row 2: printf + boundary
+    \node[rhdr] at (1.6, -1.4) {printf + boundary int};
+    \node[empty]  at (3.2+0*1.5, -1.4) {};
+    \node[filled] at (3.2+1*1.5, -1.4) {$\bullet$};
+    \node[empty]  at (3.2+2*1.5, -1.4) {};
+    \node[empty]  at (3.2+3*1.5, -1.4) {};
+    \node[empty]  at (3.2+4*1.5, -1.4) {};
+    \node[empty]  at (3.2+5*1.5, -1.4) {};
+
+    % Row 3: coalesce()
+    \node[rhdr] at (1.6, -2.1) {coalesce()};
+    \node[empty]  at (3.2+0*1.5, -2.1) {};
+    \node[empty]  at (3.2+1*1.5, -2.1) {};
+    \node[filled] at (3.2+2*1.5, -2.1) {$\bullet$};
+    \node[filled] at (3.2+3*1.5, -2.1) {$\bullet$};
+    \node[empty]  at (3.2+4*1.5, -2.1) {};
+    \node[empty]  at (3.2+5*1.5, -2.1) {};
+
+    % Row 4: JOIN / NATURAL JOIN
+    \node[rhdr] at (1.6, -2.8) {JOIN / NATURAL JOIN};
+    \node[empty]  at (3.2+0*1.5, -2.8) {};
+    \node[empty]  at (3.2+1*1.5, -2.8) {};
+    \node[filled] at (3.2+2*1.5, -2.8) {$\bullet$};
+    \node[filled] at (3.2+3*1.5, -2.8) {$\bullet$};
+    \node[empty]  at (3.2+4*1.5, -2.8) {};
+    \node[filled] at (3.2+5*1.5, -2.8) {$\bullet$};
+
+    % Row 5: Window OVER()
+    \node[rhdr] at (1.6, -3.5) {Window OVER()};
+    \node[empty]  at (3.2+0*1.5, -3.5) {};
+    \node[empty]  at (3.2+1*1.5, -3.5) {};
+    \node[empty]  at (3.2+2*1.5, -3.5) {};
+    \node[filled] at (3.2+3*1.5, -3.5) {$\bullet$};
+    \node[empty]  at (3.2+4*1.5, -3.5) {};
+    \node[empty]  at (3.2+5*1.5, -3.5) {};
+
+    % Row 6: CREATE VIEW
+    \node[rhdr] at (1.6, -4.2) {CREATE VIEW};
+    \node[empty]  at (3.2+0*1.5, -4.2) {};
+    \node[empty]  at (3.2+1*1.5, -4.2) {};
+    \node[filled] at (3.2+2*1.5, -4.2) {$\bullet$};
+    \node[empty]  at (3.2+3*1.5, -4.2) {};
+    \node[empty]  at (3.2+4*1.5, -4.2) {};
+    \node[filled] at (3.2+5*1.5, -4.2) {$\bullet$};
+
+    % Row 7: Compound (EXCEPT/INTERSECT)
+    \node[rhdr] at (1.6, -4.9) {EXCEPT / INTERSECT};
+    \node[empty]  at (3.2+0*1.5, -4.9) {};
+    \node[empty]  at (3.2+1*1.5, -4.9) {};
+    \node[empty]  at (3.2+2*1.5, -4.9) {};
+    \node[empty]  at (3.2+3*1.5, -4.9) {};
+    \node[filled] at (3.2+4*1.5, -4.9) {$\bullet$};
+    \node[filled] at (3.2+5*1.5, -4.9) {$\bullet$};
+
+    % Row 8: PRAGMA
+    \node[rhdr] at (1.6, -5.6) {PRAGMA integrity\_check};
+    \node[filled] at (3.2+0*1.5, -5.6) {$\bullet$};
+    \node[empty]  at (3.2+1*1.5, -5.6) {};
+    \node[empty]  at (3.2+2*1.5, -5.6) {};
+    \node[empty]  at (3.2+3*1.5, -5.6) {};
+    \node[empty]  at (3.2+4*1.5, -5.6) {};
+    \node[empty]  at (3.2+5*1.5, -5.6) {};
+
+    % Row 9: ORDER BY multi-col
+    \node[rhdr] at (1.6, -6.3) {Multi-col ORDER BY};
+    \node[empty]  at (3.2+0*1.5, -6.3) {};
+    \node[empty]  at (3.2+1*1.5, -6.3) {};
+    \node[empty]  at (3.2+2*1.5, -6.3) {};
+    \node[empty]  at (3.2+3*1.5, -6.3) {};
+    \node[filled] at (3.2+4*1.5, -6.3) {$\bullet$};
+    \node[filled] at (3.2+5*1.5, -6.3) {$\bullet$};
+
+    % Grid lines
+    \foreach \y in {-0.35, -1.05, -1.75, -2.45, -3.15, -3.85, -4.55, -5.25, -5.95, -6.65} {
+        \draw[black!15] (0, \y) -- (12.2, \y);
+    }
+    \foreach \x in {3.2, 4.7, 6.2, 7.7, 9.2, 10.7, 12.2} {
+        \draw[black!15] (\x, 0.35) -- (\x, -6.65);
+    }
+
+    % Bottom: pattern count per CVE
+    \node[font=\scriptsize\bfseries, text=black!60] at (3.2+0*1.5, -7.1) {2};
+    \node[font=\scriptsize\bfseries, text=black!60] at (3.2+1*1.5, -7.1) {2};
+    \node[font=\scriptsize\bfseries, text=black!60] at (3.2+2*1.5, -7.1) {4};
+    \node[font=\scriptsize\bfseries, text=black!60] at (3.2+3*1.5, -7.1) {5};
+    \node[font=\scriptsize\bfseries, text=black!60] at (3.2+4*1.5, -7.1) {3};
+    \node[font=\scriptsize\bfseries, text=black!60] at (3.2+5*1.5, -7.1) {3};
+    \node[rhdr, font=\scriptsize\itshape] at (1.6, -7.1) {Patterns required:};
+
+\end{tikzpicture}
+\caption{Cross-pollination matrix. Rows are structural pattern categories; columns are target CVEs. Filled cells ($\bullet$) indicate the pattern is required. Patterns shared across columns demonstrate cross-pollination: generated columns serve CVE-2019-19646 and CVE-2020-9327; coalesce serves CVE-2020-9327 and CVE-2020-13435; JOINs serve three CVEs.}
+\label{fig:cve-matrix}
+\end{figure}
+
 Generated columns appear in the requirements for both CVE-2019-19646 and CVE-2020-9327, served by a single \texttt{Schema-Setup} alternative (S2). The \texttt{coalesce()} function appears in CVE-2020-9327 and CVE-2020-13435, served by a single \texttt{Func-Call} alternative. Window functions with \texttt{OVER} clauses appear in CVE-2020-13435 and implicitly in CVE-2020-13871 through the window function lifecycle code path. This sharing means that improving the grammar's ability to reach one CVE simultaneously improves its ability to reach others that share structural requirements --- a multiplicative benefit that would not arise if each CVE were targeted by isolated, dedicated grammar rules.
 
 The CVE reachability analysis also reveals the minimum grammar complexity required for full coverage. CVE-2020-13434 requires only two structural elements (printf and a boundary integer), both present in the initial grammar from v3.0. CVE-2020-13435 requires five simultaneous elements including window functions and NATURAL JOIN, which were not added until v3.2. The range from 2 to 5 required patterns per CVE explains why some CVEs are discovered quickly (low combinatorial barrier) while others remain elusive even after extended campaigns (high combinatorial barrier). Section~\ref{sec:grammar-evolution} traces how the grammar evolved to close these structural gaps.
@@ -386,6 +509,42 @@ v3.3 & 2026-05-10 & 520 & +JSON/JSONB expansion (Json-Key, Json-Path, Json-Liter
 \bottomrule
 \end{tabular}
 \end{table}
+
+Figure~\ref{fig:grammar-evolution} visualizes the evolution trajectory: rule count growth and CVE reachability improvement across versions.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    vbox/.style={rectangle, rounded corners=4pt, draw=black!50, thick,
+        minimum width=2.4cm, minimum height=1.6cm, align=center, font=\small},
+    arr/.style={->, >=stealth, very thick, color=black!50},
+    lbl/.style={font=\scriptsize, color=black!60, align=center},
+]
+    % Version boxes
+    \node[vbox, fill=blue!8] (v30) at (0,0) {\textbf{v3.0}\\[2pt]{\scriptsize 449 rules}\\[1pt]{\scriptsize 2/6 CVEs}};
+    \node[vbox, fill=blue!8] (v31) at (3.5,0) {\textbf{v3.1}\\[2pt]{\scriptsize 449 rules}\\[1pt]{\scriptsize 2/6 CVEs}};
+    \node[vbox, fill=green!12] (v32) at (7,0) {\textbf{v3.2}\\[2pt]{\scriptsize 475 rules}\\[1pt]{\scriptsize \textbf{6/6 CVEs}}};
+    \node[vbox, fill=green!12] (v33) at (10.5,0) {\textbf{v3.3}\\[2pt]{\scriptsize 520 rules}\\[1pt]{\scriptsize 6/6 CVEs}};
+
+    % Arrows with labels
+    \draw[arr] (v30.east) -- node[lbl, above] {weight\\tuning} (v31.west);
+    \draw[arr] (v31.east) -- node[lbl, above] {structural\\expansion} (v32.west);
+    \draw[arr] (v32.east) -- node[lbl, above] {JSON/JSONB\\expansion} (v33.west);
+
+    % Change annotations below
+    \node[lbl, below=0.3cm of v31] {FTS weight\\2.0$\to$0.5};
+    \node[lbl, below=0.3cm of v32] {+26 rules\\+window funcs\\+gen. columns};
+    \node[lbl, below=0.3cm of v33] {+45 rules\\+json functions};
+
+    % Highlight the key transition
+    \draw[red!40, very thick, rounded corners=6pt, dashed]
+        ([xshift=-8pt, yshift=14pt]v32.north west) rectangle ([xshift=8pt, yshift=-28pt]v32.south east);
+    \node[font=\scriptsize\itshape, color=red!50!black, anchor=south] at ([yshift=16pt]v32.north) {full CVE reachability};
+
+\end{tikzpicture}
+\caption{Grammar evolution from v3.0 to v3.3. Version v3.1 rebalanced weights without adding rules. Version v3.2 (highlighted) achieved full CVE reachability through structural expansion. Version v3.3 extended coverage to modern SQLite's JSON module.}
+\label{fig:grammar-evolution}
+\end{figure}
 
 \subsection{v3.0: Initial Design (449 Rules)}
 

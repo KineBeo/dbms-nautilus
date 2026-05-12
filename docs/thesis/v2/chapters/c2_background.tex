@@ -94,7 +94,46 @@ These mutations operate on the tree structure rather than raw bytes, so every mu
 
 Fuzzing is an automated software testing technique that generates a large number of inputs, feeds them to a program under test, and monitors for anomalous behavior such as crashes, hangs, or sanitizer violations \cite{fuzzingsurvey}. The technique is particularly effective at finding inputs with \textit{unexpected characteristics} that trigger vulnerabilities --- precisely the kind of inputs that human-written tests tend to miss.
 
-Fuzzers can be classified along two axes. Along the \textit{analysis} axis: \textit{black-box} fuzzers generate inputs with no knowledge of the program's internals; \textit{white-box} fuzzers use heavyweight techniques such as symbolic execution to reason about program paths; \textit{greybox} fuzzers use lightweight instrumentation (typically branch coverage) to observe execution without full symbolic analysis \cite{fuzzingsurvey}. Along the \textit{generation} axis: \textit{mutation-based} fuzzers start from a seed corpus and apply random modifications (bit flips, byte insertions, splicing); \textit{generation-based} fuzzers construct inputs from scratch according to a model such as a grammar.
+Fuzzers can be classified along two axes. Along the \textit{analysis} axis: \textit{black-box} fuzzers generate inputs with no knowledge of the program's internals; \textit{white-box} fuzzers use heavyweight techniques such as symbolic execution to reason about program paths; \textit{greybox} fuzzers use lightweight instrumentation (typically branch coverage) to observe execution without full symbolic analysis \cite{fuzzingsurvey}. Along the \textit{generation} axis: \textit{mutation-based} fuzzers start from a seed corpus and apply random modifications (bit flips, byte insertions, splicing); \textit{generation-based} fuzzers construct inputs from scratch according to a model such as a grammar. Figure~\ref{fig:fuzzing-taxonomy} positions representative tools along these two axes.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    cell/.style={rectangle, rounded corners=3pt, draw=black!40,
+        minimum width=3.8cm, minimum height=1.1cm, align=center, font=\small},
+    tool/.style={font=\small\ttfamily, color=black!70},
+    axislbl/.style={font=\small\bfseries, color=black!70},
+]
+    % Column headers
+    \node[axislbl] at (2.2, 1.8) {Mutation-based};
+    \node[axislbl] at (6.5, 1.8) {Generation-based};
+
+    % Row headers
+    \node[axislbl, rotate=90, anchor=south] at (-0.8, 0) {Greybox};
+    \node[axislbl, rotate=90, anchor=south] at (-0.8, -1.5) {Blackbox};
+    \node[axislbl, rotate=90, anchor=south] at (-0.8, 1.4) {Whitebox};
+
+    % Whitebox row
+    \node[cell, fill=black!4] at (2.2, 1.2) {\tool{KLEE, SAGE}};
+    \node[cell, fill=black!4] at (6.5, 1.2) {\tool{Driller}};
+
+    % Greybox row
+    \node[cell, fill=blue!8] at (2.2, 0) {\tool{AFL, libFuzzer}};
+    \node[cell, fill=orange!15, draw=black!60, thick] at (6.5, 0) {\tool{Nautilus}\\[1pt]\textbf{\tool{DBMS-Nautilus}}};
+
+    % Blackbox row
+    \node[cell, fill=black!4] at (2.2, -1.2) {\tool{zzuf, Radamsa}};
+    \node[cell, fill=black!4] at (6.5, -1.2) {\tool{CSmith, SQLsmith}};
+
+    % Grid lines
+    \draw[black!20, thick] (0.1, 0.65) -- (8.6, 0.65);
+    \draw[black!20, thick] (0.1, -0.65) -- (8.6, -0.65);
+    \draw[black!20, thick] (4.35, -1.8) -- (4.35, 1.8);
+
+\end{tikzpicture}
+\caption{Fuzzing taxonomy along two axes: generation method (mutation vs.\ generation) and analysis depth (blackbox, greybox, whitebox). DBMS-Nautilus (highlighted) combines grammar-based generation with greybox coverage feedback.}
+\label{fig:fuzzing-taxonomy}
+\end{figure}
 
 Coverage-guided greybox fuzzing, pioneered by AFL \cite{afl}, is the dominant paradigm in modern fuzzing. The target program is compiled with instrumentation that records which code edges (basic block transitions) are exercised during execution. The coverage information is stored in a shared memory bitmap, typically 64KB to 2MB, where each byte corresponds to a hashed edge. After executing a test input, the fuzzer checks whether the input exercised any previously unseen edges. If so, the input is retained in the corpus for further mutation; otherwise it is discarded. This feedback loop transforms fuzzing from random input generation into a directed search that progressively explores deeper program logic.
 
