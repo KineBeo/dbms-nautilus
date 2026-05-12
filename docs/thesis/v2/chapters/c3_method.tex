@@ -1,61 +1,103 @@
-\chapter{DBMS-Nautilus: Design and Implementation}
+\chapter{Proposed Method}
 \label{chap:method}
 
-This chapter presents the design and implementation of DBMS-Nautilus, a grammar-based greybox fuzzing system for SQLite vulnerability detection. The system extends Nautilus~\cite{nautilus} with a structured attack grammar built around the structural primitives methodology and a triage pipeline for automated crash analysis. Section~\ref{sec:overview} provides an architectural overview of the system components and their interactions. Section~\ref{sec:primitives-philosophy} introduces the zero-PoC-contamination design philosophy underlying the grammar. Section~\ref{sec:layer-decomposition} details the two-layer grammar architecture and its concrete production rules. Section~\ref{sec:grammar-evolution} describes the iterative grammar evolution process that constitutes the core contribution of this work. Section~\ref{sec:harness} explains harness construction and compilation. Section~\ref{sec:oracle} defines the oracle classification scheme. Section~\ref{sec:triage} covers the post-campaign triage pipeline.
+As discussed in Chapter~\ref{chap:background}, byte-level fuzzers cannot effectively test database engines because random mutations produce parser-rejected inputs that never reach deep program logic. Grammar-based fuzzers solve the syntactic validity problem but treat all SQL constructs equally, with no knowledge of which structural patterns are most likely to trigger vulnerabilities. This chapter presents DBMS-Nautilus, a grammar-based greybox fuzzing system that combines Nautilus-style coverage-guided generation~\cite{nautilus} with a domain-specific SQL grammar engineered to target vulnerability-triggering code paths in SQLite.
 
-%% ====================================================================
+Section~\ref{sec:overview} describes the system architecture. Section~\ref{sec:grammar-design} presents the grammar design methodology, which constitutes the core contribution of this work. Section~\ref{sec:crash-pipeline} covers the crash analysis pipeline.
+
 \section{System Overview}
 \label{sec:overview}
-%% ====================================================================
 
-DBMS-Nautilus consists of five major components that together form a closed-loop fuzzing pipeline.
-
-\paragraph{Grammar Engine.}
-The Grammar Engine, implemented in Rust (2,441 lines of code in the \texttt{grammartec/} module), loads grammar specifications from Python files via the PyO3 foreign function interface. It builds a rule table from the parsed grammar, assigns weights to each production rule, and provides weighted sampling via the \texttt{loaded\_dice} crate~\cite{loadeddice}, which implements Vose's alias method for $O(1)$ sampling from weighted distributions. Given $K$ rules with weights $w_1, \ldots, w_K$, the alias method normalizes the weights into probabilities $p_i = w_i / \sum_{j=1}^{K} w_j$, constructs a probability table and an alias table, and then produces each sample in constant time using one uniform random number and one comparison. This constant-time sampling is critical because the fuzzer performs on the order of $10^6$ to $10^7$ rule selections per hour-long campaign. The engine supports three mutation operators: random subtree regeneration, recursive expansion of non-terminals, and splice mutations that graft subtrees between different inputs in the queue.
-
-\paragraph{Fuzzer Coordinator.}
-The Fuzzer Coordinator (1,658 lines of code in \texttt{fuzzer/}) orchestrates the main fuzzing loop. On each iteration, it either generates a fresh input from the grammar or selects an existing input from the queue and applies a mutation. The resulting parse tree is unparsed into a SQL string, which is then transmitted to the fork server for execution. Upon receiving coverage feedback, the coordinator determines whether the input triggered new edge transitions in the coverage bitmap. If so, it adds the input to the queue for further mutation, building a corpus that progressively explores deeper program behavior.
-
-\paragraph{Fork Server.}
-The Fork Server (570 lines of code in \texttt{forksrv/}) implements an AFL-compatible fork server protocol~\cite{afl}. A parent process loads the target program into memory, pre-initializes shared state, and then forks a child process for each test case. The child executes the SQL input and exits, while the parent collects the exit status and reads the shared memory coverage bitmap. This bitmap is a 2-megabyte region where each byte corresponds to one edge (basic block transition) in the control flow graph of the instrumented target. The fork server eliminates the overhead of \texttt{execve} on every test case, achieving throughput of thousands of executions per second.
-
-\paragraph{SQLite Harness.}
-The Harness (approximately 200 lines of C in \texttt{harness/}) is a thin wrapper around the SQLite amalgamation. It uses the \texttt{\_\_AFL\_INIT()} macro for fork-server mode (not persistent mode, since Nautilus does not implement the \texttt{\_\_AFL\_LOOP} protocol). The harness opens an in-memory database, reads the fuzzed SQL input from a file path passed as a command-line argument, executes it via \texttt{sqlite3\_exec}, and exits. The binary is compiled with AddressSanitizer and UndefinedBehaviorSanitizer instrumentation to serve as the bug oracle.
-
-\paragraph{Triage Pipeline.}
-The Triage Pipeline (approximately 500 lines of Python in \texttt{triage/}) performs post-campaign analysis. It deduplicates crashes via stack-hash clustering, measures fidelity through replay testing, matches crashes against known CVE signatures, and minimizes crashing inputs to produce succinct reproducers.
-
-Figure~\ref{fig:architecture} illustrates the data flow through the system. The grammar rules define the space of possible SQL inputs. Weighted sampling selects production rules according to their assigned weights. The selected rules drive tree generation, producing a parse tree that is then unparsed into a concrete SQL string. The fork server transmits this string to the harness, which executes it against an instrumented SQLite build. The resulting coverage bitmap is checked for new edges. If new edges are found, the input is retained in the queue, which guides subsequent generation toward unexplored program regions.
+DBMS-Nautilus is a closed-loop fuzzing pipeline where coverage feedback from each execution guides subsequent input generation. The system consists of five components, illustrated in Figure~\ref{fig:architecture}: a grammar engine that defines the space of possible SQL inputs, a generation and mutation module that constructs derivation trees, an execution layer (fork server and harness) that runs each input against an instrumented SQLite build, a coverage feedback mechanism that identifies inputs exercising new code paths, and a triage pipeline that analyzes crashes after each campaign.
 
 \begin{figure}[htbp]
 \centering
 \begin{tikzpicture}[
-    node distance=1.8cm and 2.2cm,
-    block/.style={rectangle, draw, rounded corners, minimum width=2.8cm, minimum height=1.0cm, text centered, align=center, font=\small},
+    node distance=1.4cm,
+    comp/.style={rectangle, draw, rounded corners, minimum width=3.2cm, minimum height=1.0cm, text centered, align=center, font=\small},
     arrow/.style={->, >=stealth, thick},
-    label/.style={font=\scriptsize, midway}
+    lbl/.style={font=\scriptsize, fill=white, inner sep=1pt}
 ]
-    \node[block] (grammar) {Grammar Rules\\(\texttt{grammartec/})};
-    \node[block, right=of grammar] (sampling) {Weighted\\Sampling};
-    \node[block, right=of sampling] (tree) {Tree Generation\\+ Mutation};
-    \node[block, below=of tree] (unparse) {Unparse\\to SQL String};
-    \node[block, below=of unparse] (forkserver) {Fork Server\\(\texttt{forksrv/})};
-    \node[block, left=of forkserver] (harness) {SQLite Harness\\(ASan+UBSan)};
-    \node[block, left=of harness] (coverage) {Coverage\\Bitmap (2\,MB)};
-    \node[block, above=of coverage] (queue) {Queue Update};
+    % Components in a flow
+    \node[comp] (grammar) {\textbf{1} Grammar Engine\\(Python DSL + PyO3)};
+    \node[comp, right=2.0cm of grammar] (gen) {\textbf{2} Generation\\+ Mutation};
+    \node[comp, below=of gen] (exec) {\textbf{3} Fork Server\\+ SQLite Harness};
+    \node[comp, left=2.0cm of exec] (feedback) {\textbf{4} Coverage\\Feedback + Queue};
+    \node[comp, below=1.8cm of feedback] (triage) {\textbf{5} Triage Pipeline};
 
-    \draw[arrow] (grammar) -- (sampling) node[label, above] {rules};
-    \draw[arrow] (sampling) -- (tree) node[label, above] {weights};
-    \draw[arrow] (tree) -- (unparse) node[label, right] {parse tree};
-    \draw[arrow] (unparse) -- (forkserver) node[label, right] {SQL text};
-    \draw[arrow] (forkserver) -- (harness) node[label, above] {fork + exec};
-    \draw[arrow] (harness) -- (coverage) node[label, above] {exit status};
-    \draw[arrow] (coverage) -- (queue) node[label, left] {new edges?};
-    \draw[arrow] (queue) -- (sampling) node[label, left] {retain input};
+    % Main loop
+    \draw[arrow] (grammar) -- node[lbl, above] {rules + weights} (gen);
+    \draw[arrow] (gen) -- node[lbl, right] {SQL string (file)} (exec);
+    \draw[arrow] (exec) -- node[lbl, below] {bitmap + exit status} (feedback);
+    \draw[arrow] (feedback) -- node[lbl, left] {interesting inputs} (gen);
+
+    % Triage branch
+    \draw[arrow] (exec.south) -- ++(0,-0.5) -| node[lbl, below left] {crashes} (triage.east);
 \end{tikzpicture}
-\caption{Architecture of DBMS-Nautilus. Arrows indicate data flow direction. The coverage feedback loop retains inputs that discover new edges, building a corpus that guides subsequent generation toward unexplored program regions.}
+\caption{Architecture of DBMS-Nautilus. Components 1--4 form a closed feedback loop: the grammar defines the input space, generation constructs SQL from derivation trees, the fork server executes each input against an instrumented SQLite harness, and coverage feedback retains inputs that discover new edges. Component 5 analyzes crashes after each campaign.}
 \label{fig:architecture}
 \end{figure}
+
+\paragraph{Grammar Engine.}
+The grammar engine loads a SQL grammar specification written in Python via the PyO3 foreign function interface. Each grammar file defines production rules using the \texttt{ctx.rule()} API, where non-terminals are enclosed in curly braces (e.g., \texttt{ctx.rule("Stmt", "SELECT \{Expr\} FROM \{Table\}")}). The engine builds a rule table from the parsed grammar and supports weighted sampling over production rules, allowing certain rules to be selected more frequently than others (Section~\ref{sec:grammar-design} describes how weights are assigned).
+
+\paragraph{Generation and Mutation.}
+On each iteration, the fuzzer either generates a fresh derivation tree from the grammar or selects an existing tree from the queue and applies a mutation. Three tree-level mutations are used: random mutation (replace a subtree with a freshly generated one for the same non-terminal), random recursion (expand or collapse recursive productions), and splice mutation (swap compatible subtrees between two queue trees). The resulting tree is unparsed into a concrete SQL string by reading its leaf nodes left to right.
+
+\paragraph{Fork Server and Harness.}
+The SQL string is written to a temporary file and passed as a command-line argument to the SQLite harness. The fork server, following the AFL protocol~\cite{afl}, loads the harness once into a parent process and creates child processes via \texttt{fork()} for each test case. Each child inherits the initialized program state, reads the SQL file, executes it via \texttt{sqlite3\_exec()}, and exits. The parent collects the child's exit status and reads the shared memory coverage bitmap. This fork-based execution eliminates the overhead of process creation on every test case, achieving thousands of executions per second. SQLite is compiled from source using \texttt{afl-clang-fast} with AddressSanitizer and UndefinedBehaviorSanitizer instrumentation, enabling the detection of memory safety violations and undefined behavior during execution.
+
+\paragraph{Coverage Feedback and Queue.}
+After each execution, the fuzzer compares the resulting coverage bitmap against the global coverage map accumulated from all prior executions. The bitmap is a shared memory region where each byte represents a hashed edge (basic block transition) in SQLite's control flow graph. If the input exercised at least one previously unseen edge, it is classified as interesting and added to the queue. This queue serves as the seed pool for subsequent mutations, creating a directed search that progressively steers generation toward unexplored program regions. This feedback loop is what makes DBMS-Nautilus a \textit{greybox} fuzzer rather than a purely generative one.
+
+\paragraph{Triage Pipeline.}
+After a campaign completes, the triage pipeline processes all collected crashes. It deduplicates crashes by stack hash, matches them against known CVE signatures, and scores reproduction fidelity. Section~\ref{sec:crash-pipeline} describes this pipeline in detail.
+
+A key design decision in DBMS-Nautilus is that the harness starts with an empty in-memory database. Unlike SQLsmith~\cite{sqlsmith}, which connects to an existing database and introspects its schema to generate valid queries, or Squirrel~\cite{squirrel}, which maintains a schema model during fuzzing, DBMS-Nautilus requires no external database state. Instead, the grammar itself generates complete, self-contained SQL that includes schema creation (via the \texttt{Schema-Setup} non-terminal) before issuing queries. Each test case creates its own tables, inserts its own data, and runs its own queries --- making every execution independently reproducible without any setup beyond the empty database. This design simplifies the harness, eliminates dependencies on pre-loaded state, and ensures that any crashing input can be replayed in isolation.
+
+Listing~\ref{lst:harness} shows the harness implementation. The \texttt{setup\_db()} constructor opens the in-memory database before the \texttt{\_\_AFL\_INIT()} fork point, so every child process inherits the initialized (but empty) database handle. Each child reads one SQL file, executes it, and exits.
+
+\begin{lstlisting}[language=C, caption={SQLite harness for AFL fork-server mode. The database is opened before the fork point; each child executes one SQL input from a file.}, label=lst:harness, basicstyle=\ttfamily\small, numbers=left]
+#include "sqlite3.h"
+static sqlite3 *db = NULL;
+
+__attribute__((constructor))
+static void setup_db(void) {
+    sqlite3_open(":memory:", &db);
+}
+
+int main(int argc, char **argv) {
+    __AFL_INIT();  /* Fork point */
+    char *sql = read_input(argv[1]);
+    if (sql) {
+        char *errmsg = NULL;
+        sqlite3_exec(db, sql, NULL, NULL, &errmsg);
+        if (errmsg) sqlite3_free(errmsg);
+        free(sql);
+    }
+    sqlite3_close(db);
+    return 0;
+}
+\end{lstlisting}
+
+Table~\ref{tab:components} summarizes the five components, their implementation languages, and their roles in the pipeline.
+
+\begin{table}[htbp]
+\caption{DBMS-Nautilus system components.}
+\label{tab:components}
+\centering
+\begin{tabular}{llll}
+\toprule
+\textbf{Component} & \textbf{Language} & \textbf{Module} & \textbf{Role} \\
+\midrule
+Grammar Engine & Rust & \texttt{grammartec/} & Load grammar, weighted rule sampling \\
+Generation + Mutation & Rust & \texttt{fuzzer/} & Build and mutate derivation trees \\
+Fork Server + Harness & Rust + C & \texttt{forksrv/}, \texttt{harness/} & Execute SQL against instrumented SQLite \\
+Coverage Feedback & Rust & \texttt{fuzzer/} & Track edges, maintain queue \\
+Triage Pipeline & Python & \texttt{triage/} & Crash dedup, CVE matching, reporting \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 %% ====================================================================
 \section{Structural Primitives Philosophy}
