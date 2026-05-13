@@ -7,7 +7,7 @@ This chapter presents the empirical evaluation of DBMS-Nautilus, structured arou
 \section{Experimental Setup}
 \label{sec:setup}
 
-All experiments were conducted on a standard development workstation equipped with an Intel Core i7 processor, 16~GB of RAM, and running Ubuntu 22.04 LTS. The fuzzer was compiled with Rust 1.77 in release mode, and all SQLite harness binaries were compiled with Clang~14 using AddressSanitizer (ASan) and UndefinedBehaviorSanitizer (UBSan) instrumentation. ASan detects memory safety violations (buffer overflows, use-after-free) and causes the process to exit with code 223. UBSan detects undefined behavior (integer overflow, null pointer dereference) and causes exit code 1. SQLite debug assertions fire SIGTRAP (signal~5), detected as exit code 133. Normal execution and SQL semantic errors produce exit code 0 and are not classified as bugs.
+All experiments were conducted on a standard development workstation equipped with an Intel Core i7 processor, 16~GB of RAM, and running Ubuntu 22.04 LTS. The fuzzer was compiled with Rust 1.77 in release mode, and all SQLite harness binaries were compiled with Clang~14 using AddressSanitizer (ASan)~\cite{asan} and UndefinedBehaviorSanitizer (UBSan) instrumentation. ASan detects memory safety violations (buffer overflows, use-after-free) and causes the process to exit with code 223. UBSan detects undefined behavior (integer overflow, null pointer dereference) and causes exit code 1. SQLite debug assertions fire SIGTRAP (signal~5), detected as exit code 133. Normal execution and SQL semantic errors produce exit code 0 and are not classified as bugs.
 
 Table~\ref{tab:params} summarizes the campaign parameters used across all experiments. Campaign durations ranged from 15 to 60 minutes depending on the experiment's objective: shorter campaigns for iterative grammar development and ablation, longer campaigns for coverage saturation analysis and final evaluation. A single fuzzing thread was used in all campaigns to eliminate concurrency-related variance and ensure reproducibility.
 
@@ -152,20 +152,21 @@ Table~\ref{tab:all-bugs} presents all 10 bug classes discovered by DBMS-Nautilus
 \caption{All bug classes discovered by DBMS-Nautilus. Ten distinct classes identified through stack-hash deduplication. Three match known CVEs; seven are previously unreported.}
 \label{tab:all-bugs}
 \centering
+\small
 \begin{tabular}{llllcr}
 \toprule
-\textbf{Class} & \textbf{Bug Type} & \textbf{Severity} & \textbf{Versions} & \textbf{CVE} & \textbf{Hashes} \\
+\textbf{Class} & \textbf{Bug Type} & \textbf{Sev.} & \textbf{Versions} & \textbf{CVE} & \textbf{Hashes} \\
 \midrule
-BC001 & Null ptr in sqlite3Fts5GetTokenizer & HIGH & 4 versions & --- & 4 \\
-BC002 & Misaligned access in sqlite3WindowUnlinkFromSelect & HIGH & 3.30.1 & CVE-2020-13871 & 1 \\
-BC003 & Signed int overflow in sqlite3\_str\_vappendf & MEDIUM & 3 versions & CVE-2020-13434 & 6 \\
-BC004 & Float cast overflow in alsoAnInt & LOW & 4 versions & --- & 42 \\
-BC005 & Signal 6 in sqlite3WindowListDelete & MEDIUM & 3.30.1 & --- & 4 \\
-BC006 & Null ptr in sqlite3AtoF & HIGH & 3.30.1 & --- & 1 \\
-BC007 & Null ptr in sqlite3Atoi64 & HIGH & 3.30.1 & --- & 1 \\
-BC008 & Float cast overflow in sqlite3VdbeMemNumerify & LOW & 2 versions & --- & 8 \\
-BC009 & Signal 6 (no stack trace) & MEDIUM & 2 versions & --- & 21 \\
-BC010 & Null ptr in sqlite3Select & HIGH & 3.31.1 & CVE-2020-9327 & 1 \\
+BC001 & Null ptr in \texttt{sqlite3Fts5GetTokenizer} & HIGH & 4 ver. & --- & 4 \\
+BC002 & Misaligned in \texttt{WindowUnlinkFromSelect} & HIGH & 3.30.1 & 13871 & 1 \\
+BC003 & Int overflow in \texttt{sqlite3\_str\_vappendf} & MED & 3 ver. & 13434 & 6 \\
+BC004 & Float cast overflow in \texttt{alsoAnInt} & LOW & 4 ver. & --- & 42 \\
+BC005 & Signal 6 in \texttt{WindowListDelete} & MED & 3.30.1 & --- & 4 \\
+BC006 & Null ptr in \texttt{sqlite3AtoF} & HIGH & 3.30.1 & --- & 1 \\
+BC007 & Null ptr in \texttt{sqlite3Atoi64} & HIGH & 3.30.1 & --- & 1 \\
+BC008 & Float cast overflow in \texttt{VdbeMemNumerify} & LOW & 2 ver. & --- & 8 \\
+BC009 & Signal 6 (no stack trace) & MED & 2 ver. & --- & 21 \\
+BC010 & Null ptr in \texttt{sqlite3Select} & HIGH & 3.31.1 & 9327 & 1 \\
 \midrule
 \multicolumn{5}{l}{\textbf{Total}} & \textbf{89} \\
 \bottomrule

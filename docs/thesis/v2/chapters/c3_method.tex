@@ -79,7 +79,7 @@ The system consists of five components organized into a closed feedback loop, il
 \end{figure}
 
 \paragraph{Grammar Engine.}
-The grammar engine defines the space of SQL inputs that the fuzzer can produce. It loads a context-free grammar specification written as a Python script, where each production rule maps a non-terminal to a string pattern containing terminal symbols and references to other non-terminals. Rules can carry numeric weights that bias the sampling distribution, allowing the grammar designer to make certain SQL constructs more likely to appear than others. The grammar engine is the component that distinguishes DBMS-Nautilus from general-purpose grammar fuzzers: by encoding SQL-specific structural patterns and weighting them toward vulnerability-relevant constructs, it concentrates the fuzzer's effort on the most productive regions of the input space. Section~\ref{sec:grammar-design} describes the grammar design methodology in detail.
+The grammar engine defines the space of SQL inputs that the fuzzer can produce. It loads a context-free grammar specification written as a Python script, where each production rule maps a non-terminal to a string pattern containing terminal symbols and references to other non-terminals. Rules can carry numeric weights that bias the sampling distribution via the loaded dice algorithm~\cite{loadeddice}, allowing the grammar designer to make certain SQL constructs more likely to appear than others. The grammar engine is the component that distinguishes DBMS-Nautilus from general-purpose grammar fuzzers: by encoding SQL-specific structural patterns and weighting them toward vulnerability-relevant constructs, it concentrates the fuzzer's effort on the most productive regions of the input space. Section~\ref{sec:grammar-design} describes the grammar design methodology in detail.
 
 \paragraph{Generation and Mutation.}
 The generation and mutation module transforms grammar rules into concrete SQL strings. On each iteration, it either builds a fresh derivation tree by expanding non-terminals according to the grammar, or takes an existing tree from the queue and applies a structural mutation --- replacing a subtree, expanding or collapsing recursive productions, or splicing subtrees between two trees. The result is unparsed into a SQL string by reading leaf nodes left to right. This tree-level approach ensures that every generated input is syntactically valid with respect to the grammar, avoiding the wasted executions that plague byte-level mutators when applied to structured languages like SQL.
@@ -497,14 +497,14 @@ The grammar underwent iterative refinement across four versions, guided by exper
 \caption{Grammar version history. Each version addresses a specific deficiency identified through experimental feedback.}
 \label{tab:grammar-evolution}
 \centering
-\begin{tabular}{llrl}
+\small
+\begin{tabular}{llrp{7.5cm}}
 \toprule
 \textbf{Version} & \textbf{Date} & \textbf{Rules} & \textbf{Key Change} \\
 \midrule
 v3.0 & 2026-04-27 & 449 & Initial structural primitives design \\
 v3.1 & 2026-04-28 & 449 & S5 (FTS) weight 2.0$\to$0.5; diversify crash portfolio \\
-v3.2 & 2026-05-05 & 475 & +window functions, +self-ref generated columns, \\
-     &            &     & +count() zero-arg, +ORDER BY 3-term \\
+v3.2 & 2026-05-05 & 475 & +window functions, +self-ref generated columns, +count() zero-arg, +ORDER BY 3-term \\
 v3.3 & 2026-05-10 & 520 & +JSON/JSONB expansion (Json-Key, Json-Path, Json-Literal) \\
 \bottomrule
 \end{tabular}
@@ -560,7 +560,7 @@ This episode illustrates a general principle of grammar engineering for fuzzing:
 
 \subsection{v3.1 to v3.2: Structural Expansion (475 Rules)}
 
-The second refinement addressed structural gaps that prevented the grammar from reaching four of the six target CVEs. A systematic gap analysis compared the structural requirements of each CVE (as documented in Table~\ref{tab:cve-reachability}) against the non-terminals available in v3.1. The analysis revealed that:
+The second refinement addressed structural gaps that prevented the grammar from reaching four of the six target CVEs. A systematic gap analysis compared the structural requirements of each CVE (as documented in Table~\ref{tab:cve-structural}) against the non-terminals available in v3.1. The analysis revealed that:
 
 \begin{itemize}
     \item CVE-2020-9327 required self-referential generated columns (a generated column whose expression references another generated column in the same table), which v3.1 could not express.
