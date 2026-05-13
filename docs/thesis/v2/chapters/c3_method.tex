@@ -577,7 +577,7 @@ After this expansion, all six target CVEs became structurally reachable --- the 
 
 The third refinement targeted the \texttt{json.c} module in SQLite, motivated by the goal of extending the fuzzer's reach beyond the original six CVEs into a current SQLite release (version 3.53.0). The JSON1 extension is a high-value target because it performs complex string parsing, type coercion, and memory management operations that are historically prone to vulnerabilities.
 
-Version~3.3 added 51 new rules organized into four non-terminal groups:
+Version~3.3 added 45 new rules organized into four non-terminal groups:
 
 \begin{itemize}
     \item \texttt{Json-Key}: 4 rules for JSON key access patterns (dot notation, bracket notation, quoted keys, nested paths).
