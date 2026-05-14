@@ -115,6 +115,31 @@ Triage Pipeline & Python & \texttt{triage/} & Crash dedup, CVE matching, reporti
 \end{tabular}
 \end{table}
 
+\subsection{Positioning Among DBMS Fuzzers}
+\label{sec:positioning}
+
+Table~\ref{tab:fuzzer-comparison} compares DBMS-Nautilus against two representative SQL fuzzers: SQLsmith~\cite{sqlsmith} and Squirrel~\cite{squirrel}.
+
+\begin{table}[htbp]
+\caption{Comparison of SQL fuzzing approaches.}
+\label{tab:fuzzer-comparison}
+\centering
+\begin{tabular}{p{3.5cm}p{3.5cm}p{3.5cm}p{3.5cm}}
+\toprule
+\textbf{Feature} & \textbf{SQLsmith} & \textbf{Squirrel} & \textbf{DBMS-Nautilus} \\
+\midrule
+Input generation method & Random grammar-based & Validity-preserving mutation & Weighted grammar with derivation trees \\
+Schema handling & External pre-populated database & Internal evolving schema model & Self-contained per test case \\
+Mutation strategy & Random re-generation & Semantic-aware tree mutation & Structure-preserving tree mutation \\
+Coverage guidance & No & No & Yes (shared memory bitmap) \\
+Vulnerability targeting & No & No & Yes (weighted production rules) \\
+Test case isolation & No (requires external state) & No (requires schema model) & Yes (empty database per input) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The key distinction between DBMS-Nautilus and prior approaches lies in how each tool allocates fuzzing effort across the SQL input space. SQLsmith samples uniformly from a random grammar, giving equal probability to every syntactic construct regardless of its likelihood of reaching vulnerable code paths~\cite{sqlsmith}. Squirrel improves semantic validity by tracking a schema model, but still does not bias generation toward vulnerability-relevant patterns~\cite{squirrel}. DBMS-Nautilus instead embeds that bias directly into the grammar: weighted production rules concentrate sampling probability on structural patterns --- such as recursive \texttt{WITH} clauses, aggregate functions over virtual tables, and boundary-value arithmetic --- that correspond to the code regions implicated in known CVEs. The effect of these design choices on crash discovery rates is measured empirically in Chapter~\ref{chap:experiments}.
+
 %% ====================================================================
 \section{Grammar Design}
 \label{sec:grammar-design}
@@ -476,6 +501,29 @@ Figure~\ref{fig:cve-matrix} visualizes the same data as a cross-pollination matr
 Generated columns appear in the requirements for both CVE-2019-19646 and CVE-2020-9327, served by a single \texttt{Schema-Setup} alternative (S2). The \texttt{coalesce()} function appears in CVE-2020-9327 and CVE-2020-13435, served by a single \texttt{Func-Call} alternative. Window functions with \texttt{OVER} clauses appear in CVE-2020-13435 and implicitly in CVE-2020-13871 through the window function lifecycle code path. This sharing means that improving the grammar's ability to reach one CVE simultaneously improves its ability to reach others that share structural requirements --- a multiplicative benefit that would not arise if each CVE were targeted by isolated, dedicated grammar rules.
 
 The CVE reachability analysis also reveals the minimum grammar complexity required for full coverage. CVE-2020-13434 requires only two structural elements (printf and a boundary integer), both present in the initial grammar from v3.0. CVE-2020-13435 requires five simultaneous elements including window functions and NATURAL JOIN, which were not added until v3.2. The range from 2 to 5 required patterns per CVE explains why some CVEs are discovered quickly (low combinatorial barrier) while others remain elusive even after extended campaigns (high combinatorial barrier). Section~\ref{sec:grammar-evolution} traces how the grammar evolved to close these structural gaps.
+
+\subsection{Compositional Discovery Probability}
+\label{sec:composition-probability}
+
+The cross-pollination structure has a quantifiable consequence: for each CVE, the probability that a single generated input contains all required structural patterns can be computed from the grammar weights. Each Layer~2 shape selection is an independent draw from a weighted categorical distribution, and each terminal-level choice (format specifier, boundary value, column type) is a further independent draw. The probability of generating a CVE-triggering composition in a single input is the product of these conditional probabilities.
+
+\paragraph{Example: CVE-2020-13434.}
+This CVE requires two structural elements: a \texttt{printf()} call with a format specifier and an INT32 boundary value. The probability of generating a triggering input requires:
+
+\begin{enumerate}
+    \item Selecting \texttt{Boundary-Func-Call} at Layer~2: the \texttt{Sql-Stmt} structure must include a boundary function call. This occurs with probability $p_1$ depending on the Layer~2 dispatch weights.
+    \item Selecting the \texttt{printf} alternative within \texttt{Boundary-Func-Call}: weight 3.0 out of total 6.5, giving $p_2 = 3.0/6.5 \approx 0.46$.
+    \item Selecting \texttt{\%.*g} as the format specifier: weight 3.0 out of total 5.0, giving $p_3 = 3.0/5.0 = 0.60$.
+    \item Selecting an INT32 boundary value ($\geq 2^{31}-1$): weight 6.0 out of total 12.0, giving $p_4 = 6.0/12.0 = 0.50$.
+\end{enumerate}
+
+The per-input probability is $P(\text{CVE-13434}) = p_1 \times p_2 \times p_3 \times p_4 \approx p_1 \times 0.138$. With $p_1$ estimated conservatively at 0.1 (one in ten inputs includes a boundary function call), $P \approx 0.014$, meaning approximately one in 70 generated inputs contains the required structural composition. At typical throughput of 500--1000 executions per second, the expected time to first triggering input is under one second of fuzzing --- though the input must also avoid schema configurations that interfere with the query, and the mutation engine must not disrupt the critical subtree.
+
+\paragraph{Contrast: CVE-2020-13435.}
+This CVE requires five simultaneous elements: NATURAL JOIN, \texttt{coalesce()}, window function with \texttt{OVER}, UNIQUE column constraint, and IN subquery. Each element has its own conditional selection probability, and the product yields $P(\text{CVE-13435}) \approx 10^{-5}$ to $10^{-6}$. At 1000 executions per second, the expected time to first triggering input is 10--1000 seconds --- consistent with the observed time-to-first-crash in campaigns where this CVE was found after several minutes rather than immediately.
+
+\paragraph{Implication for grammar design.}
+The exponential relationship between the number of required patterns and the per-input probability has two consequences. First, it explains why simple CVEs (2 patterns) are found within seconds while complex CVEs (5 patterns) may require minutes or tens of minutes. Second, it motivates weight tuning: increasing the weight of a required non-terminal directly increases its selection probability, multiplicatively improving the per-input probability for \emph{every} CVE that requires that pattern. This multiplicative benefit is the quantitative mechanism behind cross-pollination: a weight increase for \texttt{coalesce()} improves reachability for both CVE-2020-9327 and CVE-2020-13435 simultaneously. The experimental comparison in Chapter~\ref{chap:experiments} validates this analysis by measuring whether the weighted grammar's crash rates exceed those of a baseline grammar with uniform weights.
 
 \subsection{Analysis of the Grammar Design Approach}
 \label{sec:grammar-analysis}
