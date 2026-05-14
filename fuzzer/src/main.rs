@@ -1,8 +1,6 @@
 // Nautilus
 // Copyright (C) 2024  Daniel Teuchert, Cornelius Aschermann, Sergej Schumilo
 
-extern crate candle_core;
-extern crate candle_nn;
 extern crate forksrv;
 extern crate grammartec;
 extern crate rand;
@@ -16,25 +14,22 @@ extern crate pyo3;
 extern crate ron;
 
 mod config;
-mod dqn;
 mod fuzzer;
 mod grammar_bandit;
 mod python_grammar_loader;
 mod queue;
+#[allow(dead_code)]
 mod rl_hook;
-mod rl_logger;
 mod shared_state;
 mod state;
 
 use config::Config;
-use dqn::DqnTrainer;
 use forksrv::newtypes::SubprocessError;
 use fuzzer::Fuzzer;
 use grammar_bandit::GrammarBandit;
 use grammartec::chunkstore::ChunkStoreWrapper;
 use grammartec::context::Context;
 use queue::{InputState, QueueItem};
-use rl_hook::{DefaultPolicy, DqnPolicy, MutationPolicy, PolicyContext};
 use shared_state::GlobalSharedState;
 use state::FuzzingState;
 
@@ -52,7 +47,6 @@ fn process_input(
     state: &mut FuzzingState,
     inp: &mut QueueItem,
     config: &Config,
-    policy: &mut dyn MutationPolicy,
     global_state: &Arc<Mutex<GlobalSharedState>>,
 ) -> Result<(), SubprocessError> {
     match inp.state {
@@ -60,13 +54,7 @@ fn process_input(
             let end_index = start_index + 200;
 
             if state.minimize(inp, start_index, end_index)? {
-                if config.rl_enabled {
-                    // Skip Det when RL controls strategy selection —
-                    // the DQN can choose Det as action=3 in Random mode.
-                    inp.state = InputState::Random;
-                } else {
-                    inp.state = InputState::Det((0, 0));
-                }
+                inp.state = InputState::Det((0, 0));
             } else {
                 inp.state = InputState::Init(end_index);
             }
@@ -88,89 +76,9 @@ fn process_input(
             state.havoc_recursion(inp)?;
         }
         InputState::Random => {
-            // Snapshot pre-mutation signals from GlobalSharedState
-            let (bits_before, crashes_before, queue_sz_before, total_cov_before) = {
-                let gs = global_state.lock().expect("P2-6_before_lock");
-                let bits = gs.bits_found_by_havoc
-                    + gs.bits_found_by_havoc_rec
-                    + gs.bits_found_by_splice
-                    + gs.bits_found_by_det
-                    + gs.bits_found_by_gen;
-                let crashes = gs.total_found_asan + gs.total_found_sig + gs.total_found_ubsan;
-                let queue_sz = gs.queue.len();
-                let total_cov = gs.bitmaps.get(&false)
-                    .map_or(0, |b| b.iter().filter(|&&x| x != 0).count());
-                (bits, crashes, queue_sz, total_cov)
-            };
-
-            let ctx_before = PolicyContext {
-                coverage_delta: 0,
-                is_crash: false,
-                is_timeout: false,
-                total_coverage: total_cov_before,
-                exec_count: state.fuzzer.execution_count,
-                queue_size: queue_sz_before,
-                strategy_emas: [0.0f32; 5],
-                last_action: None,
-            };
-
-            match policy.select_action(&ctx_before) {
-                None => {
-                    // DefaultPolicy: run all three strategies (original behaviour).
-                    state.splice(inp)?;
-                    state.havoc(inp)?;
-                    state.havoc_recursion(inp)?;
-                }
-                Some(action) => {
-                    // DqnPolicy: dispatch to the single selected strategy.
-                    match action {
-                        0 => state.havoc(inp)?,              // Havoc
-                        1 => state.havoc_recursion(inp)?,    // HavocRec
-                        2 => state.splice(inp)?,             // Splice
-                        3 => {
-                            // Det — run a single deterministic mutation step
-                            state.deterministic_tree_mutation(inp, 0, 1)?;
-                        }
-                        4 => state.generate_random("START")?, // Generate
-                        _ => {
-                            // Unknown action — fall back to default.
-                            state.splice(inp)?;
-                            state.havoc(inp)?;
-                            state.havoc_recursion(inp)?;
-                        }
-                    }
-
-                    // Snapshot post-mutation signals
-                    let (bits_after, crashes_after, queue_sz_after, total_cov_after) = {
-                        let gs = global_state.lock().expect("P2-6_after_lock");
-                        let bits = gs.bits_found_by_havoc
-                            + gs.bits_found_by_havoc_rec
-                            + gs.bits_found_by_splice
-                            + gs.bits_found_by_det
-                            + gs.bits_found_by_gen;
-                        let crashes = gs.total_found_asan + gs.total_found_sig + gs.total_found_ubsan;
-                        let queue_sz = gs.queue.len();
-                        let total_cov = gs.bitmaps.get(&false)
-                            .map_or(0, |b| b.iter().filter(|&&x| x != 0).count());
-                        (bits, crashes, queue_sz, total_cov)
-                    };
-
-                    let coverage_delta = bits_after.saturating_sub(bits_before) as usize;
-                    let is_crash = crashes_after > crashes_before;
-
-                    let ctx_after = PolicyContext {
-                        coverage_delta,
-                        is_crash,
-                        is_timeout: false,
-                        total_coverage: total_cov_after,
-                        exec_count: state.fuzzer.execution_count,
-                        queue_size: queue_sz_after,
-                        strategy_emas: [0.0f32; 5],
-                        last_action: Some(action),
-                    };
-                    policy.observe(action, &ctx_after);
-                }
-            }
+            state.splice(inp)?;
+            state.havoc(inp)?;
+            state.havoc_recursion(inp)?;
         }
     }
     return Ok(());
@@ -181,7 +89,6 @@ fn fuzzing_thread(
     config: Config,
     ctx: Context,
     cks: Arc<ChunkStoreWrapper>,
-    dqn_trainer: Option<Arc<Mutex<DqnTrainer>>>,
     shared_bandit: Option<Arc<Mutex<GrammarBandit>>>,
 ) {
     let path_to_bin_target = config.path_to_bin_target.to_owned();
@@ -201,29 +108,6 @@ fn fuzzing_thread(
     let mut old_execution_count = 0;
     let mut old_executions_per_sec = 0;
 
-    // Build the policy for this thread.
-    let thread_dqn_cfg = dqn::DqnConfig {
-        batch_size: config.rl_batch_size,
-        replay_size: config.rl_replay_size,
-        gamma: config.rl_gamma,
-        lr: config.rl_lr as f64,
-        target_update_freq: config.rl_target_update,
-        train_interval: config.rl_train_interval,
-        epsilon_start: config.rl_epsilon_start,
-        epsilon_end: config.rl_epsilon_end,
-        epsilon_decay: config.rl_epsilon_decay as f32,
-    };
-    let mut dqn_policy_storage: Option<DqnPolicy> = dqn_trainer.map(|trainer| {
-        DqnPolicy::new(trainer, &config.path_to_workdir, &thread_dqn_cfg)
-    });
-    let mut default_policy_storage = DefaultPolicy;
-
-    let policy: &mut dyn MutationPolicy = if let Some(ref mut p) = dqn_policy_storage {
-        p
-    } else {
-        &mut default_policy_storage
-    };
-
     let mut last_bandit_exec = 0_u64;
     let mut last_bandit_coverage = 0_usize;
     let mut last_bandit_crashes = 0_u64;
@@ -233,7 +117,7 @@ fn fuzzing_thread(
         let inp = global_state.lock().expect("RAND_2191486322").queue.pop();
         if let Some(mut inp) = inp {
             //If subprocess died restart forkserver
-            if process_input(&mut state, &mut inp, &config, policy, &global_state).is_err() {
+            if process_input(&mut state, &mut inp, &config, &global_state).is_err() {
                 let args = vec![];
                 let fuzzer = Fuzzer::new(
                     path_to_bin_target.clone(),
@@ -377,8 +261,8 @@ fn main() {
             Arg::with_name("policy")
                 .long("policy")
                 .takes_value(true)
-                .possible_values(&["uniform", "bandit", "dqn"])
-                .help("Grammar weight policy: uniform (default), bandit (Thompson Sampling), dqn"),
+                .possible_values(&["uniform", "bandit"])
+                .help("Grammar weight policy: uniform (default), bandit (Thompson Sampling)"),
         )
         .arg(Arg::with_name("cmdline").multiple(true))
         .get_matches();
@@ -484,34 +368,6 @@ fn main() {
             .expect("Could not create folder in workdir");
     }
 
-    // Build a shared DqnTrainer when rl_enabled=true.
-    // All fuzzing threads share the same trainer (replay buffer + network weights).
-    let dqn_cfg = dqn::DqnConfig {
-        batch_size: config.rl_batch_size,
-        replay_size: config.rl_replay_size,
-        gamma: config.rl_gamma,
-        lr: config.rl_lr as f64,
-        target_update_freq: config.rl_target_update,
-        train_interval: config.rl_train_interval,
-        epsilon_start: config.rl_epsilon_start,
-        epsilon_end: config.rl_epsilon_end,
-        epsilon_decay: config.rl_epsilon_decay as f32,
-    };
-    let dqn_trainer: Option<Arc<Mutex<DqnTrainer>>> = if config.rl_enabled {
-        match DqnTrainer::new(&dqn_cfg) {
-            Ok(trainer) => {
-                println!("RL enabled: DQN trainer initialised.");
-                Some(Arc::new(Mutex::new(trainer)))
-            }
-            Err(e) => {
-                eprintln!("WARNING: failed to initialise DqnTrainer ({:?}); RL disabled.", e);
-                None
-            }
-        }
-    } else {
-        None
-    };
-
     // Build shared GrammarBandit when policy=bandit
     let shared_bandit: Option<Arc<Mutex<GrammarBandit>>> = if config.policy == "bandit" {
         let bandit = GrammarBandit::new(&my_context, &config.path_to_workdir);
@@ -531,13 +387,12 @@ fn main() {
         let config = config.clone();
         let ctx = my_context.clone();
         let cks = shared_chunkstore.clone();
-        let trainer = dqn_trainer.clone();
         let bandit = shared_bandit.clone();
         thread_number += 1;
         thread::Builder::new()
             .name(format!("fuzzer_{}", thread_number))
             .stack_size(config.thread_size)
-            .spawn(move || fuzzing_thread(state, config, ctx, cks, trainer, bandit))
+            .spawn(move || fuzzing_thread(state, config, ctx, cks, bandit))
     });
 
     //Start status thread
