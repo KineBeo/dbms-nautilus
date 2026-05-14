@@ -31,7 +31,6 @@ Config(
     number_of_generate_inputs: 1000,
     max_tree_size: $MAX_TREE_SIZE,
     number_of_deterministic_mutations: 1,
-    rl_enabled: false,
 )
 ```
 
@@ -44,8 +43,7 @@ Config(
 
 **Step 4 — Launch the fuzzer.**
 `timeout "$DURATION" ./target/release/fuzzer -c "$CONFIG" [--policy $POLICY]`
-(`run_eval.sh` lines 114–120). The `--policy` flag accepts `uniform`, `bandit`,
-or `dqn`; omitting it defaults to `uniform`.
+(`run_eval.sh` lines 114–120). The `--policy` flag accepts `uniform` or `bandit`; omitting it defaults to `uniform`.
 
 **Step 5 — Workdir structure created by `main.rs`.**
 `main.rs` lines 476–485 create four subdirectories under `$WORKDIR`:
@@ -246,12 +244,7 @@ is passed to `Queue::add()` as `all_bits` for the new `QueueItem`
 `GlobalSharedState` on each loop iteration and displayed by the status thread.
 
 **`InputState::Random` dispatch** (`main.rs` lines 90–173):
-- `DefaultPolicy` (no RL): runs all three strategies — `splice`, `havoc`,
-  `havoc_recursion` — unconditionally.
-- `DqnPolicy` (RL enabled): calls `policy.select_action()` and routes to
-  exactly one strategy by action index (0=Havoc, 1=HavocRec, 2=Splice,
-  3=Det, 4=Gen). After execution, calls `policy.observe(action, ctx_after)`
-  with the `coverage_delta` and `is_crash` computed from global state deltas.
+Runs all three strategies — `splice`, `havoc`, `havoc_recursion` — unconditionally.
 
 **`InputState::Det` phase** (`main.rs` lines 74–88):
 Runs deterministic mutations for `config.number_of_deterministic_mutations`
@@ -437,17 +430,7 @@ configs that predate Phase 2.
 | `number_of_generate_inputs` | `u16` | (required) | How many `generate_random("START")` calls per idle round (when queue is empty) |
 | `max_tree_size` | `usize` | (required) | Maximum grammar derivation tree node count; caps recursive tree growth |
 | `number_of_deterministic_mutations` | `usize` | (required) | Number of full Det cycles (each cycle covers all tree nodes once); `1` is the standard setting |
-| `rl_enabled` | `bool` | `false` | When `true`, wraps the `DqnPolicy` around mutation selection in `InputState::Random`; also skips the `Det` stage during initial processing |
-| `policy` | `String` | `"uniform"` | Grammar weight policy: `"uniform"` (static), `"bandit"` (Thompson Sampling), `"dqn"` (DQN actor) |
-| `rl_epsilon_start` | `f32` | `1.0` | Initial ε for DQN ε-greedy exploration (fully random at start) |
-| `rl_epsilon_end` | `f32` | `0.05` | Final ε after decay (5% random exploration at convergence) |
-| `rl_epsilon_decay` | `u64` | `50000` | Number of exec steps over which ε decays linearly from `rl_epsilon_start` to `rl_epsilon_end` |
-| `rl_batch_size` | `usize` | `32` | Mini-batch size for each DQN training step |
-| `rl_replay_size` | `usize` | `3000` | Experience replay buffer capacity (transitions); older entries evicted when full |
-| `rl_gamma` | `f32` | `0.99` | Discount factor γ for Bellman target: `Q_target = r + γ * max Q_next` |
-| `rl_lr` | `f32` | `0.001` | AdamW learning rate for the DQN online network |
-| `rl_target_update` | `u64` | `1000` | How many train steps between copying online network weights to the target network |
-| `rl_train_interval` | `u64` | `100` | How many exec steps between DQN training calls |
+| `policy` | `String` | `"uniform"` | Grammar weight policy: `"uniform"` (static weights) or `"bandit"` (Thompson Sampling) |
 
 ### Configuration quick-start for a standard campaign
 
@@ -464,9 +447,7 @@ Config(
     number_of_generate_inputs: 1000,
     max_tree_size: 300,
     number_of_deterministic_mutations: 1,
-    rl_enabled: false,
 )
 ```
 
 For a bandit-policy run, add `policy: "bandit"` (no other fields required).
-For DQN, set `rl_enabled: true` and optionally tune the `rl_*` hyperparameters.
