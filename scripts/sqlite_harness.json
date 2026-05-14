@@ -1,0 +1,90 @@
+{
+  "schema": {
+    "_name": {
+      "nt": "Name",
+      "type": "fixed",
+      "values": ["t1", "t2", "t3"]
+    },
+    "_name2": {
+      "nt": "Name",
+      "type": "alias",
+      "target": "_name",
+      "comment": "schema-qualified name — for single-DB harness, same as _name"
+    },
+    "identifier": {
+      "nt": "Col-Name",
+      "type": "fixed",
+      "values": ["c1", "c2", "c3", "rowid", "_rowid_"]
+    },
+    "function_name": {
+      "nt": "Func-Name",
+      "type": "enum",
+      "values": [
+        "count", "sum", "avg", "min", "max",
+        "abs", "length", "typeof", "upper", "lower", "trim",
+        "hex", "quote", "char", "unicode",
+        "coalesce", "nullif", "ifnull", "substr", "iif",
+        "last_insert_rowid", "changes", "total_changes", "random",
+        "randomblob", "zeroblob",
+        "format", "printf",
+        "group_concat",
+        "json", "json_valid", "json_type", "json_extract",
+        "json_array", "json_object"
+      ]
+    },
+    "collation_name": {
+      "nt": "Collation-Name",
+      "type": "enum",
+      "values": ["NOCASE", "BINARY", "RTRIM"]
+    },
+    "error_message": {
+      "nt": "Error-Message",
+      "type": "alias",
+      "target": "_name"
+    },
+    "pragma_value": {
+      "nt": "Pragma-Value",
+      "type": "inline",
+      "comment": "inlined into pragma_stmt rules"
+    },
+    "filename": {
+      "nt": "Filename",
+      "type": "alias",
+      "target": "_name"
+    },
+    "numeric_literal": {
+      "nt": "Numeric-Literal",
+      "type": "regex",
+      "patterns": {
+        "Int-Literal": "-?(?:0|[1-9][0-9]{0,6})",
+        "Float-Literal": "-?[0-9]+\\.[0-9]+(?:[eE][+-]?[0-9]+)?"
+      }
+    },
+    "string_literal": {
+      "nt": "Str-Literal",
+      "type": "regex",
+      "pattern": "'[a-zA-Z0-9 _-]{0,20}'"
+    },
+    "blob_literal": {
+      "nt": "Blob-Literal",
+      "type": "regex",
+      "pattern": "X'[0-9a-fA-F]{0,16}'"
+    },
+    "bind_parameter": {
+      "type": "skip",
+      "comment": "harness uses sqlite3_exec, not prepared statements"
+    }
+  },
+  "skip_productions": [
+    "_whitespace", "_word", "comment", "_string",
+    "bind_parameter"
+  ],
+  "repeat_depth": 2,
+  "max_expansions_per_production": 64,
+  "harness_tables": ["t1", "t2", "t3"],
+  "harness_columns": ["c1", "c2", "c3", "rowid", "_rowid_"],
+  "harness_virtual_tables": {
+    "fts_t1": "fts5",
+    "fts_t2": "fts3"
+  }
+}
