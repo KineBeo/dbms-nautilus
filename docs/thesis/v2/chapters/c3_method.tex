@@ -14,67 +14,8 @@ The system consists of five components organized into a closed feedback loop, il
 
 \begin{figure}[htbp]
 \centering
-\begin{tikzpicture}[
-    node distance=1.6cm and 2.8cm,
-    box/.style={rectangle, draw=black!70, rounded corners=4pt, thick,
-        minimum width=3.4cm, minimum height=1.6cm, align=center,
-        font=\small, fill=#1, inner sep=6pt},
-    box/.default={blue!6},
-    numbox/.style={circle, fill=black!75, text=white, font=\footnotesize\bfseries,
-        inner sep=0pt, minimum size=16pt},
-    dataflow/.style={->, >=stealth, thick, color=black!70},
-    feedback/.style={->, >=stealth, thick, color=black!40, dashed},
-    lbl/.style={font=\scriptsize, fill=white, inner sep=2pt, text=black!70},
-]
-    % === Top row: components 1 and 2 ===
-    \node[box] (grammar) {Grammar Engine\\[2pt]{\scriptsize Python DSL + PyO3}};
-    \node[box, right=of grammar] (gen) {Generation\\+ Mutation\\[2pt]{\scriptsize tree ops + unparse}};
-
-    % === Right side: component 3 ===
-    \node[box=orange!8, below=of gen] (exec) {Fork Server\\+ SQLite Harness\\[2pt]{\scriptsize ASan + UBSan}};
-
-    % === Left side: component 4 ===
-    \node[box=green!8, below=of grammar] (feedback) {Coverage Feedback\\+ Queue\\[2pt]{\scriptsize shared memory bitmap}};
-
-    % === Below: component 5 (triage) ===
-    \node[box=red!6, below=1.2cm of exec] (triage) {Triage Pipeline\\[2pt]{\scriptsize dedup + CVE matching}};
-
-    % === Numbered circles ===
-    \node[numbox] at ([xshift=-12pt, yshift=12pt]grammar.north west) {1};
-    \node[numbox] at ([xshift=-12pt, yshift=12pt]gen.north west) {2};
-    \node[numbox] at ([xshift=-12pt, yshift=12pt]exec.north west) {3};
-    \node[numbox] at ([xshift=-12pt, yshift=12pt]feedback.north west) {4};
-    \node[numbox] at ([xshift=-12pt, yshift=12pt]triage.north west) {5};
-
-    % === Main loop arrows (clockwise: 1→2→3→4→2) ===
-    % 1 → 2: rules + weights
-    \draw[dataflow] (grammar.east) -- node[lbl, above] {rules + weights} (gen.west);
-
-    % 2 → 3: SQL string
-    \draw[dataflow] (gen.south) -- node[lbl, right] {SQL string} (exec.north);
-
-    % 3 → 4: bitmap + exit status
-    \draw[dataflow] (exec.west) -- node[lbl, below] {bitmap + exit} (feedback.east);
-
-    % 4 → 2: feedback loop (interesting inputs)
-    \draw[feedback] (feedback.north) -- node[lbl, left] {interesting inputs} (grammar.south);
-    \draw[feedback] (feedback.north east) -- node[lbl, above right=-1pt, pos=0.4] {queue} (gen.south west);
-
-    % === Crash branch: 3 → 5 ===
-    \draw[dataflow, color=red!50!black!60] (exec.south) -- node[lbl, right] {crashes} (triage.north);
-
-    % === Dashed box around the feedback loop ===
-    \begin{scope}[on background layer]
-        \draw[rounded corners=10pt, draw=black!20, fill=black!2, thick]
-            ([xshift=-22pt, yshift=22pt]grammar.north west)
-            rectangle
-            ([xshift=22pt, yshift=-10pt]feedback.south east -| exec.east);
-    \end{scope}
-    \node[font=\scriptsize\itshape, text=black!40]
-        at ([yshift=28pt]$(grammar.north)!0.5!(gen.north)$) {fuzzing loop};
-
-\end{tikzpicture}
-\caption{Architecture of DBMS-Nautilus. Components \textbf{1}--\textbf{4} form a closed feedback loop (dashed region): the grammar defines the input space, generation constructs SQL from derivation trees, the fork server executes each input against an instrumented SQLite build, and coverage feedback retains inputs that discover new edges. Component \textbf{5} analyzes crashes after each campaign.}
+\includegraphics[width=\textwidth]{figures/fig_3_1_architecture.pdf}
+\caption{Architecture of DBMS-Nautilus. Components \textbf{1}--\textbf{10} form the fuzzer core (shaded region): the grammar defines the input space, the context engine performs weighted rule selection, tree generation constructs derivation trees, the mutation engine applies four mutation operators, minimization shrinks inputs preserving coverage, the chunk store indexes subtrees for splice mutations, the queue manages inputs through a three-state pipeline (Init$\to$Det$\to$Random), the fork server executes each input via AFL protocol, and shared state tracks global coverage bitmaps. Components \textbf{11} (instrumented SQLite) and \textbf{12} (triage pipeline) are external: the target under test and the post-campaign crash analyzer.}
 \label{fig:architecture}
 \end{figure}
 
@@ -189,78 +130,8 @@ Layer~2 composes Layer~1 primitives into four high-level shapes. The \texttt{Sch
 
 \begin{figure}[htbp]
 \centering
-\begin{tikzpicture}[
-    node distance=0.8cm and 0.6cm,
-    every node/.style={font=\small},
-    l1box/.style={rectangle, rounded corners=3pt, draw=black!50, thick,
-        fill=blue!8, minimum width=2.2cm, minimum height=0.7cm, align=center,
-        font=\small},
-    l2box/.style={rectangle, rounded corners=3pt, draw=black!50, thick,
-        fill=green!10, minimum width=2.6cm, minimum height=0.8cm, align=center,
-        font=\small},
-    topbox/.style={rectangle, rounded corners=4pt, draw=black!70, thick,
-        fill=orange!12, minimum width=2.8cm, minimum height=0.9cm, align=center,
-        font=\small\bfseries},
-    comp/.style={->, >=stealth, thick, color=black!60},
-    optcomp/.style={->, >=stealth, thick, color=black!40, dashed},
-    uses/.style={->, >=stealth, color=black!40, thin},
-]
-    % === Top: Sql-Stmt ===
-    \node[topbox] (sqlstmt) {Sql-Stmt};
-
-    % === Layer 2: Composed Shapes (4 boxes in 2x2 grid) ===
-    \node[l2box, below left=1.4cm and 2.4cm of sqlstmt] (schema) {\texttt{Schema-Setup}};
-    \node[l2box, right=0.5cm of schema] (stress) {\texttt{Stress-Query}};
-    \node[l2box, right=0.5cm of stress] (valid) {\texttt{Validation-Op}};
-    \node[l2box, right=0.5cm of valid] (boundary) {\texttt{Boundary-Func-Call}};
-
-    % === Layer 1: SQL Atoms (8 boxes in 2 rows) ===
-    \node[l1box, below left=1.8cm and 3.2cm of stress] (expr) {\texttt{Expr}};
-    \node[l1box, right=0.3cm of expr] (tname) {\texttt{Table-Name}};
-    \node[l1box, right=0.3cm of tname] (coldef) {\texttt{Col-Def}};
-    \node[l1box, right=0.3cm of coldef] (colname) {\texttt{Col-Name}};
-    \node[l1box, right=0.3cm of colname] (funccall) {\texttt{Func-Call}};
-    \node[l1box, below=0.3cm of expr] (joinc) {\texttt{Join-Clause}};
-    \node[l1box, right=0.3cm of joinc] (winfunc) {\texttt{Window-Func}};
-    \node[l1box, right=0.3cm of winfunc] (literal) {\texttt{Literal}};
-    \node[font=\small\itshape, color=black!50, right=0.3cm of literal] (ellipsis) {$\cdots$ (30+ non-terminals)};
-
-    % === Sql-Stmt → Layer 2 connections ===
-    \draw[comp] (sqlstmt.south) -- ++(0,-0.4) -| (schema.north);
-    \draw[comp] (sqlstmt.south) -- ++(0,-0.4) -| (stress.north);
-    \draw[optcomp] (sqlstmt.south) -- ++(0,-0.4) -| (valid.north);
-    \draw[optcomp] (sqlstmt.south) -- ++(0,-0.4) -| (boundary.north);
-
-    % === Layer 2 → Layer 1 connections ===
-    % Schema-Setup → Col-Def, Table-Name, Expr
-    \draw[uses] (schema.south) -- ++(0,-0.3) -| (coldef.north);
-    \draw[uses] (schema.south) -- ++(0,-0.3) -| (tname.north);
-    \draw[uses] (schema.south) -- ++(0,-0.3) -| (expr.north);
-
-    % Stress-Query → Expr, Table-Name, Join-Clause, Window-Func
-    \draw[uses] (stress.south) -- ++(0,-0.3) -| (expr.north);
-    \draw[uses] (stress.south) -- ++(0,-0.3) -| (tname.north);
-    \draw[uses] (stress.south) -- ++(0,-0.5) -| (joinc.north);
-    \draw[uses] (stress.south) -- ++(0,-0.5) -| (winfunc.north);
-
-    % Validation-Op → Expr, Table-Name
-    \draw[uses] (valid.south) -- ++(0,-0.3) -| (expr.north);
-    \draw[uses] (valid.south) -- ++(0,-0.3) -| (tname.north);
-
-    % Boundary-Func-Call → Func-Call, Literal
-    \draw[uses] (boundary.south) -- ++(0,-0.5) -| (funccall.north);
-    \draw[uses] (boundary.south) -- ++(0,-0.5) -| (literal.north);
-
-    % === Layer zone backgrounds ===
-    \begin{scope}[on background layer]
-        \node[fit=(schema)(boundary), rounded corners=8pt, draw=black!15, fill=green!4,
-            inner sep=10pt, label={[font=\scriptsize\bfseries, text=black!50]above left:Layer 2: Composed Shapes}] {};
-        \node[fit=(expr)(funccall)(joinc)(ellipsis), rounded corners=8pt, draw=black!15, fill=blue!4,
-            inner sep=10pt, label={[font=\scriptsize\bfseries, text=black!50]above left:Layer 1: SQL Atoms}] {};
-    \end{scope}
-
-\end{tikzpicture}
-\caption{Two-layer grammar architecture. The start symbol \texttt{Sql-Stmt} composes Layer~2 shapes (solid arrows for primary, dashed for optional). Each Layer~2 shape references Layer~1 atoms (thin arrows). Layer~1 contains over 30 non-terminals defining SQL primitives; eight representative ones are shown.}
+\includegraphics[width=\textwidth]{figures/fig_3_2_grammar_layers.pdf}
+\caption{Two-layer grammar architecture. The start symbol \texttt{Sql-Stmt} composes Layer~2 shapes (solid arrows for required composition, dashed for optional). Each Layer~2 shape references specific Layer~1 atoms (thin arrows). Required shapes (\texttt{Schema-Setup}, \texttt{Stress-Query}) appear in every generated statement; optional shapes (\texttt{Validation-Op}, \texttt{Boundary-Func-Call}) are selected by weighted sampling. Weight ranges control the relative frequency of each shape. Layer~1 contains over 30 non-terminals defining SQL primitives; representative ones are shown grouped by their primary Layer~2 consumer.}
 \label{fig:two-layer}
 \end{figure}
 
