@@ -72,9 +72,12 @@ def collect_campaign(workdir: Path) -> dict | None:
     triage = parse_triage_json(workdir / "triage_test.json")
     execlog = parse_exec_log(workdir / "exec.log")
 
+    # total_crashes from triage_test (UBSan/ASan real bugs only, not debug asserts)
+    triage_total = sum(c["count"] for c in triage["crashes"]) if triage["crashes"] else 0
+
     return {
         "workdir": str(workdir),
-        "total_crashes": cov["signaled_final"],
+        "total_crashes": triage_total,
         "unique_root_causes": triage["unique_crashes"],
         "edge_coverage": cov["queue_final"],
         "throughput_eps": cov["exec_per_sec"],
