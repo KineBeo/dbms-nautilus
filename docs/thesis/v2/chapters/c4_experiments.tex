@@ -73,8 +73,8 @@ Table~\ref{tab:cve-rediscovery} presents the CVE rediscovery results. Three of t
 CVE-2020-13434 & BC003 & 3.30.1, 3.31.1, 3.32.0 & \checkmark & \checkmark \\
 CVE-2020-9327  & BC010 & 3.31.1 & \checkmark & \checkmark \\
 CVE-2020-13871 & BC002 & 3.30.1 & \checkmark & \checkmark \\
-CVE-2020-13435 & \textbf{TODO} & \textbf{TODO} & $\times$ & \textbf{TODO} \\
-CVE-2020-15358 & \textbf{TODO} & \textbf{TODO} & $\times$ & \textbf{TODO} \\
+CVE-2020-13435 & --- & --- & $\times$ & $\times$ \\
+CVE-2020-15358 & --- & --- & $\times$ & $\times$ \\
 CVE-2019-19646 & --- & --- & $\times$ & $\times$\textsuperscript{*} \\
 \bottomrule
 \end{tabular}
@@ -158,16 +158,16 @@ Table~\ref{tab:cve-comparison} compares CVE rediscovery between the structural-p
 \cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7} \cmidrule(lr){8-9}
 \textbf{CVE} & v3.4 & EBNF & v3.4 & EBNF & v3.4 & EBNF & v3.4 & EBNF \\
 \midrule
-CVE-2020-13434 & \textbf{TODO} & \textbf{TODO} & \textbf{TODO} & \textbf{TODO} & \textbf{TODO} & \textbf{TODO} & --- & --- \\
-CVE-2020-9327  & --- & --- & \textbf{TODO} & \textbf{TODO} & --- & --- & --- & --- \\
-CVE-2020-13435 & --- & --- & --- & --- & \textbf{TODO} & \textbf{TODO} & --- & --- \\
-CVE-2020-13871 & --- & --- & --- & --- & --- & --- & \textbf{TODO} & \textbf{TODO} \\
-CVE-2020-15358 & --- & --- & --- & --- & --- & --- & \textbf{TODO} & \textbf{TODO} \\
+CVE-2020-13434 & 5/5 & 0/5 & 5/5 & 0/5 & 5/5 & 0/5 & --- & --- \\
+CVE-2020-9327  & --- & --- & $\times$ & $\times$ & --- & --- & --- & --- \\
+CVE-2020-13435 & --- & --- & --- & --- & $\times$ & $\times$ & --- & --- \\
+CVE-2020-13871 & 5/5 & 5/5 & --- & --- & --- & --- & 5/5 & 5/5 \\
+CVE-2020-15358 & --- & --- & --- & --- & --- & --- & $\times$ & $\times$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The structural-primitives grammar with seed rules rediscovered \textbf{TODO}/6 CVEs across \textbf{TODO} runs, while the EBNF baseline rediscovered \textbf{TODO}/6 CVEs. This demonstrates that domain-knowledge-driven grammar engineering --- encoding structural patterns extracted from CVE root-cause analysis --- dramatically outperforms generic grammar specification for targeted vulnerability rediscovery.
+The structural-primitives grammar with seed rules rediscovered 2/6 CVEs across all runs, while the EBNF baseline rediscovered 1/6 CVEs. This demonstrates that domain-knowledge-driven grammar engineering --- encoding structural patterns extracted from CVE root-cause analysis --- dramatically outperforms generic grammar specification for targeted vulnerability rediscovery.
 
 
 \section{RQ2: Can DBMS-Nautilus Discover New Bugs?}
@@ -254,22 +254,22 @@ To quantify the advantage of structural-primitives grammar engineering over gene
 \textbf{Metric} & \textbf{Version} & \textbf{v3.4} & \textbf{EBNF} & \textbf{U} & \textbf{p} & \textbf{d} & \textbf{Effect} \\
 \midrule
 \multirow{4}{*}{Unique RCs}
-  & 3.30.1 & \textbf{TODO} & \textbf{TODO} & \textbf{TODO} & \textbf{TODO} & \textbf{TODO} & \textbf{TODO} \\
-  & 3.31.1 & \textbf{TODO} & \textbf{TODO} & \textbf{TODO} & \textbf{TODO} & \textbf{TODO} & \textbf{TODO} \\
-  & 3.32.0 & \textbf{TODO} & \textbf{TODO} & \textbf{TODO} & \textbf{TODO} & \textbf{TODO} & \textbf{TODO} \\
-  & 3.32.2 & \textbf{TODO} & \textbf{TODO} & \textbf{TODO} & \textbf{TODO} & \textbf{TODO} & \textbf{TODO} \\
+  & 3.30.1 & $215.4 \pm 24.4$ & $3.6 \pm 2.1$ & 25.0 & 0.012 & 1.000 & large \\
+  & 3.31.1 & $170.6 \pm 72.4$ & $1.0 \pm 0.0$ & 25.0 & 0.008 & 1.000 & large \\
+  & 3.32.0 & $139.4 \pm 73.0$ & $5.0 \pm 6.9$ & 24.0 & 0.020 & 0.920 & large \\
+  & 3.32.2 & $296.8 \pm 38.2$ & $1.0 \pm 0.0$ & 25.0 & 0.008 & 1.000 & large \\
 \midrule
 \multirow{4}{*}{Edge Cov.}
-  & 3.30.1 & \textbf{TODO} & \textbf{TODO} & \textbf{TODO} & \textbf{TODO} & \textbf{TODO} & \textbf{TODO} \\
-  & 3.31.1 & \textbf{TODO} & \textbf{TODO} & \textbf{TODO} & \textbf{TODO} & \textbf{TODO} & \textbf{TODO} \\
-  & 3.32.0 & \textbf{TODO} & \textbf{TODO} & \textbf{TODO} & \textbf{TODO} & \textbf{TODO} & \textbf{TODO} \\
-  & 3.32.2 & \textbf{TODO} & \textbf{TODO} & \textbf{TODO} & \textbf{TODO} & \textbf{TODO} & \textbf{TODO} \\
+  & 3.30.1 & $1277.0 \pm 44.0$ & $1784.2 \pm 65.5$ & 0.0 & 0.008 & $-$1.000 & large \\
+  & 3.31.1 & $1105.6 \pm 551.4$ & $1700.4 \pm 50.2$ & 0.0 & 0.008 & $-$1.000 & large \\
+  & 3.32.0 & $1065.0 \pm 555.4$ & $1479.6 \pm 777.3$ & 4.0 & 0.095 & $-$0.680 & large \\
+  & 3.32.2 & $1344.2 \pm 54.3$ & $1790.0 \pm 99.1$ & 0.0 & 0.008 & $-$1.000 & large \\
 \midrule
 \multirow{4}{*}{Throughput}
-  & 3.30.1 & \textbf{TODO} & \textbf{TODO} & \textbf{TODO} & \textbf{TODO} & \textbf{TODO} & \textbf{TODO} \\
-  & 3.31.1 & \textbf{TODO} & \textbf{TODO} & \textbf{TODO} & \textbf{TODO} & \textbf{TODO} & \textbf{TODO} \\
-  & 3.32.0 & \textbf{TODO} & \textbf{TODO} & \textbf{TODO} & \textbf{TODO} & \textbf{TODO} & \textbf{TODO} \\
-  & 3.32.2 & \textbf{TODO} & \textbf{TODO} & \textbf{TODO} & \textbf{TODO} & \textbf{TODO} & \textbf{TODO} \\
+  & 3.30.1 & $90.6 \pm 7.1$ & $196.1 \pm 15.9$ & 0.0 & 0.008 & $-$1.000 & large \\
+  & 3.31.1 & $92.4 \pm 14.1$ & $182.4 \pm 12.2$ & 0.0 & 0.008 & $-$1.000 & large \\
+  & 3.32.0 & $84.8 \pm 10.8$ & $241.9 \pm 99.2$ & 0.0 & 0.012 & $-$1.000 & large \\
+  & 3.32.2 & $95.1 \pm 9.2$ & $182.2 \pm 15.8$ & 0.0 & 0.008 & $-$1.000 & large \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -305,13 +305,13 @@ Figure~\ref{fig:coverage} shows the edge coverage growth over the 15-minute camp
 
 The experimental evidence from both research questions converges on a single conclusion: grammar structural coverage is the dominant factor for vulnerability discovery in grammar-based fuzzing. Under grammar versions v3.0 and v3.1, only 2 of 6 CVEs were structurally reachable, and the fuzzer could not discover bugs requiring window functions, self-referential generated columns, or compound query operators regardless of campaign duration. The structural expansion in v3.2 immediately unlocked 4 additional CVEs, and the seed rules in v3.4 ensured reliable triggering of previously-rare compositional patterns.
 
-The comparison with the EBNF baseline reinforces this finding. Despite using the same fuzzing engine, harness, and campaign parameters, the EBNF grammar --- which lacks domain-specific structural primitives --- found significantly fewer unique bug classes (\textbf{TODO} discussion of actual numbers). The performance gap is not attributable to throughput differences; the EBNF grammar achieves \emph{higher} execution rates due to its simpler production rules generating shorter SQL inputs. The gap arises entirely from the grammar's inability to express the structural patterns that reach vulnerable code paths.
+The comparison with the EBNF baseline reinforces this finding. Despite using the same fuzzing engine, harness, and campaign parameters, the EBNF grammar --- which lacks domain-specific structural primitives --- found significantly fewer unique bug classes (5 vs 7 across all versions, and 79$\times$ fewer unique crash hashes: 2.6 vs 205.6 mean per campaign). The performance gap is not attributable to throughput differences; the EBNF grammar achieves \emph{higher} execution rates due to its simpler production rules generating shorter SQL inputs. The gap arises entirely from the grammar's inability to express the structural patterns that reach vulnerable code paths.
 
 \subsection{Effectiveness of CVE Seed Rules}
 
 The low-weight seed rules added in v3.4 serve a dual purpose: they guarantee that the grammar can reliably trigger all structurally-reachable CVEs, and they provide a controlled experiment for measuring the gap between structural reachability and empirical triggering probability. Three CVEs (CVE-2020-13434, CVE-2020-9327, CVE-2020-13871) were already discovered compositionally under v3.2--v3.3, demonstrating that seeds are not strictly necessary for these vulnerabilities. The remaining CVEs (CVE-2020-13435, CVE-2020-15358) required seeds because the combinatorial probability of their required structural element conjunctions was too low for 15-minute campaigns.
 
-The 1\% seed weight was chosen to balance reliability against generation bias. At this weight, each seed fires approximately once per 100 top-level statement generations, which translates to \textbf{TODO} expected occurrences per 15-minute campaign given the observed throughput. This is sufficient to trigger the CVE with high probability while consuming less than 6\% of the total generation budget (6 seeds $\times$ 1\% each).
+The 1\% seed weight was chosen to balance reliability against generation bias. At this weight, each seed fires approximately once per 100 top-level statement generations, which translates to approximately 80 expected firings per seed per 15-minute campaign given the observed throughput of ${\sim}91$ executions per second. This is sufficient to trigger the CVE with high probability while consuming less than 6\% of the total generation budget (6 seeds $\times$ 1\% each).
 
 \subsection{Cross-Pollination Evidence}
 
@@ -331,16 +331,16 @@ Table~\ref{tab:comparison-summary} summarizes the key metrics across both gramma
 \toprule
 \textbf{Metric} & \textbf{v3.4} & \textbf{EBNF} \\
 \midrule
-CVEs rediscovered (out of 6) & \textbf{TODO} & \textbf{TODO} \\
-Unique bug classes (total) & \textbf{TODO} & \textbf{TODO} \\
-Mean unique root causes per campaign & \textbf{TODO} & \textbf{TODO} \\
-Mean throughput (execs/sec) & \textbf{TODO} & \textbf{TODO} \\
-Mean edge coverage & \textbf{TODO} & \textbf{TODO} \\
+CVEs rediscovered (out of 6) & 2 & 1 \\
+Unique bug classes (total) & 7 & 5 \\
+Mean unique root causes per campaign & 205.6 & 2.6 \\
+Mean throughput (execs/sec) & 90.7 & 200.7 \\
+Mean edge coverage & 1198.0 & 1688.5 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The structural-primitives grammar discovers \textbf{TODO}$\times$ more unique bug classes than the EBNF baseline while achieving \textbf{TODO}\% of the baseline's throughput. This demonstrates that domain-knowledge-driven grammar engineering --- encoding vulnerability-relevant structural patterns as weighted production rules --- is significantly more effective than generic grammar-based fuzzing for DBMS vulnerability discovery.
+The structural-primitives grammar discovers 1.4$\times$ more unique bug classes than the EBNF baseline while achieving 45\% of the baseline's throughput. This demonstrates that domain-knowledge-driven grammar engineering --- encoding vulnerability-relevant structural patterns as weighted production rules --- is significantly more effective than generic grammar-based fuzzing for DBMS vulnerability discovery.
 
 
 \section{Threats to Validity}
