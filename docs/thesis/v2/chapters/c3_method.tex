@@ -3,14 +3,14 @@
 
 As discussed in Chapter~\ref{chap:background}, byte-level fuzzers cannot effectively test database engines because random mutations produce parser-rejected inputs that never reach deep program logic. Grammar-based fuzzers solve the syntactic validity problem but treat all SQL constructs equally, with no knowledge of which structural patterns are most likely to trigger vulnerabilities. This chapter presents DBMS-Nautilus, a grammar-based greybox fuzzing system that combines Nautilus-style coverage-guided generation~\cite{nautilus} with a domain-specific SQL grammar engineered to target vulnerability-triggering code paths in SQLite.
 
-Section~\ref{sec:overview} provides a high-level overview of the system and its components. Section~\ref{sec:grammar-design} presents the grammar design methodology, which constitutes the core contribution of this work. Section~\ref{sec:grammar-evolution} describes the evidence-driven process of iterative grammar refinement.
+Section~\ref{sec:overview} provides a high-level overview of the system and its components. Section~\ref{sec:grammar-design} presents the grammar design methodology, which constitutes the core contribution of this work. The grammar was iteratively refined across four versions (v3.0 through v3.3, growing from 449 to 520 production rules), guided by root-cause analysis of known CVEs and experimental feedback from fuzzing campaigns.
 
 \section{System Overview}
 \label{sec:overview}
 
 DBMS-Nautilus is a grammar-based greybox fuzzer designed specifically for database engines. It combines the coverage-guided fuzzing loop of Nautilus~\cite{nautilus} with a domain-specific SQL grammar that encodes structural patterns associated with known vulnerability classes. Where existing SQL fuzzers such as SQLsmith~\cite{sqlsmith} generate random queries against an existing database, or Squirrel~\cite{squirrel} maintains an internal schema model to ensure semantic validity, DBMS-Nautilus takes a different approach: the grammar itself generates complete, self-contained SQL programs that create their own schema, populate data, and issue queries --- all starting from an empty in-memory database. This self-contained design means every test case is independently reproducible, requires no external database state, and can be replayed in isolation for crash confirmation.
 
-The system consists of five components organized into a closed feedback loop, illustrated in Figure~\ref{fig:architecture}. Components 1 through 4 form the fuzzing loop: the grammar defines what SQL can be generated, the generation module constructs concrete inputs, the execution layer runs each input against an instrumented SQLite build, and the coverage feedback mechanism decides which inputs are worth keeping. Component 5, the triage pipeline, operates after a campaign completes to analyze collected crashes.
+The system consists of twelve components organized into a closed feedback loop, illustrated in Figure~\ref{fig:architecture}. Components~1 through~10 form the fuzzer core: the grammar (1) defines the input space, the context engine (2) performs weighted rule selection, tree generation (3) constructs derivation trees, the mutation engine (4) applies structural mutations, minimization (5) shrinks inputs while preserving coverage, the chunk store (6) indexes subtrees for splice mutations, the queue (7) manages inputs through a three-state pipeline, the fork server (8) executes each input via the AFL protocol, the fuzzer executor (9) coordinates per-thread execution, and shared state (10) tracks global coverage bitmaps. Components~11 (instrumented SQLite) and~12 (triage pipeline) are external to the fuzzer core. The following paragraphs describe the key subsystems.
 
 \begin{figure}[htbp]
 \centering
@@ -35,15 +35,16 @@ The coverage feedback mechanism is what makes DBMS-Nautilus a \textit{greybox} f
 The triage pipeline operates after a fuzzing campaign completes. It processes the collected crashing inputs to determine how many distinct bugs were found, whether any correspond to known CVEs, and how reliably each crash reproduces. This post-campaign analysis transforms raw crash data into actionable vulnerability reports. Chapter~\ref{chap:experiments} describes the triage methodology in detail.
 
 \paragraph{Self-Contained Test Cases.}
-A key design decision is that every test case begins from an empty database. The grammar generates multi-statement SQL programs that first create tables and insert data (via the \texttt{Schema-Setup} non-terminal), then issue the queries that exercise the target code paths. This contrasts with SQLsmith, which requires a pre-populated database and introspects its schema at runtime, and Squirrel, which maintains an evolving schema model during fuzzing. The self-contained approach has three advantages: the harness requires no setup beyond opening an empty database, every crashing input can be replayed in isolation without reconstructing external state, and the grammar retains full control over which schema patterns appear in each test case.
+A key design decision is that every test case begins from an empty database. The grammar generates multi-statement SQL programs that first create tables and insert data (via the \texttt{Schema-Setup} non-terminal), then issue the queries that exercise the target code paths. This contrasts with SQLsmith, which requires a pre-populated database and introspects its schema at runtime, and Squirrel, which maintains an evolving schema model during fuzzing. The self-contained approach has three advantages: the harness requires no setup beyond opening an empty database, every crashing input can be replayed in isolation without reconstructing external state, and the grammar retains full control over which schema patterns appear in each test case. The Schema-Setup$\to$Stress-Query ordering within each generated program ensures referential consistency: tables and columns exist before they are queried. Remaining semantic errors (e.g., type mismatches in expressions) are handled gracefully by SQLite's error-tolerant execution --- they produce error return codes rather than crashes, and are thus filtered out naturally by the crash-detection oracle.
 
-Table~\ref{tab:components} summarizes the five components, their implementation languages, and their roles in the pipeline.
+Table~\ref{tab:components} groups the twelve components into five functional subsystems, showing their implementation languages and roles in the pipeline.
 
 \begin{table}[htbp]
-\caption{DBMS-Nautilus system components.}
+\caption{DBMS-Nautilus system components, grouped into five functional subsystems. Individual components (1--12) are shown in Figure~\ref{fig:architecture}.}
 \label{tab:components}
 \centering
-\begin{tabular}{llll}
+\footnotesize
+\begin{tabular}{lllp{4.5cm}}
 \toprule
 \textbf{Component} & \textbf{Language} & \textbf{Module} & \textbf{Role} \\
 \midrule
@@ -65,21 +66,22 @@ Table~\ref{tab:fuzzer-comparison} compares DBMS-Nautilus against two representat
 \caption{Comparison of SQL fuzzing approaches.}
 \label{tab:fuzzer-comparison}
 \centering
-\begin{tabular}{p{3.5cm}p{3.5cm}p{3.5cm}p{3.5cm}}
+\footnotesize
+\begin{tabular}{lp{3.0cm}p{3.0cm}p{3.8cm}}
 \toprule
 \textbf{Feature} & \textbf{SQLsmith} & \textbf{Squirrel} & \textbf{DBMS-Nautilus} \\
 \midrule
-Input generation method & Random grammar-based & Validity-preserving mutation & Weighted grammar with derivation trees \\
-Schema handling & External pre-populated database & Internal evolving schema model & Self-contained per test case \\
-Mutation strategy & Random re-generation & Semantic-aware tree mutation & Structure-preserving tree mutation \\
-Coverage guidance & No & No & Yes (shared memory bitmap) \\
-Vulnerability targeting & No & No & Yes (weighted production rules) \\
-Test case isolation & No (requires external state) & No (requires schema model) & Yes (empty database per input) \\
+Generation & Random grammar & Validity-preserving mutation & Weighted grammar with derivation trees \\[3pt]
+Schema & External pre-populated database & Internal evolving schema model & Self-contained per test case \\[3pt]
+Mutation & Random re-generation & Semantic-aware tree mutation & Structure-preserving tree mutation \\[3pt]
+Coverage & No & Yes (edge coverage) & Yes (shared memory bitmap) \\[3pt]
+Targeting & No & No & Yes (weighted production rules) \\[3pt]
+Isolation & No (requires external state) & No (requires schema model) & Yes (empty database per input) \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The key distinction between DBMS-Nautilus and prior approaches lies in how each tool allocates fuzzing effort across the SQL input space. SQLsmith samples uniformly from a random grammar, giving equal probability to every syntactic construct regardless of its likelihood of reaching vulnerable code paths~\cite{sqlsmith}. Squirrel improves semantic validity by tracking a schema model, but still does not bias generation toward vulnerability-relevant patterns~\cite{squirrel}. DBMS-Nautilus instead embeds that bias directly into the grammar: weighted production rules concentrate sampling probability on structural patterns --- such as recursive \texttt{WITH} clauses, aggregate functions over virtual tables, and boundary-value arithmetic --- that correspond to the code regions implicated in known CVEs. The effect of these design choices on crash discovery rates is measured empirically in Chapter~\ref{chap:experiments}.
+The key distinction between DBMS-Nautilus and prior approaches lies in how each tool allocates fuzzing effort across the SQL input space. SQLsmith samples uniformly from a random grammar, giving equal probability to every syntactic construct regardless of its likelihood of reaching vulnerable code paths~\cite{sqlsmith}. Squirrel combines semantic-aware mutation with coverage feedback, improving both validity and code exploration, but does not bias generation toward vulnerability-relevant patterns~\cite{squirrel}. DBMS-Nautilus instead embeds that bias directly into the grammar: weighted production rules concentrate sampling probability on structural patterns --- such as generated columns with circular dependencies, NATURAL JOINs that stress column resolution, and boundary-value function calls --- that correspond to the code regions implicated in known CVEs. The effect of these design choices on crash discovery rates is measured empirically in Chapter~\ref{chap:experiments}.
 
 %% ====================================================================
 \section{Grammar Design}
@@ -98,24 +100,9 @@ This philosophy yields three concrete design constraints:
 
 Constraint~(a) prevents the fuzzer from trivially replaying known attacks, ensuring that any CVE rediscovery constitutes a genuine compositional achievement. Constraint~(b) guarantees that the grammar's expressible input space contains the structural ingredients required for each target CVE --- without these building blocks, no amount of mutation could reach the vulnerable code path. Constraint~(c) ensures that the grammar is not so narrowly tailored to known CVEs that it cannot discover new bugs: the non-terminals must combine freely in ways the grammar designer did not explicitly anticipate.
 
-The tension between constraints (b) and (c) is the central design challenge. Too few non-terminals and the fuzzer lacks the vocabulary to reach target vulnerabilities. Too many non-terminals and the input space becomes so large that the probability of assembling the right combination within a finite campaign drops below a useful threshold. The grammar evolution process described in Section~\ref{sec:grammar-evolution} addresses this tension through iterative refinement guided by experimental feedback.
+A natural concern is circularity: the grammar is informed by CVE root-cause analysis, and the evaluation measures CVE rediscovery. This is by design --- known CVEs serve as ground truth for evaluating whether the methodology produces grammars that can reach vulnerability-triggering code paths. The zero PoC contamination principle (constraint~a) ensures that rediscovery is not trivial: the grammar provides structural building blocks, not recipes, and the fuzzer must compose them correctly from a large combinatorial space. Chapter~\ref{chap:experiments} further validates the methodology by showing that the grammar also discovers bugs beyond the known CVEs.
 
-\subsection{Cross-Pollination of Structural Patterns}
-\label{sec:cross-pollination}
-
-The grammar's structural patterns originate from root-cause analysis of known CVEs, but they are deliberately not labeled or isolated per CVE. Each non-terminal encodes a SQL structural affordance --- a syntactic shape that participates in one or more vulnerability-triggering code paths --- without indicating which specific vulnerability it targets. This anonymity is not an oversight but a design choice: it ensures that the grammar captures the \emph{structural category} of a vulnerability rather than a single instance, and it enables the cross-pollination effect described below.
-
-Cross-pollination arises because a single non-terminal serves multiple CVEs simultaneously, and a single CVE requires patterns from multiple independent non-terminals. Consider the \texttt{Schema-Setup} non-terminal and its alternative S2, which creates tables with generated columns. Generated columns are a structural prerequisite for CVE-2020-9327~\cite{cve20209327}, a null pointer dereference triggered during column resolution when a self-referential generated column creates a circular dependency, and also for CVE-2019-19646~\cite{cve201919646}, an infinite loop triggered by \texttt{PRAGMA integrity\_check} on tables containing generated columns. When the fuzzer selects S2, it is not targeting either CVE specifically. It is constructing a schema that happens to enable multiple vulnerability-triggering paths, and the subsequent choice of query pattern determines which path --- if any --- is actually exercised. The grammar designer encoded the structural observation that generated columns stress the column resolver and the integrity checker; which specific failure mode materializes depends on the full composition of the generated input.
-
-A similar overlap occurs in the query layer. The \texttt{Stress-Query} non-terminal includes a NATURAL JOIN pattern (Q3) that is required for CVE-2020-13435~\cite{cve202013435}, where a NATURAL JOIN combined with window functions and a \texttt{coalesce} call triggers a null dereference in the query planner's column name resolution logic. However, NATURAL JOIN also exercises the query planner's join optimization logic more broadly, stressing the column matching algorithm that pairs columns across tables by name. Any bug in this matching logic --- not only the specific null dereference documented in CVE-2020-13435 --- becomes reachable when Q3 is selected. The non-terminal is thus more general than the CVE that motivated its inclusion.
-
-The \texttt{Boundary-Func-Call} non-terminal provides an especially clear illustration of cross-pollination at the terminal level. The \texttt{printf} alternative with format specifiers and boundary integers directly targets CVE-2020-13434~\cite{cve202013434}, an integer overflow in SQLite's printf implementation when the width argument exceeds INT32\_MAX. However, the boundary integer terminals defined for this purpose --- 2147483647, 2147483648, $-$2147483648, and 9223372036854775807 --- also participate in float cast overflows and numeric conversion null dereferences that were not anticipated during grammar design. The grammar provides the boundary values because they are structurally relevant to printf overflow; the fuzzer discovers that the same values are structurally relevant to entirely different code paths through independent composition.
-
-The compositional power of cross-pollination emerges from the independence of non-terminal selections. On each generated input, the fuzzer independently selects a \texttt{Schema-Setup} variant, a \texttt{Stress-Query} variant, and optionally a \texttt{Boundary-Func-Call} or \texttt{Validation-Op}. Because these selections are governed by independent weighted distributions, the fuzzer explores the Cartesian product of all Layer~2 shapes --- producing combinations that the grammar designer never explicitly planned. A single generated input might combine S2 (generated columns) with Q3 (NATURAL JOIN) and a printf boundary call, yielding a three-way composition that no individual CVE analysis would have prescribed. This input exercises a unique intersection of SQLite's generated column processor, join optimizer, and printf implementation simultaneously, creating opportunities to discover bugs at the interfaces between these subsystems.
-
-This cross-pollination property has two important consequences for the evaluation of the fuzzer's effectiveness. First, any CVE rediscovery constitutes a genuine compositional achievement rather than a scripted replay. To trigger CVE-2020-13434, for example, the fuzzer must independently select the \texttt{Boundary-Func-Call} non-terminal (rather than \texttt{Stress-Query} or \texttt{Validation-Op}), then select the printf alternative (rather than substr or zeroblob), then select the \texttt{\%.*g} format specifier, and then select a boundary integer that exceeds INT32\_MAX --- all while also selecting a schema setup that does not interfere with the query. Each selection is a probabilistic choice from a weighted distribution, and the correct combination is one point in a large combinatorial space.
-
-Second, the grammar discovers bugs beyond its explicit design targets. The seven non-CVE bug classes reported in Chapter~\ref{chap:experiments} --- including FTS tokenizer null dereferences, float cast overflows, and window function lifecycle errors --- were found because the structural patterns intended for specific CVEs also exercise adjacent code paths that contain previously undocumented defects. The generated column rules intended for CVE-2020-9327 stress the column resolver in ways that also reveal bugs in view materialization. The window function rules intended for CVE-2020-13871 exercise frame boundary computation in ways that also reveal bugs in the \texttt{nth\_value} implementation. This emergent discovery capability is a direct consequence of the cross-pollination design: because the grammar encodes structural affordances rather than CVE-specific sequences, every structural pattern participates in a broader exploration of the code region it touches.
+The tension between constraints (b) and (c) is the central design challenge. Too few non-terminals and the fuzzer lacks the vocabulary to reach target vulnerabilities. Too many non-terminals and the input space becomes so large that the probability of assembling the right combination within a finite campaign drops below a useful threshold. The grammar addresses this tension through iterative refinement guided by experimental feedback across four versions.
 
 \subsection{Two-Layer Architecture}
 \label{sec:layer-decomposition}
@@ -135,7 +122,15 @@ Layer~2 composes Layer~1 primitives into four high-level shapes. The \texttt{Sch
 \label{fig:two-layer}
 \end{figure}
 
-Listing~\ref{lst:schema-setup} shows the Layer~2 Schema-Setup alternatives. Each alternative creates a different database schema topology that enables distinct classes of vulnerability-triggering queries. The weights assigned to each rule reflect the empirical importance of each schema pattern for triggering bugs: the generated-column schema (S2) receives the highest weight of 3.0 because generated columns are involved in two of the six target CVEs.
+\subsection{Structural Pattern Categories}
+\label{sec:pattern-categories}
+
+The grammar's production rules are organized into four structural pattern categories, each targeting a distinct class of SQLite subsystem. The categorization follows from root-cause analysis of known CVEs: each vulnerability implicates specific SQLite internals, and the grammar encodes SQL constructs that exercise those internals. This section describes each category systematically --- what DBMS subsystem it targets, why vulnerabilities cluster there, and how the grammar rules exercise the relevant code paths.
+
+\paragraph{Schema Topology Patterns (S1--S6).}
+The \texttt{Schema-Setup} non-terminal defines six schema construction alternatives, each creating a different database topology that activates distinct SQLite subsystems. The alternatives range from simple single-table schemas (S1) to schemas involving generated columns (S2), multi-table layouts enabling JOINs (S3), views (S4), FTS virtual tables (S5), and indexed tables (S6). Listing~\ref{lst:schema-setup} shows the complete set.
+
+Schema topology matters because SQLite's column resolver, view materializer, and generated column processor contain complex dependency-tracking logic that is exercised differently by each schema shape. Generated columns (S2) are particularly important: they activate the generated column processor, which must resolve column expressions that may reference other columns in the same table --- a recursive process prone to null pointer dereferences and infinite loops when circular dependencies arise~\cite{cve20209327, cve201919646}. Views (S4) activate the view materializer and create additional column resolution paths. The weights assigned to each alternative reflect empirical importance: S2 receives weight 3.0 (highest) because generated columns participate in two of the six target CVEs.
 
 \begin{lstlisting}[language=Python, caption={Schema-Setup alternatives (Layer 2). Each alternative constructs a different schema topology. Weights reflect empirical importance for vulnerability triggering.}, label=lst:schema-setup, basicstyle=\ttfamily\small, numbers=left]
 # S1: Single table, basic columns
@@ -160,7 +155,7 @@ ctx.rule("Schema-Setup",
     "CREATE VIEW IF NOT EXISTS v1 AS {Select-Stmt}",
     weight=2.0)
 
-# S5: Virtual table (FTS5/FTS3) -- reduced in v3.1
+# S5: Virtual table (FTS5/FTS3)
 ctx.rule("Schema-Setup",
     "CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 "
     "USING {Fts-Engine}({Col-Name-List})",
@@ -173,7 +168,10 @@ ctx.rule("Schema-Setup",
     weight=1.0)
 \end{lstlisting}
 
-Listing~\ref{lst:stress-query} shows representative Stress-Query alternatives. The NATURAL JOIN pattern (Q3) is particularly relevant because CVE-2020-13435~\cite{cve202013435} requires a NATURAL JOIN in combination with window functions and a coalesce call. The compound query pattern (Q5) exercises the INTERSECT and EXCEPT operators needed for CVE-2020-15358~\cite{cve202015358} and CVE-2020-13871~\cite{cve202013871}.
+\paragraph{Query Stress Patterns (Q1--Q8).}
+The \texttt{Stress-Query} non-terminal provides eight query patterns, each designed to exercise a distinct path through SQLite's query planner and execution engine. These include basic SELECT with WHERE filtering (Q1), EXISTS subqueries (Q2), NATURAL JOINs (Q3), correlated subqueries (Q4), compound queries with INTERSECT/EXCEPT (Q5), self-JOINs (Q6), window functions with OVER clauses (Q7), and aggregate queries with GROUP BY and HAVING (Q8). Listing~\ref{lst:stress-query} shows four representative alternatives; the remaining patterns follow the same structure.
+
+Query stress patterns target the query planner because this subsystem performs the most complex transformations on the SQL AST: join reordering, subquery flattening, compound query optimization, and window function frame computation. Each transformation involves pointer manipulation and column name resolution across multiple table scopes --- operations where off-by-one errors, null dereferences, and use-after-free bugs frequently occur. NATURAL JOIN (Q3) is particularly effective because it forces the column matching algorithm to pair columns across tables by name, stressing the name resolution logic that has been implicated in multiple CVEs~\cite{cve202013435}. Compound queries (Q5) exercise the INTERSECT/EXCEPT code path, which must align result columns across independently optimized subqueries~\cite{cve202015358, cve202013871}.
 
 \begin{lstlisting}[language=Python, caption={Representative Stress-Query alternatives (Layer 2). Each pattern exercises a distinct query planning path in the SQLite optimizer.}, label=lst:stress-query, basicstyle=\ttfamily\small, numbers=left]
 # Q2: EXISTS subquery
@@ -200,7 +198,10 @@ ctx.rule("Stress-Query",
     weight=2.0)
 \end{lstlisting}
 
-Listing~\ref{lst:boundary-func} shows the Boundary-Func-Call non-terminal. The \texttt{printf} with format specifier \texttt{'\%.*g'} and boundary integer 2147483647 directly targets the CVE-2020-13434 integer overflow in SQLite's printf implementation. The \texttt{substr} with boundary integers can trigger heap buffer overreads, while \texttt{hex(zeroblob(N))} with large $N$ values exercises memory allocation edge cases.
+\paragraph{Boundary Value Patterns.}
+The \texttt{Boundary-Func-Call} non-terminal targets integer overflow, buffer boundary, and memory allocation edge cases by combining SQLite built-in functions with boundary-value arguments. The \texttt{printf} alternative pairs format specifiers with INT32/INT64 boundary integers, targeting overflow paths in SQLite's string formatting implementation~\cite{cve202013434}. The \texttt{substr} alternative exercises heap buffer boundaries, while \texttt{hex(zeroblob(N))} with large $N$ stresses memory allocation limits. Listing~\ref{lst:boundary-func} shows the alternatives.
+
+These patterns are effective because SQLite's C implementation performs many integer width conversions (32-bit to 64-bit and vice versa) in its formatting and string manipulation functions. Boundary values at INT32\_MAX, INT32\_MAX+1, INT32\_MIN, and INT64\_MAX systematically probe these conversion points, where truncation or sign extension errors can lead to buffer overflows or undefined behavior.
 
 \begin{lstlisting}[language=Python, caption={Boundary-Func-Call alternatives targeting integer overflow and buffer boundary conditions.}, label=lst:boundary-func, basicstyle=\ttfamily\small, numbers=left]
 ctx.rule("Boundary-Func-Call",
@@ -221,10 +222,36 @@ ctx.rule("Boundary-Int", "-2147483648", weight=3.0)  # INT32_MIN
 ctx.rule("Boundary-Int", "9223372036854775807", weight=3.0) # INT64_MAX
 \end{lstlisting}
 
-\subsection{CVE Reachability Analysis}
-\label{sec:cve-reachability}
+\paragraph{Validation Operations.}
+The \texttt{Validation-Op} non-terminal generates PRAGMA statements and internal consistency checks that exercise SQLite's schema validation and integrity verification subsystems: \texttt{integrity\_check}, \texttt{foreign\_key\_check}, \texttt{quick\_check}, and \texttt{REINDEX}. Validation operations are important because they traverse internal data structures (B-trees, schema tables, index metadata) using code paths that are distinct from normal query execution. The integrity checker, in particular, walks every page of the database file and validates structural invariants --- a process that can trigger bugs in the page cache, B-tree traversal, or column type checking logic when the schema contains unusual constructs such as generated columns or virtual tables~\cite{cve201919646}.
 
-Table~\ref{tab:cve-structural} maps each target CVE to the structural patterns required to trigger it. A CVE is structurally reachable if and only if the grammar contains non-terminals capable of generating every required pattern. The table reveals the cross-pollination structure of the grammar: no structural pattern is unique to a single CVE, and every CVE requires between two and five patterns drawn from different non-terminal groups.
+Table~\ref{tab:pattern-subsystem} summarizes the mapping between pattern categories and the SQLite subsystems they exercise.
+
+\begin{table}[htbp]
+\caption{Structural pattern categories and their target SQLite subsystems. Each category exercises distinct internal code paths where vulnerabilities cluster.}
+\label{tab:pattern-subsystem}
+\centering
+\small
+\begin{tabular}{p{3.2cm}p{4.0cm}p{5.5cm}}
+\toprule
+\textbf{Pattern Category} & \textbf{Target Subsystem} & \textbf{Vulnerability Mechanism} \\
+\midrule
+Schema Topology (S1--S6) & Column resolver, generated column processor, view materializer & Circular dependencies, null dereferences in column resolution \\
+Query Stress (Q1--Q8) & Query planner, join optimizer, compound query engine & Name resolution errors, use-after-free in AST transforms \\
+Boundary Values & printf, substr, zeroblob implementations & Integer overflow, buffer overread, allocation failures \\
+Validation Ops & Integrity checker, B-tree traversal, schema validator & Page cache errors, type checking failures on unusual schemas \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Cross-Pollination of Structural Patterns}
+\label{sec:cross-pollination}
+
+A key property of the grammar is that structural patterns are not labeled or isolated per CVE. Each non-terminal encodes a SQL structural affordance --- a syntactic shape that participates in one or more vulnerability-triggering code paths --- without indicating which specific vulnerability it targets. This design choice ensures that the grammar captures \emph{structural categories} of vulnerabilities rather than individual instances, and it produces a cross-pollination effect: a single non-terminal serves multiple CVEs simultaneously, and a single CVE requires patterns drawn from multiple independent non-terminals.
+
+Cross-pollination arises naturally from the independence of Layer~2 selections. On each generated input, the fuzzer independently selects a \texttt{Schema-Setup} variant, a \texttt{Stress-Query} variant, and optionally a \texttt{Boundary-Func-Call} or \texttt{Validation-Op}. Because these selections are governed by independent weighted distributions, the fuzzer explores the Cartesian product of all Layer~2 shapes --- producing combinations that the grammar designer never explicitly planned. For example, a single generated input might combine S2 (generated columns) with Q3 (NATURAL JOIN) and a printf boundary call, exercising the intersection of SQLite's generated column processor, join optimizer, and printf implementation simultaneously.
+
+Table~\ref{tab:cve-structural} maps each target CVE to the structural patterns required to trigger it. The table reveals that no structural pattern is unique to a single CVE, and every CVE requires between two and five patterns drawn from different non-terminal groups. Generated columns participate in two CVEs; JOIN patterns serve three; coalesce appears in two. This sharing means that improving the grammar's ability to reach one CVE simultaneously improves its ability to reach others --- a multiplicative benefit that would not arise if each CVE were targeted by isolated grammar rules.
 
 \begin{table}[htbp]
 \caption{Structural patterns required for each target CVE. Each CVE requires all listed patterns to co-occur in a single generated input. Shared patterns across CVEs demonstrate cross-pollination.}
@@ -246,268 +273,17 @@ CVE-2020-15358 & 3 & CREATE VIEW with ORDER BY, INTERSECT, \\
 \end{tabular}
 \end{table}
 
-Figure~\ref{fig:cve-matrix} visualizes the same data as a cross-pollination matrix. Each row is a structural pattern category, each column is a target CVE, and filled cells indicate that the pattern is required. The matrix makes the sharing structure immediately visible: generated columns serve two CVEs, coalesce serves two, and window functions participate in two vulnerability paths.
-
-\begin{figure}[htbp]
-\centering
-\begin{tikzpicture}[
-    cell/.style={minimum width=1.4cm, minimum height=0.6cm, align=center, font=\scriptsize},
-    filled/.style={cell, fill=green!25},
-    empty/.style={cell, fill=white},
-    hdr/.style={cell, font=\scriptsize\bfseries, fill=black!8},
-    rhdr/.style={minimum width=3.2cm, minimum height=0.6cm, align=right, font=\scriptsize, fill=black!4},
-]
-    % Column headers (CVEs)
-    \node[hdr] at (3.2+0*1.5, 0) {\rotatebox{45}{\tiny 19646}};
-    \node[hdr] at (3.2+1*1.5, 0) {\rotatebox{45}{\tiny 13434}};
-    \node[hdr] at (3.2+2*1.5, 0) {\rotatebox{45}{\tiny 9327}};
-    \node[hdr] at (3.2+3*1.5, 0) {\rotatebox{45}{\tiny 13435}};
-    \node[hdr] at (3.2+4*1.5, 0) {\rotatebox{45}{\tiny 13871}};
-    \node[hdr] at (3.2+5*1.5, 0) {\rotatebox{45}{\tiny 15358}};
-
-    % Row labels and cells
-    % Row 1: Generated column
-    \node[rhdr] at (1.6, -0.7) {Generated column};
-    \node[filled] at (3.2+0*1.5, -0.7) {$\bullet$};
-    \node[empty]  at (3.2+1*1.5, -0.7) {};
-    \node[filled] at (3.2+2*1.5, -0.7) {$\bullet$};
-    \node[empty]  at (3.2+3*1.5, -0.7) {};
-    \node[empty]  at (3.2+4*1.5, -0.7) {};
-    \node[empty]  at (3.2+5*1.5, -0.7) {};
-
-    % Row 2: printf + boundary
-    \node[rhdr] at (1.6, -1.4) {printf + boundary int};
-    \node[empty]  at (3.2+0*1.5, -1.4) {};
-    \node[filled] at (3.2+1*1.5, -1.4) {$\bullet$};
-    \node[empty]  at (3.2+2*1.5, -1.4) {};
-    \node[empty]  at (3.2+3*1.5, -1.4) {};
-    \node[empty]  at (3.2+4*1.5, -1.4) {};
-    \node[empty]  at (3.2+5*1.5, -1.4) {};
-
-    % Row 3: coalesce()
-    \node[rhdr] at (1.6, -2.1) {coalesce()};
-    \node[empty]  at (3.2+0*1.5, -2.1) {};
-    \node[empty]  at (3.2+1*1.5, -2.1) {};
-    \node[filled] at (3.2+2*1.5, -2.1) {$\bullet$};
-    \node[filled] at (3.2+3*1.5, -2.1) {$\bullet$};
-    \node[empty]  at (3.2+4*1.5, -2.1) {};
-    \node[empty]  at (3.2+5*1.5, -2.1) {};
-
-    % Row 4: JOIN / NATURAL JOIN
-    \node[rhdr] at (1.6, -2.8) {JOIN / NATURAL JOIN};
-    \node[empty]  at (3.2+0*1.5, -2.8) {};
-    \node[empty]  at (3.2+1*1.5, -2.8) {};
-    \node[filled] at (3.2+2*1.5, -2.8) {$\bullet$};
-    \node[filled] at (3.2+3*1.5, -2.8) {$\bullet$};
-    \node[empty]  at (3.2+4*1.5, -2.8) {};
-    \node[filled] at (3.2+5*1.5, -2.8) {$\bullet$};
-
-    % Row 5: Window OVER()
-    \node[rhdr] at (1.6, -3.5) {Window OVER()};
-    \node[empty]  at (3.2+0*1.5, -3.5) {};
-    \node[empty]  at (3.2+1*1.5, -3.5) {};
-    \node[empty]  at (3.2+2*1.5, -3.5) {};
-    \node[filled] at (3.2+3*1.5, -3.5) {$\bullet$};
-    \node[empty]  at (3.2+4*1.5, -3.5) {};
-    \node[empty]  at (3.2+5*1.5, -3.5) {};
-
-    % Row 6: CREATE VIEW
-    \node[rhdr] at (1.6, -4.2) {CREATE VIEW};
-    \node[empty]  at (3.2+0*1.5, -4.2) {};
-    \node[empty]  at (3.2+1*1.5, -4.2) {};
-    \node[filled] at (3.2+2*1.5, -4.2) {$\bullet$};
-    \node[empty]  at (3.2+3*1.5, -4.2) {};
-    \node[empty]  at (3.2+4*1.5, -4.2) {};
-    \node[filled] at (3.2+5*1.5, -4.2) {$\bullet$};
-
-    % Row 7: Compound (EXCEPT/INTERSECT)
-    \node[rhdr] at (1.6, -4.9) {EXCEPT / INTERSECT};
-    \node[empty]  at (3.2+0*1.5, -4.9) {};
-    \node[empty]  at (3.2+1*1.5, -4.9) {};
-    \node[empty]  at (3.2+2*1.5, -4.9) {};
-    \node[empty]  at (3.2+3*1.5, -4.9) {};
-    \node[filled] at (3.2+4*1.5, -4.9) {$\bullet$};
-    \node[filled] at (3.2+5*1.5, -4.9) {$\bullet$};
-
-    % Row 8: PRAGMA
-    \node[rhdr] at (1.6, -5.6) {PRAGMA integrity\_check};
-    \node[filled] at (3.2+0*1.5, -5.6) {$\bullet$};
-    \node[empty]  at (3.2+1*1.5, -5.6) {};
-    \node[empty]  at (3.2+2*1.5, -5.6) {};
-    \node[empty]  at (3.2+3*1.5, -5.6) {};
-    \node[empty]  at (3.2+4*1.5, -5.6) {};
-    \node[empty]  at (3.2+5*1.5, -5.6) {};
-
-    % Row 9: ORDER BY multi-col
-    \node[rhdr] at (1.6, -6.3) {Multi-col ORDER BY};
-    \node[empty]  at (3.2+0*1.5, -6.3) {};
-    \node[empty]  at (3.2+1*1.5, -6.3) {};
-    \node[empty]  at (3.2+2*1.5, -6.3) {};
-    \node[empty]  at (3.2+3*1.5, -6.3) {};
-    \node[filled] at (3.2+4*1.5, -6.3) {$\bullet$};
-    \node[filled] at (3.2+5*1.5, -6.3) {$\bullet$};
-
-    % Grid lines
-    \foreach \y in {-0.35, -1.05, -1.75, -2.45, -3.15, -3.85, -4.55, -5.25, -5.95, -6.65} {
-        \draw[black!15] (0, \y) -- (12.2, \y);
-    }
-    \foreach \x in {3.2, 4.7, 6.2, 7.7, 9.2, 10.7, 12.2} {
-        \draw[black!15] (\x, 0.35) -- (\x, -6.65);
-    }
-
-    % Bottom: pattern count per CVE
-    \node[font=\scriptsize\bfseries, text=black!60] at (3.2+0*1.5, -7.1) {2};
-    \node[font=\scriptsize\bfseries, text=black!60] at (3.2+1*1.5, -7.1) {2};
-    \node[font=\scriptsize\bfseries, text=black!60] at (3.2+2*1.5, -7.1) {4};
-    \node[font=\scriptsize\bfseries, text=black!60] at (3.2+3*1.5, -7.1) {5};
-    \node[font=\scriptsize\bfseries, text=black!60] at (3.2+4*1.5, -7.1) {3};
-    \node[font=\scriptsize\bfseries, text=black!60] at (3.2+5*1.5, -7.1) {3};
-    \node[rhdr, font=\scriptsize\itshape] at (1.6, -7.1) {Patterns required:};
-
-\end{tikzpicture}
-\caption{Cross-pollination matrix. Rows are structural pattern categories; columns are target CVEs. Filled cells ($\bullet$) indicate the pattern is required. Patterns shared across columns demonstrate cross-pollination: generated columns serve CVE-2019-19646 and CVE-2020-9327; coalesce serves CVE-2020-9327 and CVE-2020-13435; JOINs serve three CVEs.}
-\label{fig:cve-matrix}
-\end{figure}
-
-Generated columns appear in the requirements for both CVE-2019-19646 and CVE-2020-9327, served by a single \texttt{Schema-Setup} alternative (S2). The \texttt{coalesce()} function appears in CVE-2020-9327 and CVE-2020-13435, served by a single \texttt{Func-Call} alternative. Window functions with \texttt{OVER} clauses appear in CVE-2020-13435 and implicitly in CVE-2020-13871 through the window function lifecycle code path. This sharing means that improving the grammar's ability to reach one CVE simultaneously improves its ability to reach others that share structural requirements --- a multiplicative benefit that would not arise if each CVE were targeted by isolated, dedicated grammar rules.
-
-The CVE reachability analysis also reveals the minimum grammar complexity required for full coverage. CVE-2020-13434 requires only two structural elements (printf and a boundary integer), both present in the initial grammar from v3.0. CVE-2020-13435 requires five simultaneous elements including window functions and NATURAL JOIN, which were not added until v3.2. The range from 2 to 5 required patterns per CVE explains why some CVEs are discovered quickly (low combinatorial barrier) while others remain elusive even after extended campaigns (high combinatorial barrier). Section~\ref{sec:grammar-evolution} traces how the grammar evolved to close these structural gaps.
-
-\subsection{Compositional Discovery Probability}
-\label{sec:composition-probability}
-
-The cross-pollination structure has a quantifiable consequence: for each CVE, the probability that a single generated input contains all required structural patterns can be computed from the grammar weights. Each Layer~2 shape selection is an independent draw from a weighted categorical distribution, and each terminal-level choice (format specifier, boundary value, column type) is a further independent draw. The probability of generating a CVE-triggering composition in a single input is the product of these conditional probabilities.
-
-\paragraph{Example: CVE-2020-13434.}
-This CVE requires two structural elements: a \texttt{printf()} call with a format specifier and an INT32 boundary value. The probability of generating a triggering input requires:
-
-\begin{enumerate}
-    \item Selecting \texttt{Boundary-Func-Call} at Layer~2: the \texttt{Sql-Stmt} structure must include a boundary function call. This occurs with probability $p_1$ depending on the Layer~2 dispatch weights.
-    \item Selecting the \texttt{printf} alternative within \texttt{Boundary-Func-Call}: weight 3.0 out of total 6.5, giving $p_2 = 3.0/6.5 \approx 0.46$.
-    \item Selecting \texttt{\%.*g} as the format specifier: weight 3.0 out of total 5.0, giving $p_3 = 3.0/5.0 = 0.60$.
-    \item Selecting an INT32 boundary value ($\geq 2^{31}-1$): weight 6.0 out of total 12.0, giving $p_4 = 6.0/12.0 = 0.50$.
-\end{enumerate}
-
-The per-input probability is $P(\text{CVE-13434}) = p_1 \times p_2 \times p_3 \times p_4 \approx p_1 \times 0.138$. With $p_1$ estimated conservatively at 0.1 (one in ten inputs includes a boundary function call), $P \approx 0.014$, meaning approximately one in 70 generated inputs contains the required structural composition. At typical throughput of 500--1000 executions per second, the expected time to first triggering input is under one second of fuzzing --- though the input must also avoid schema configurations that interfere with the query, and the mutation engine must not disrupt the critical subtree.
-
-\paragraph{Contrast: CVE-2020-13435.}
-This CVE requires five simultaneous elements: NATURAL JOIN, \texttt{coalesce()}, window function with \texttt{OVER}, UNIQUE column constraint, and IN subquery. Each element has its own conditional selection probability, and the product yields $P(\text{CVE-13435}) \approx 10^{-5}$ to $10^{-6}$. At 1000 executions per second, the expected time to first triggering input is 10--1000 seconds --- consistent with the observed time-to-first-crash in campaigns where this CVE was found after several minutes rather than immediately.
-
-\paragraph{Implication for grammar design.}
-The exponential relationship between the number of required patterns and the per-input probability has two consequences. First, it explains why simple CVEs (2 patterns) are found within seconds while complex CVEs (5 patterns) may require minutes or tens of minutes. Second, it motivates weight tuning: increasing the weight of a required non-terminal directly increases its selection probability, multiplicatively improving the per-input probability for \emph{every} CVE that requires that pattern. This multiplicative benefit is the quantitative mechanism behind cross-pollination: a weight increase for \texttt{coalesce()} improves reachability for both CVE-2020-9327 and CVE-2020-13435 simultaneously. The experimental comparison in Chapter~\ref{chap:experiments} validates this analysis by measuring whether the weighted grammar's crash rates exceed those of a baseline grammar with uniform weights.
+This cross-pollination property has two important consequences. First, any CVE rediscovery constitutes a genuine compositional achievement: the fuzzer must independently select the correct combination of non-terminals from a large combinatorial space, with each selection governed by a weighted probability distribution. Second, the grammar discovers bugs beyond its explicit design targets. The seven non-CVE bug classes reported in Chapter~\ref{chap:experiments} --- including FTS tokenizer null dereferences, float cast overflows, and window function lifecycle errors --- were found because structural patterns intended for specific CVEs also exercise adjacent code paths containing previously undocumented defects.
 
 \subsection{Analysis of the Grammar Design Approach}
 \label{sec:grammar-analysis}
 
-The structural primitives methodology offers several advantages over alternative grammar design strategies. The cross-pollination property, described in Section~\ref{sec:cross-pollination}, ensures that the grammar's bug-finding capability scales super-linearly with the number of non-terminals: each new structural pattern participates in combinations with all existing patterns, expanding the reachable input space combinatorially rather than additively. The zero PoC contamination principle guarantees that the grammar remains a genuine testing tool rather than a regression suite --- any vulnerability it triggers is discovered through compositional exploration, providing confidence that the methodology can find bugs that are not yet known.
+The structural primitives methodology offers several advantages over alternative grammar design strategies. The cross-pollination property, described in Section~\ref{sec:cross-pollination}, means that each new structural pattern participates in combinations with all existing patterns, expanding the reachable input space combinatorially rather than additively. The zero PoC contamination principle guarantees that the grammar remains a genuine testing tool rather than a regression suite --- any vulnerability it triggers is discovered through compositional exploration, providing confidence that the methodology can find bugs that are not yet known.
 
 The composability of the two-layer architecture simplifies grammar extension. Adding a new non-terminal to Layer~1 makes it available to all Layer~2 shapes without modifying existing rules. Adding a new Layer~2 shape creates new compositions with all existing Layer~1 atoms. This modularity means that grammar improvements are local changes with global effects, reducing the effort required to expand the grammar's reach.
 
-However, the approach has significant limitations. First, the grammar design process requires manual domain expertise. Identifying which structural patterns are associated with a vulnerability class demands understanding of both the SQL language specification and the target DBMS's internal architecture. The grammar designer must trace from a CVE's root cause to the SQL constructs that exercise the relevant code path --- an analysis that cannot be fully automated with current techniques. Second, the grammar is sensitive to weight distribution. As demonstrated by the FTS saturation problem in grammar v3.0 (Section~\ref{sec:grammar-evolution}), incorrect weights can concentrate sampling effort on a shallow region of the bug space, starving other regions of exploration budget. Weight tuning requires empirical feedback from actual campaigns, creating a chicken-and-egg problem: the grammar must be run to assess its weights, but running it with poor weights wastes campaign time. Third, the grammar imposes a hard reachability ceiling: it can only discover bugs whose structural prerequisites exist as non-terminals. If a vulnerability requires a SQL construct that the grammar does not encode --- for example, a recursive common table expression or a specific ATTACH DATABASE pattern --- no amount of campaign time or weight tuning will trigger it. The grammar defines the boundary of what the fuzzer can discover; coverage feedback can navigate within that boundary but cannot expand it.
+An alternative to manual grammar engineering is automated grammar inference from corpora or seeds, as explored by Skyfire~\cite{skyfire} and IFuzzer~\cite{ifuzzer}. These approaches learn syntactic structure from existing inputs, eliminating the need for domain expertise. However, they cannot encode vulnerability-specific knowledge --- identifying which SQLite subsystems to stress and which structural patterns reach vulnerable code paths requires understanding that cannot be inferred from syntactic corpora alone. The manual approach trades scalability for targeting precision, which the experiments in Chapter~\ref{chap:experiments} show is the dominant factor for CVE rediscovery.
 
-%% ====================================================================
-\section{Grammar Evolution}
-\label{sec:grammar-evolution}
-%% ====================================================================
+The approach has significant limitations. First, the grammar design process requires manual domain expertise. Identifying which structural patterns are associated with a vulnerability class demands understanding of both the SQL language specification and the target DBMS's internal architecture. The grammar designer must trace from a CVE's root cause to the SQL constructs that exercise the relevant code path --- an analysis that cannot be fully automated with current techniques. Second, the grammar is sensitive to weight distribution. Incorrect weights can concentrate sampling effort on a shallow region of the bug space, starving other regions of exploration budget. For example, overweighting FTS virtual table schemas in early grammar versions caused 92\% of crashes to involve FTS bugs, crowding out other vulnerability classes until the weight was reduced. Initial weights were set proportional to the number of target CVEs requiring each pattern, then adjusted based on crash diversity in pilot campaigns. This process requires empirical feedback, creating a chicken-and-egg problem: the grammar must be run to assess its weights, but running it with poor weights wastes campaign time. Third, the grammar imposes a hard reachability ceiling: it can only discover bugs whose structural prerequisites exist as non-terminals. If a vulnerability requires a SQL construct that the grammar does not encode --- for example, a recursive common table expression or a specific ATTACH DATABASE pattern --- no amount of campaign time or weight tuning will trigger it. The grammar defines the boundary of what the fuzzer can discover; coverage feedback can navigate within that boundary but cannot expand it.
 
-The grammar underwent iterative refinement across four versions, guided by experimental feedback from fuzzing campaigns. Each version addresses a specific deficiency identified through crash analysis, coverage measurement, or CVE reachability assessment. Table~\ref{tab:grammar-evolution} summarizes the version history.
-
-\begin{table}[htbp]
-\caption{Grammar version history. Each version addresses a specific deficiency identified through experimental feedback.}
-\label{tab:grammar-evolution}
-\centering
-\small
-\begin{tabular}{llrp{7.5cm}}
-\toprule
-\textbf{Version} & \textbf{Date} & \textbf{Rules} & \textbf{Key Change} \\
-\midrule
-v3.0 & 2026-04-27 & 449 & Initial structural primitives design \\
-v3.1 & 2026-04-28 & 449 & S5 (FTS) weight 2.0$\to$0.5; diversify crash portfolio \\
-v3.2 & 2026-05-05 & 475 & +window functions, +self-ref generated columns, +count() zero-arg, +ORDER BY 3-term \\
-v3.3 & 2026-05-10 & 520 & +JSON/JSONB expansion (Json-Key, Json-Path, Json-Literal) \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-Figure~\ref{fig:grammar-evolution} visualizes the evolution trajectory: rule count growth and CVE reachability improvement across versions.
-
-\begin{figure}[htbp]
-\centering
-\begin{tikzpicture}[
-    vbox/.style={rectangle, rounded corners=4pt, draw=black!50, thick,
-        minimum width=2.4cm, minimum height=1.6cm, align=center, font=\small},
-    arr/.style={->, >=stealth, very thick, color=black!50},
-    lbl/.style={font=\scriptsize, color=black!60, align=center},
-]
-    % Version boxes
-    \node[vbox, fill=blue!8] (v30) at (0,0) {\textbf{v3.0}\\[2pt]{\scriptsize 449 rules}\\[1pt]{\scriptsize 2/6 CVEs}};
-    \node[vbox, fill=blue!8] (v31) at (3.5,0) {\textbf{v3.1}\\[2pt]{\scriptsize 449 rules}\\[1pt]{\scriptsize 2/6 CVEs}};
-    \node[vbox, fill=green!12] (v32) at (7,0) {\textbf{v3.2}\\[2pt]{\scriptsize 475 rules}\\[1pt]{\scriptsize \textbf{6/6 CVEs}}};
-    \node[vbox, fill=green!12] (v33) at (10.5,0) {\textbf{v3.3}\\[2pt]{\scriptsize 520 rules}\\[1pt]{\scriptsize 6/6 CVEs}};
-
-    % Arrows with labels
-    \draw[arr] (v30.east) -- node[lbl, above] {weight\\tuning} (v31.west);
-    \draw[arr] (v31.east) -- node[lbl, above] {structural\\expansion} (v32.west);
-    \draw[arr] (v32.east) -- node[lbl, above] {JSON/JSONB\\expansion} (v33.west);
-
-    % Change annotations below
-    \node[lbl, below=0.3cm of v31] {FTS weight\\2.0$\to$0.5};
-    \node[lbl, below=0.3cm of v32] {+26 rules\\+window funcs\\+gen. columns};
-    \node[lbl, below=0.3cm of v33] {+45 rules\\+json functions};
-
-    % Highlight the key transition
-    \draw[red!40, very thick, rounded corners=6pt, dashed]
-        ([xshift=-8pt, yshift=14pt]v32.north west) rectangle ([xshift=8pt, yshift=-28pt]v32.south east);
-    \node[font=\scriptsize\itshape, color=red!50!black, anchor=south] at ([yshift=16pt]v32.north) {full CVE reachability};
-
-\end{tikzpicture}
-\caption{Grammar evolution from v3.0 to v3.3. Version v3.1 rebalanced weights without adding rules. Version v3.2 (highlighted) achieved full CVE reachability through structural expansion. Version v3.3 extended coverage to modern SQLite's JSON module.}
-\label{fig:grammar-evolution}
-\end{figure}
-
-\subsection{v3.0: Initial Design (449 Rules)}
-
-Version~3.0 established the structural primitives architecture described in Section~\ref{sec:grammar-design}. The grammar comprised 449 production rules organized into the two-layer hierarchy, with Layer~1 providing SQL atoms and Layer~2 composing them into schema-setup, stress-query, validation, and boundary function call shapes. Initial weights were assigned based on domain analysis of which structural patterns are associated with each target CVE. This version served as the baseline for subsequent refinement.
-
-\subsection{v3.0 to v3.1: Weight Rebalancing (449 Rules)}
-
-The first refinement addressed a crash diversity problem. In campaigns run with v3.0, 92\% of crashes involved FTS (Full-Text Search) virtual tables. The root cause was straightforward: the S5 schema variant (FTS virtual table creation) had weight 2.0, while the average weight across other schema variants was approximately 1.5. Because the FTS module in SQLite contains many shallow bugs --- particularly in its tokenizer and auxiliary function implementations --- even moderate overweighting of FTS schemas caused FTS-related crashes to dominate the crash portfolio.
-
-The fix was to reduce the S5 weight from 2.0 to 0.5, making FTS schemas the least likely schema variant. This single weight change diversified the crash portfolio significantly: subsequent campaigns produced crashes from generated columns, views, joins, and index operations that had previously been crowded out by FTS bugs. Version~3.1 retained the same 449 rules; only the weight distribution changed.
-
-This episode illustrates a general principle of grammar engineering for fuzzing: a grammar that is structurally capable of reaching a vulnerability may still fail to reach it in practice if the weight distribution concentrates sampling effort on a different, shallower region of the bug space. Weight tuning is a necessary complement to structural coverage.
-
-\subsection{v3.1 to v3.2: Structural Expansion (475 Rules)}
-
-The second refinement addressed structural gaps that prevented the grammar from reaching four of the six target CVEs. A systematic gap analysis compared the structural requirements of each CVE (as documented in Table~\ref{tab:cve-structural}) against the non-terminals available in v3.1. The analysis revealed that:
-
-\begin{itemize}
-    \item CVE-2020-9327 required self-referential generated columns (a generated column whose expression references another generated column in the same table), which v3.1 could not express.
-    \item CVE-2020-13435 required window functions with \texttt{OVER} clauses, which v3.1 lacked entirely.
-    \item CVE-2020-13871 required window functions combined with multi-column \texttt{ORDER BY} clauses.
-    \item CVE-2020-15358 required compound queries with \texttt{INTERSECT}/\texttt{EXCEPT} operators, which were present but lacked the specific \texttt{ORDER BY} clause structure needed.
-\end{itemize}
-
-Version~3.2 added 26 new rules to close these gaps: 15 window function rules covering \texttt{lead}, \texttt{lag}, \texttt{row\_number}, \texttt{rank}, \texttt{dense\_rank}, \texttt{ntile}, \texttt{first\_value}, \texttt{last\_value}, \texttt{nth\_value}, \texttt{percent\_rank}, and \texttt{cume\_dist} with \texttt{OVER} clause variants (including \texttt{PARTITION BY} and frame specifications); 3 self-referential generated column rules where the generated expression references a sibling column; 1 zero-argument \texttt{count()} form (distinct from \texttt{count(expr)}); 1 three-term \texttt{ORDER BY} clause; and 6 supporting non-terminals for window frame boundaries and partition specifications.
-
-After this expansion, all six target CVEs became structurally reachable --- the grammar contained every building block needed to compose a triggering input for each CVE. CVE reachability improved from 2/6 to 6/6.
-
-\subsection{v3.2 to v3.3: JSON/JSONB Expansion (520 Rules)}
-
-The third refinement targeted the \texttt{json.c} module in SQLite, motivated by the goal of extending the fuzzer's reach beyond the original six CVEs into a current SQLite release (version 3.53.0). The JSON1 extension is a high-value target because it performs complex string parsing, type coercion, and memory management operations that are historically prone to vulnerabilities.
-
-Version~3.3 added 45 new rules organized into four non-terminal groups:
-
-\begin{itemize}
-    \item \texttt{Json-Key}: 4 rules for JSON key access patterns (dot notation, bracket notation, quoted keys, nested paths).
-    \item \texttt{Json-Path}: 8 rules for JSON path expressions (\texttt{\$} root, array indexing, recursive descent, wildcard).
-    \item \texttt{Json-Literal}: 6 rules for JSON value construction (objects, arrays, strings, numbers, booleans, null, nested structures).
-    \item JSON function calls: rules for \texttt{json()}, \texttt{json\_extract()}, \texttt{json\_set()}, \texttt{json\_insert()}, \texttt{json\_remove()}, \texttt{json\_type()}, \texttt{json\_array()}, and \texttt{json\_object()}, each composed with the above non-terminals.
-\end{itemize}
-
-\subsection{Key Insight: Two Axes of Grammar Evolution}
-
-Grammar evolution operates on two orthogonal axes. \emph{Weight tuning} controls the probability distribution over existing rules, determining which regions of the expressible input space receive more sampling effort. \emph{Structural expansion} extends the boundaries of the expressible input space itself by adding new non-terminals and production rules.
-
-Both axes are necessary. Weight tuning without structural coverage leaves CVEs unreachable regardless of campaign duration --- if the grammar cannot express window functions, no weight adjustment will produce an input containing \texttt{OVER} clauses. Conversely, structural expansion without weight tuning can lead to dominance of one grammar region, as demonstrated by the FTS saturation in v3.0. Effective grammar engineering requires alternating between these two modes of refinement: expanding structure when gap analysis reveals missing building blocks, and tuning weights when crash analysis reveals imbalanced sampling.
 
