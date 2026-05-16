@@ -21,11 +21,16 @@ FIG_DIR = ROOT / "results" / "comparison" / "figures"
 
 BLUE = "#2196F3"
 ORANGE = "#FF9800"
-GRAMMAR_COLORS = {"v3.3": BLUE, "ebnf": ORANGE}
-GRAMMAR_LABELS = {"v3.3": "Active (v3.3)", "ebnf": "Baseline (EBNF)"}
-VERSION_LABELS = {"sqlite-3.31.1": "SQLite 3.31.1", "sqlite-3.32.2": "SQLite 3.32.2"}
-VERSIONS = ["sqlite-3.31.1", "sqlite-3.32.2"]
-GRAMMARS = ["v3.3", "ebnf"]
+GRAMMAR_COLORS = {"v3.4": BLUE, "ebnf": ORANGE}
+GRAMMAR_LABELS = {"v3.4": "Active (v3.4)", "ebnf": "Baseline (EBNF)"}
+VERSION_LABELS = {
+    "sqlite-3.30.1": "SQLite 3.30.1",
+    "sqlite-3.31.1": "SQLite 3.31.1",
+    "sqlite-3.32.0": "SQLite 3.32.0",
+    "sqlite-3.32.2": "SQLite 3.32.2",
+}
+VERSIONS = ["sqlite-3.30.1", "sqlite-3.31.1", "sqlite-3.32.0", "sqlite-3.32.2"]
+GRAMMARS = ["v3.4", "ebnf"]
 
 plt.rcParams.update({
     "font.family": "serif",
@@ -67,7 +72,7 @@ def chart1_unique_bugs(summary: pd.DataFrame) -> None:
 
     x = np.arange(len(VERSIONS))
     width = 0.3
-    offsets = {"v3.3": -width / 2, "ebnf": width / 2}
+    offsets = {"v3.4": -width / 2, "ebnf": width / 2}
 
     for grammar in GRAMMARS:
         means, stds, vals_list = [], [], []
@@ -82,7 +87,7 @@ def chart1_unique_bugs(summary: pd.DataFrame) -> None:
                alpha=0.85, capsize=4, edgecolor="black", linewidth=0.4)
 
     for i, version in enumerate(VERSIONS):
-        a = summary[(summary.grammar == "v3.3") & (summary.sqlite_version == version)]["unique_root_causes"].values
+        a = summary[(summary.grammar == "v3.4") & (summary.sqlite_version == version)]["unique_root_causes"].values
         b = summary[(summary.grammar == "ebnf") & (summary.sqlite_version == version)]["unique_root_causes"].values
         _, p = mann_whitney(list(a), list(b))
         ymax = max(np.mean(a) + np.std(a, ddof=1), np.mean(b) + np.std(b, ddof=1)) if len(a) > 1 else max(a.max(), b.max())
@@ -217,7 +222,7 @@ def chart5_throughput(summary: pd.DataFrame) -> None:
 
     x = np.arange(len(VERSIONS))
     width = 0.3
-    offsets = {"v3.3": -width / 2, "ebnf": width / 2}
+    offsets = {"v3.4": -width / 2, "ebnf": width / 2}
 
     for grammar in GRAMMARS:
         means, stds = [], []

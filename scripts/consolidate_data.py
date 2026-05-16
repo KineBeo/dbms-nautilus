@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parent.parent
 WORKDIR_BASE = ROOT / "workdirs"
 OUTPUT_DIR = ROOT / "results" / "comparison" / "data"
 
-CAMPAIGN_RE = re.compile(r"(sqlite-[\d.]+)_comparison_(v3\.3|ebnf)_run(\d+)")
+CAMPAIGN_RE = re.compile(r"(sqlite-[\d.]+)_comparison_(v3\.4|ebnf)_run(\d+)")
 
 
 def parse_campaign(workdir: Path, version: str, grammar: str, run: int) -> dict | None:

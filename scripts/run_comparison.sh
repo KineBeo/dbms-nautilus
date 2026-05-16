@@ -23,11 +23,11 @@ export LD_LIBRARY_PATH="${LD_LIBRARY_PATH:-/home/linuxbrew/.linuxbrew/lib}"
 export PYTHONPATH="$ROOT"
 
 declare -A GRAMMARS=(
-    [v3.3]="$ROOT/grammars/active/sqlite_v3.py"
+    [v3.4]="$ROOT/grammars/v3.4/sqlite_v3.py"
     [ebnf]="$ROOT/grammars/baseline/sqlite-ebnf.py"
 )
 
-VERSIONS=("sqlite-3.31.1" "sqlite-3.32.2")
+VERSIONS=("sqlite-3.30.1" "sqlite-3.31.1" "sqlite-3.32.0" "sqlite-3.32.2")
 
 TOTAL=$((2 * ${#VERSIONS[@]} * RUNS))
 CURRENT=0
@@ -35,7 +35,7 @@ START_ALL=$(date +%s)
 
 echo "=============================================="
 echo " Comparison Campaign Suite"
-echo " Grammars: v3.3 (active) vs ebnf (baseline)"
+echo " Grammars: v3.4 (active) vs ebnf (baseline)"
 echo " Versions: ${VERSIONS[*]}"
 echo " Runs:     $RUNS per pair"
 echo " Duration: ${DURATION}s per campaign"
@@ -45,7 +45,7 @@ echo "=============================================="
 
 mkdir -p "$ROOT/results/comparison"
 
-for GRAMMAR_NAME in v3.3 ebnf; do
+for GRAMMAR_NAME in v3.4 ebnf; do
     GRAMMAR="${GRAMMARS[$GRAMMAR_NAME]}"
     for VERSION in "${VERSIONS[@]}"; do
         for RUN_N in $(seq 1 "$RUNS"); do
