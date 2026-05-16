@@ -1,4 +1,0 @@
-campaign_id,grammar,sqlite_version,run,bug_hash,bug_type,bug_subtype,key_function,crash_count,sample_sql
-v3.3_uniform_sqlite-3.31.1_run1,v3.3_uniform,sqlite-3.31.1,1,8e36b1ab15ffac2b,ubsan,null-pointer,sqlite3Fts5GetTokenizer,7,CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(a); INSERT INTO q (a) VALUES (CURRENT_TIME IS NOT total_changes() NOT LIKE NOT EXISTS (VALUES (CURRENT_TIMESTAMP IS NULL)) > RAISE(IGNORE) LIKE RAI
-v3.3_uniform_sqlite-3.31.1_run1,v3.3_uniform,sqlite-3.31.1,1,7264a343681aca95,ubsan,signed-integer-overflow,sqlite3_str_vappendf,2,"SELECT printf('%.*g', 2147483647, 0.01); CREATE TABLE IF NOT EXISTS p(a TEXT, c1 AS(c1) UNIQUE); INSERT INTO p (rowid) VALUES (RAISE(IGNORE) - CURRENT_DATE > RAISE(IGNORE)); SELECT *;"
-ebnf_sqlite-3.31.1_run1,ebnf,sqlite-3.31.1,1,8e36b1ab15ffac2b,ubsan,null-pointer,sqlite3Fts5GetTokenizer,211,"CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c3, c2);"

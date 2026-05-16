@@ -109,7 +109,11 @@ def chart1_unique_bugs(summary: pd.DataFrame) -> None:
 
 def chart2_coverage_over_time(ts: pd.DataFrame) -> None:
     """Line plot: edge coverage over time with confidence bands."""
-    fig, axes = plt.subplots(1, 2, figsize=(12, 4.5), sharey=True)
+    nv = len(VERSIONS)
+    ncols = min(nv, 2)
+    nrows = (nv + ncols - 1) // ncols
+    fig, axes = plt.subplots(nrows, ncols, figsize=(6 * ncols, 4.5 * nrows), sharey=True)
+    axes = np.atleast_1d(axes).flatten()
 
     for i, version in enumerate(VERSIONS):
         ax = axes[i]
@@ -144,11 +148,15 @@ def chart2_coverage_over_time(ts: pd.DataFrame) -> None:
 
 def chart3_bug_breakdown(bugs: pd.DataFrame) -> None:
     """Horizontal grouped bar: bug subtypes per grammar × version."""
-    fig, axes = plt.subplots(1, 2, figsize=(12, 4.5))
+    nv = len(VERSIONS)
+    ncols = min(nv, 2)
+    nrows = (nv + ncols - 1) // ncols
+    fig, axes = plt.subplots(nrows, ncols, figsize=(6 * ncols, 4.5 * nrows))
+    axes = np.atleast_1d(axes).flatten()
 
     for i, version in enumerate(VERSIONS):
         ax = axes[i]
-        subset = bugs[bugs.sqlite_version == version]
+        subset = bugs[bugs.sqlite_version == version].dropna(subset=["bug_subtype"])
 
         all_subtypes = sorted(subset["bug_subtype"].unique())
         if not all_subtypes:
@@ -183,7 +191,11 @@ def chart3_bug_breakdown(bugs: pd.DataFrame) -> None:
 
 def chart4_crash_accumulation(ts: pd.DataFrame) -> None:
     """Line plot: crash accumulation over time."""
-    fig, axes = plt.subplots(1, 2, figsize=(12, 4.5), sharey=True)
+    nv = len(VERSIONS)
+    ncols = min(nv, 2)
+    nrows = (nv + ncols - 1) // ncols
+    fig, axes = plt.subplots(nrows, ncols, figsize=(6 * ncols, 4.5 * nrows), sharey=True)
+    axes = np.atleast_1d(axes).flatten()
 
     for i, version in enumerate(VERSIONS):
         ax = axes[i]

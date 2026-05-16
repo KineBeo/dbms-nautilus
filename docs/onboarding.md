@@ -3,7 +3,7 @@
 ## Project Overview
 
 **Name:** rl-nautilus-phase-2  
-**Description:** Grammar-based fuzzer (Nautilus 2.0) enhanced with Reinforcement Learning for automated CVE discovery in SQLite  
+**Description:** Grammar-based greybox fuzzer (Nautilus 2.0) with structural-primitives grammar for automated CVE discovery in SQLite  
 **Languages:** Rust, Python, C, Bash  
 **Frameworks:** PyO3 (Rust↔Python bridge), AFL fork-server protocol
 
@@ -26,7 +26,7 @@ The project has 10 architectural layers. Here's how they connect:
                              │ generates/mutates SQL
 ┌────────────────────────────▼────────────────────────────────────┐
 │                    Fuzzer Core (Rust)                            │
-│  main.rs (thread pool) → fuzzer.rs (exec) → grammar_bandit.rs  │
+│  main.rs (thread pool) → fuzzer.rs (exec) → shared_state.rs    │
 └────────────────────────────┬────────────────────────────────────┘
                              │ executes via
 ┌────────────────────────────▼────────────────────────────────────┐
@@ -44,14 +44,14 @@ The project has 10 architectural layers. Here's how they connect:
 
 | Layer | Purpose | Key Files |
 |-------|---------|-----------|
-| **Fuzzer Core** | Thread pool, mutation loop, crash detection, RL integration | `fuzzer/src/main.rs`, `fuzzer.rs`, `grammar_bandit.rs`, `dqn.rs` |
+| **Fuzzer Core** | Thread pool, mutation loop, crash detection | `fuzzer/src/main.rs`, `fuzzer.rs`, `shared_state.rs` |
 | **Grammar Engine** | Weighted rule sampling, tree generation, grammar-aware mutations | `grammartec/src/context.rs`, `loaded_dice.rs`, `mutator.rs`, `tree.rs` |
 | **Fork Server** | AFL-compatible process execution, shared memory coverage bitmap | `forksrv/src/lib.rs`, `exitreason.rs` |
 | **SQLite Harness** | Executes SQL against instrumented SQLite, sanitizer oracle | `harness/src/sqlite_harness.c`, `harness/src/Makefile` |
 | **Triage Pipeline** | Crash replay, dedup by stack hash, CVE signature matching | `triage/classify.py`, `cve_signatures.py`, `stack_dedup.py` |
 | **Grammar Definitions** | SQLite attack patterns in Python DSL (ctx.rule API) | `grammars/active/sqlite_v3.py` |
 | **CVE-to-Grammar** | Transforms CVE POC SQL → generalized grammar patterns | `cve2grammar/cve2grammar/generalizer/pattern_generalizer.py` |
-| **Scripts** | Campaign runners, analysis, experiments | `scripts/run_eval.sh`, `compare_campaigns.py` |
+| **Scripts** | Campaign runners, analysis, plotting | `scripts/run_eval.sh`, `consolidate_data.py`, `plot_comparison.py` |
 | **Configuration** | Build (Cargo.toml, Makefile), runtime (config.ron) | `Cargo.toml`, `config.ron` |
 | **Documentation** | Architecture, CVE list, experiment results | `docs/`, `README.md` |
 
@@ -74,9 +74,6 @@ The harness is compiled with ASan (memory errors) + UBSan (undefined behavior). 
 - Exit 223 = ASan caught something  
 - Exit 134 = Debug assert fired (SIGABRT)
 
-### Multi-Armed Bandit (RL)
-`fuzzer/src/grammar_bandit.rs` treats grammar rules as "arms." Rules that lead to new coverage or crashes get higher reward → higher weight → sampled more often. Uses UCB1 selection + EMA reward normalization.
-
 ### Triage Pipeline
 Raw crashes are meaningless until triaged. `classify.py` replays each crash, captures the stack trace, hashes the top 5 frames, and groups duplicates. 10,000 raw crashes typically reduce to 5-10 unique root causes.
 
@@ -88,10 +85,9 @@ Raw crashes are meaningless until triaged. `classify.py` replays each crash, cap
 2. **Grammar Engine** — Start with `grammartec/src/context.rs` (core), then `loaded_dice.rs` (sampling), `rule.rs` (definitions), `mutator.rs` (mutations)
 3. **Fork Server & Execution** — `forksrv/src/lib.rs` + `harness/src/sqlite_harness.c`
 4. **Fuzzer Core Loop** — `fuzzer/src/main.rs` → `fuzzer.rs` → `shared_state.rs`
-5. **RL Integration** — `grammar_bandit.rs` → `dqn.rs` → `rl_hook.rs`
-6. **Attack Grammars** — `grammars/active/sqlite_v3.py` + `cve2grammar/` pipeline
-7. **Triage Pipeline** — `triage/classify.py` → `cve_signatures.py` → `stack_dedup.py`
-8. **Experiment Infrastructure** — `scripts/run_eval.sh`, `run_campaign_matrix.sh`, `compare_campaigns.py`
+5. **Attack Grammars** — `grammars/active/sqlite_v3.py` + `cve2grammar/` pipeline
+6. **Triage Pipeline** — `triage/classify.py` → `cve_signatures.py` → `stack_dedup.py`
+7. **Experiment Infrastructure** — `scripts/run_eval.sh`, `run_campaigns_safe.sh`, `consolidate_data.py`
 
 ---
 
@@ -102,9 +98,6 @@ Raw crashes are meaningless until triaged. `classify.py` replays each crash, cap
 |------|---------|------------|
 | `main.rs` | Entry point — thread pool, mutation loop, stats | Complex |
 | `fuzzer.rs` | Core execution — run_on_input, crash classification, save | Complex |
-| `grammar_bandit.rs` | Multi-armed bandit — UCB1 selection, EMA reward | Complex |
-| `dqn.rs` | DQN agent — state vector, reward computation | Complex |
-| `rl_hook.rs` | Connects execution results to RL reward signals | Moderate |
 | `shared_state.rs` | Thread-shared coverage bitmaps, crash counters | Moderate |
 | `config.rs` | FuzzerConfig struct from config.ron | Simple |
 
@@ -148,7 +141,6 @@ These files require careful understanding before modifying:
 | `grammartec/src/context.rs` | Core grammar engine, PyO3 bridge, weighted sampling |
 | `grammartec/src/mutator.rs` | Multiple mutation strategies, tree manipulation |
 | `forksrv/src/lib.rs` | Low-level Unix IPC (pipes, fork, waitpid, shared memory) |
-| `fuzzer/src/grammar_bandit.rs` | RL math (UCB1, EMA), weight normalization |
 | `cve2grammar/.../pattern_generalizer.py` | Tree-sitter AST manipulation, grammar pattern generation |
 
 ---

@@ -1,0 +1,37 @@
+# Per-Rule Attribution Report
+
+Total log entries: 1620
+
+## Strategy Summary
+Strategy      NEW_COV  Crashes
+------------------------------
+Det                 0        2
+Gen               201      102
+Havoc             133      239
+HavocRec           59        0
+Min               240       44
+MinRec             66        3
+Splice            468       60
+
+## Per-Rule Attribution (Sql-Stmt level)
+Rule   Name                              W   COV  Crash  1st COV  1st Crash
+---------------------------------------------------------------------------
+R3     Schema-Setup                    3.0   603    174       12        877
+R5     Schema-Setup                    2.0   242     96       48        251
+R4     Schema-Setup                    2.5   220    101      159        386
+R6     Boundary-Func-Call              2.0   102     79        6        458
+
+## Top Rules by Coverage (with strategy breakdown)
+  R3 Schema-Setup: 603 COV — Splice=298, Min=118, Gen=62, Havoc=54, MinRec=38, HavocRec=33
+  R5 Schema-Setup: 242 COV — Splice=86, Min=43, Havoc=43, Gen=36, HavocRec=19, MinRec=15
+  R4 Schema-Setup: 220 COV — Splice=79, Min=58, Gen=41, Havoc=24, MinRec=12, HavocRec=6
+  R6 Boundary-Func-Call: 102 COV — Gen=62, Min=21, Havoc=12, Splice=5, HavocRec=1, MinRec=1
+
+## Top Rules by Crashes
+  R3 Schema-Setup (w=3.0): 174 crashes
+  R4 Schema-Setup (w=2.5): 101 crashes
+  R5 Schema-Setup (w=2.0): 96 crashes
+  R6 Boundary-Func-Call (w=2.0): 79 crashes
+
+## Dead Rules (no COV, no crashes)
+  (none — all Sql-Stmt rules observed)

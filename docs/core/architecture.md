@@ -51,7 +51,7 @@ flowchart TD
 
 | Component | Language | LoC (approx.) | Key Files | Purpose |
 |-----------|----------|--------------|-----------|---------|
-| **fuzzer/** | Rust | ~3,254 | `src/main.rs`, `src/fuzzer.rs`, `src/grammar_bandit.rs`, `src/python_grammar_loader.rs` | Multi-threaded coordinator, state machine, mutation dispatch, grammar weight policy |
+| **fuzzer/** | Rust | ~3,254 | `src/main.rs`, `src/fuzzer.rs`, `src/shared_state.rs`, `src/python_grammar_loader.rs` | Multi-threaded coordinator, state machine, mutation dispatch, coverage feedback |
 | **grammartec/** | Rust | ~2,466 | `src/context.rs`, `src/rule.rs`, `src/mutator.rs`, `src/tree.rs` | Grammar engine, weighted sampling, tree representation, mutation primitives |
 | **forksrv/** | Rust | ~426 | `src/lib.rs` | AFL fork-server protocol, shared memory bitmap, process lifecycle |
 | **harness/** | C | ~89 | `src/sqlite_harness.c` | AFL fork-server harness, `setup_db()` constructor, `__AFL_INIT()`, crash oracle |
@@ -102,7 +102,6 @@ per-topic docs):
 |------|------|
 | `fuzzer/src/main.rs` | Entry point: CLI parsing, `Context` init, thread spawning, status display |
 | `fuzzer/src/fuzzer.rs` | `Fuzzer` struct, `run_on()`, `exec()`, `new_bits()`, `ExecLogger` |
-| `fuzzer/src/grammar_bandit.rs` | `GrammarBandit`, `select_group()`, `observe_reward()`, `apply_multipliers()` |
 | `fuzzer/src/python_grammar_loader.rs` | `PyContext` `#[pyclass]`, `load_python_grammar()` |
 | `grammartec/src/context.rs` | `Context`, `add_rule_weighted()`, `get_random_rule_for_nt()`, `set_weight()` |
 | `grammartec/src/rule.rs` | `Rule` enum, `PlainRule`, `ScriptRule`, `RegExpRule`, `weight` field |

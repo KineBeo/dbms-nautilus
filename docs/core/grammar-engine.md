@@ -35,9 +35,8 @@ Each call appends a `Rule` variant to `Context.rules` and registers it in
 (`config.number_of_threads`) calling `fuzzing_thread()`. A `GlobalSharedState`
 and `ChunkStoreWrapper` are shared across all threads via `Arc<Mutex<>>`.
 
-Each thread owns its own `Context` clone — weight updates from the GrammarBandit
-are applied to the thread-local copy via `apply_multipliers()`, not to the
-shared original.
+Each thread owns its own `Context` clone. Weights are set at grammar load time
+and remain static for the duration of the campaign.
 
 ---
 
@@ -97,8 +96,7 @@ ctx.rule("Sql-Stmt", "{Schema-Setup};\n{Stress-Query}", weight=3.0)
 ctx.rule("Sql-Stmt", "{Schema-Setup};\n{Insert-Stmt};\n{Stress-Query}", weight=2.5)
 ```
 
-These weights are static — they are set once at load time and remain fixed
-for the lifetime of the fuzzer unless modified by the GrammarBandit at runtime.
+These weights are static — set once at load time and fixed for the campaign.
 
 ---
 

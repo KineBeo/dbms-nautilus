@@ -24,7 +24,7 @@ Key dependency versions:
 | Crate | Version | Role |
 |-------|---------|------|
 | `pyo3` | 0.21.2 | Python grammar bridge (requires `PYO3_USE_ABI3_FORWARD_COMPATIBILITY=1` on Python 3.13) |
-| `rand` / `rand_distr` | 0.8 / 0.4 | RNG, Beta distribution (for GrammarBandit) |
+| `rand` / `rand_distr` | 0.8 / 0.4 | RNG, random sampling |
 | `nix` | 0.17.0 | Fork/signal/pipe syscalls |
 | `ron` | * | Config file deserialization |
 | `loaded_dice` | 0.2 | Weighted sampling (grammartec dep; available but sampling now done via inline weighted scan) |
@@ -112,10 +112,8 @@ Key values are templated from environment variables (`THREADS`, `TIMEOUT_MS`,
 
 **Step 4 — Launch the fuzzer.**
 ```bash
-timeout "$DURATION" ./target/release/fuzzer -c "$CONFIG" [--policy $POLICY]
+timeout "$DURATION" ./target/release/fuzzer -c "$CONFIG"
 ```
-The `--policy` flag accepts `uniform` or `bandit`; omitting it defaults to
-`uniform`.
 
 **Step 5 — Workdir structure.**
 `main.rs` creates four subdirectories under `$WORKDIR`:
@@ -155,7 +153,7 @@ All fields are defined in `fuzzer/src/config.rs`. Fields marked with
 | `number_of_generate_inputs` | `u16` | (required) | How many `generate_random("START")` calls per idle round (when queue is empty) |
 | `max_tree_size` | `usize` | (required) | Maximum grammar derivation tree node count; caps recursive tree growth |
 | `number_of_deterministic_mutations` | `usize` | (required) | Number of full Det cycles (each cycle covers all tree nodes once); `1` is the standard setting |
-| `policy` | `String` | `"uniform"` | Grammar weight policy: `"uniform"` (static weights), `"bandit"` (Thompson Sampling via `GrammarBandit`) |
+| `policy` | `String` | `"uniform"` | Grammar weight policy (currently only `"uniform"` is used) |
 
 ---
 
@@ -179,18 +177,15 @@ Config(
 )
 ```
 
-For a bandit-policy run, add `policy: "bandit"` — no other fields required.
-
 ---
 
-## 8. Ablation Runner
+## 8. Comparison Runner
 
-`scripts/run_ablation.sh` runs a matrix of variants × seeds:
+`scripts/run_campaigns_safe.sh` runs v3.4 vs EBNF comparison campaigns:
 
 ```bash
-DURATION=900 RUNS=2 TARGET=sqlite-3.31.1 ./scripts/run_ablation.sh
+./scripts/run_campaigns_safe.sh
 ```
 
-The ablation covers four variants: `uniform` and `bandit` policies, each with
-the distilled grammar and the pattern library grammar. Results land in
-`results/campaigns/` for later analysis with `scripts/analyze.py`.
+Runs 5 repeats × 4 SQLite versions × 2 grammars (v3.4 + EBNF baseline).
+Results land in `results/campaigns/` for analysis with `scripts/consolidate_data.py` and `scripts/plot_comparison.py`.
