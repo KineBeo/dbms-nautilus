@@ -25,6 +25,43 @@ The grammar engine defines the space of SQL inputs that the fuzzer can produce. 
 \paragraph{Generation and Mutation.}
 The generation and mutation module transforms grammar rules into concrete SQL strings. On each iteration, it either builds a fresh derivation tree by expanding non-terminals according to the grammar, or takes an existing tree from the queue and applies one of five structural mutations: deterministic rule substitution (trying every alternative production at a given node), random subtree regeneration (replacing a subtree with a fresh derivation from the grammar), random recursion expansion (repeating recursive productions to increase nesting depth), splice mutation (replacing a subtree with a fragment of the same non-terminal from the chunk store), or bulk random havoc (applying repeated random subtree replacements in succession). The result is unparsed into a SQL string by reading leaf nodes left to right. This tree-level approach ensures that every generated input is syntactically valid with respect to the grammar, avoiding the wasted executions that plague byte-level mutators when applied to structured languages like SQL.
 
+Figures~\ref{fig:mut-minimize} through~\ref{fig:mut-splice} illustrate each mutation operator using SQL derivation tree examples.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/mutations/fig_3_mutation_minimize.pdf}
+\caption{Subtree minimization. The \texttt{Expr} subtree \texttt{a + b} is replaced with the smallest valid derivation of the same non-terminal (\texttt{Expr} $\to$ \texttt{Col} $\to$ \texttt{a}), producing a shorter input that preserves the same coverage bits.}
+\label{fig:mut-minimize}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/mutations/fig_3_mutation_rules.pdf}
+\caption{Deterministic rule substitution (\texttt{mut\_rules}). The targeted \texttt{Expr} node is systematically replaced with every alternative production rule for that non-terminal, generating one mutant per rule.}
+\label{fig:mut-rules}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/mutations/fig_3_mutation_random.pdf}
+\caption{Random subtree regeneration (\texttt{mut\_random}). A randomly selected node's subtree is replaced with a fresh derivation from the grammar. Here, the comparison \texttt{a > 1} is replaced with a subquery \texttt{a IN (SELECT b FROM q)}.}
+\label{fig:mut-random}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/mutations/fig_3_mutation_recursion.pdf}
+\caption{Random recursion expansion (\texttt{mut\_random\_recursion}). A recursive production (\texttt{Expr} $\to$ \texttt{Expr + Expr}) is repeated $2^n$ times, increasing expression nesting depth. This mutation only expands; collapsing is performed by minimization.}
+\label{fig:mut-recursion}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/mutations/fig_3_mutation_splice.pdf}
+\caption{Splice mutation (\texttt{mut\_splice}). A subtree from the ChunkStore (populated by minimized interesting inputs) replaces a compatible node in the current tree. The ChunkStore matches by non-terminal: here, an \texttt{Expr} node producing \texttt{a > 1} is replaced with an \texttt{Expr} node producing \texttt{printf('\%.*g', 2147483647, 0.01)}.}
+\label{fig:mut-splice}
+\end{figure}
+
 \paragraph{Fork Server and Harness.}
 The fork server and harness form the execution layer that runs each generated SQL input against a real SQLite build. The harness opens an empty in-memory SQLite database, then uses the AFL fork-server protocol~\citep{afl} to efficiently create a child process for each test case without the overhead of full process initialization. Each child executes one SQL input and exits. SQLite is compiled with AddressSanitizer (ASan) and UndefinedBehaviorSanitizer (UBSan) instrumentation, which act as oracles: ASan detects memory safety violations such as buffer overflows and use-after-free, while UBSan detects undefined behavior such as integer overflow and null pointer dereference. Without these sanitizers, many vulnerabilities would execute silently without any observable failure.
 
