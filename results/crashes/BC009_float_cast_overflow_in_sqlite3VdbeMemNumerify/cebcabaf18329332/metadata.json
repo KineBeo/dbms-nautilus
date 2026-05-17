@@ -1,0 +1,17 @@
+{
+  "hash": "cebcabaf18329332",
+  "crash_type": "ubsan",
+  "subtype": "float-cast-overflow",
+  "exit_code": -6,
+  "version": "3.32.0",
+  "error_message": "../cve_builds/sqlite-3.32.0/sqlite3.c:76346:47: runtime error: 1e+22 is outside the range of representable values of type 'long long'",
+  "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 TEXT CHECK (CAST(TRUE || FALSE || FALSE || FALSE || FALSE || FALSE || FALSE || FALSE || FALSE || FALSE || FALSE || FALSE || CAST(CURRENT_DATE AS DATE) || FALSE || FALSE",
+  "campaigns": [
+    "sqlite-3.32.0_uniform_run5"
+  ],
+  "total_count": 1,
+  "sample_file": "5_000177397",
+  "bug_class": "BC009",
+  "cve": null,
+  "severity": "LOW"
+}

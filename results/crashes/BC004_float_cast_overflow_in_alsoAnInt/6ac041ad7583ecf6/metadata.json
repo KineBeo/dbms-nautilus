@@ -1,0 +1,17 @@
+{
+  "hash": "6ac041ad7583ecf6",
+  "crash_type": "ubsan",
+  "subtype": "float-cast-overflow",
+  "exit_code": -6,
+  "version": "3.32.0",
+  "error_message": "../cve_builds/sqlite-3.32.0/sqlite3.c:85315:16: runtime error: 1e+65 is outside the range of representable values of type 'long long'",
+  "sql_preview": "VALUES (CURRENT_TIMESTAMP) INTERSECT SELECT FALSE ORDER BY CURRENT_TIMESTAMP DESC LIMIT TRUE || FALSE || FALSE || FALSE || FALSE || FALSE || FALSE || FALSE || FALSE || FALSE || FALSE || FALSE || FALSE",
+  "campaigns": [
+    "sqlite-3.32.0_comparison_ebnf_run4"
+  ],
+  "total_count": 1,
+  "sample_file": "5_000172051",
+  "bug_class": "BC004",
+  "cve": null,
+  "severity": "LOW"
+}

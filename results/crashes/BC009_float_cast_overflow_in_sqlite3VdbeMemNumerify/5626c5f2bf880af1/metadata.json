@@ -1,0 +1,17 @@
+{
+  "hash": "5626c5f2bf880af1",
+  "crash_type": "ubsan",
+  "subtype": "float-cast-overflow",
+  "exit_code": -6,
+  "version": "3.32.0",
+  "error_message": "../cve_builds/sqlite-3.32.0/sqlite3.c:76346:47: runtime error: 1e+19 is outside the range of representable values of type 'long long'",
+  "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 TEXT CHECK (CAST(TRUE IN (rowid) || FALSE || FALSE || FALSE || FALSE || FALSE || FALSE || FALSE || FALSE || FALSE || FALSE || FALSE || FALSE || FALSE || FALSE || FALSE ",
+  "campaigns": [
+    "sqlite-3.32.0_uniform_run5"
+  ],
+  "total_count": 3,
+  "sample_file": "5_000177440",
+  "bug_class": "BC009",
+  "cve": null,
+  "severity": "LOW"
+}

@@ -5,7 +5,7 @@
 **Key function:** `sqlite3WindowUnlinkFromSelect`
 **CVE:** CVE-2020-13871
 **Versions affected:** 3.30.1
-**Total crash count:** 265
+**Total crash count:** 432
 **Unique hashes:** 1
 
 ## Error message

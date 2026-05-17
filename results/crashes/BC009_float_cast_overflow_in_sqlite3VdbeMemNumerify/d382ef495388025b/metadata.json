@@ -1,0 +1,17 @@
+{
+  "hash": "d382ef495388025b",
+  "crash_type": "ubsan",
+  "subtype": "float-cast-overflow",
+  "exit_code": -6,
+  "version": "3.30.1",
+  "error_message": "../cve_builds/sqlite-3.30.1/sqlite3.c:75399:47: runtime error: inf is outside the range of representable values of type 'long long'",
+  "sql_preview": "CREATE TABLE IF NOT EXISTS p(b DATE PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(_rowid_ REAL PRIMARY KEY); INSERT INTO q DEFAULT VALUES; SELECT * FROM (SELECT * FROM p WHERE CAST(CAST(hex(hex(hex(hex(h",
+  "campaigns": [
+    "sqlite-3.30.1_uniform_run4"
+  ],
+  "total_count": 1,
+  "sample_file": "5_000225968",
+  "bug_class": "BC009",
+  "cve": null,
+  "severity": "LOW"
+}

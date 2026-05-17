@@ -5,7 +5,7 @@
 **Key function:** `sqlite3Fts5GetTokenizer`
 **CVE:** none
 **Versions affected:** 3.30.1, 3.31.1, 3.32.0, 3.32.2
-**Total crash count:** 6329
+**Total crash count:** 9357
 **Unique hashes:** 4
 
 ## Error message

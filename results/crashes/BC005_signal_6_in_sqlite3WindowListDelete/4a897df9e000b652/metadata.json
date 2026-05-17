@@ -5,12 +5,13 @@
   "exit_code": -6,
   "version": "3.30.1",
   "error_message": "",
-  "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 DATE CHECK (EXISTS (VALUES (TRUE) EXCEPT SELECT * FROM s NOT INDEXED WHERE NULL GROUP BY CURRENT_DATE WINDOW w1 AS () ORDER BY RAISE(IGNORE) COLLATE NOCASE))); CREATE V",
+  "sql_preview": "CREATE TABLE IF NOT EXISTS t3 (c1 REAL CHECK (EXISTS (WITH RECURSIVE t1 (_rowid_) AS (VALUES (CURRENT_TIME)) VALUES (TRUE) UNION SELECT * FROM t2 GROUP BY CURRENT_DATE WINDOW w1 AS () ORDER BY FALSE C",
   "campaigns": [
+    "sqlite-3.30.1_comparison_ebnf_run3",
     "sqlite-3.30.1_uniform_run4"
   ],
-  "total_count": 2,
-  "sample_file": "6_000112865",
+  "total_count": 3,
+  "sample_file": "6_000085914",
   "bug_class": "BC005",
   "cve": null,
   "severity": "MEDIUM"

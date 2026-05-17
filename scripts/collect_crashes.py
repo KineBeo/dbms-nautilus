@@ -167,6 +167,13 @@ def scan_workdirs(workdirs_path: Path) -> dict[str, CrashEntry]:
             if crash.get("type") not in _KEEP_TYPES:
                 continue
 
+            # Skip signal-6 crashes with no stack trace — these are SQLite
+            # debug asserts (SIGABRT from assert()), not real bugs.
+            if crash.get("subtype") == "signal-6":
+                frames = crash.get("top_frames", [])
+                if all(f.startswith("<no-stack-") for f in frames if f.strip()):
+                    continue
+
             h = crash["hash"]
             count = crash.get("count", 1)
 

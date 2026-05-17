@@ -1,100 +1,100 @@
 =================================================================
-==23826==ERROR: AddressSanitizer: heap-use-after-free on address 0xef768cc02ee8 at pc 0xae5918798778 bp 0xffffd0442230 sp 0xffffd0442228
-READ of size 8 at 0xef768cc02ee8 thread T0
-    #0 0xae5918798774 in sqlite3WindowListDelete /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:147764:24
-    #1 0xae5918798774 in clearSelect /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:125721:7
-    #2 0xae59187989a8 in sqlite3SelectDelete /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:125808:30
-    #3 0xae59187989a8 in sqlite3SrcListDelete /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:111827:5
-    #4 0xae5918798508 in clearSelect /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:125713:5
-    #5 0xae5918797e54 in sqlite3SelectDelete /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:125808:30
-    #6 0xae5918797e54 in sqlite3ExprDeleteNN /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:98571:7
-    #7 0xae5918799184 in sqlite3ExprDelete /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:98587:11
-    #8 0xae5918799184 in exprListDeleteNN /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:99297:5
-    #9 0xae59187984e4 in sqlite3ExprListDelete /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:99305:15
-    #10 0xae59187984e4 in clearSelect /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:125712:5
-    #11 0xae59187acab0 in sqlite3SelectDelete /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:125808:30
-    #12 0xae59187acab0 in yy_reduce /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:153208:3
-    #13 0xae59186922d8 in sqlite3Parser /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:154496:15
-    #14 0xae59186922d8 in sqlite3RunParser /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:155636:5
-    #15 0xae591868d6a8 in sqlite3Prepare /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:125306:5
-    #16 0xae591868d6a8 in sqlite3LockAndPrepare /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:125402:10
-    #17 0xae591868a7a8 in sqlite3_prepare_v2 /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:125486:8
-    #18 0xae591868a7a8 in sqlite3_exec /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:119919:10
-    #19 0xae59186a6190 in main /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/sqlite_harness.c:82:9
-    #20 0xef76900c73fc in __libc_start_call_main csu/../sysdeps/nptl/libc_start_call_main.h:58:16
-    #21 0xef76900c74d4 in __libc_start_main csu/../csu/libc-start.c:392:3
-    #22 0xae59185a4eac in _start (/home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/test/sqlite_harness_sqlite-3.30.1_test+0x2c4eac) (BuildId: 71be2021f6990d0edd9b783344f267862c8b5bd1)
+==15074==ERROR: AddressSanitizer: heap-use-after-free on address 0xe4ff63c02ee8 at pc 0xc4535bc28778 bp 0xffffc252b6d0 sp 0xffffc252b6c8
+READ of size 8 at 0xe4ff63c02ee8 thread T0
+    #0 0xc4535bc28774 in sqlite3WindowListDelete /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:147764:24
+    #1 0xc4535bc28774 in clearSelect /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:125721:7
+    #2 0xc4535bc289a8 in sqlite3SelectDelete /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:125808:30
+    #3 0xc4535bc289a8 in sqlite3SrcListDelete /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:111827:5
+    #4 0xc4535bc28508 in clearSelect /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:125713:5
+    #5 0xc4535bc27e54 in sqlite3SelectDelete /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:125808:30
+    #6 0xc4535bc27e54 in sqlite3ExprDeleteNN /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:98571:7
+    #7 0xc4535bc29184 in sqlite3ExprDelete /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:98587:11
+    #8 0xc4535bc29184 in exprListDeleteNN /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:99297:5
+    #9 0xc4535bc284e4 in sqlite3ExprListDelete /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:99305:15
+    #10 0xc4535bc284e4 in clearSelect /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:125712:5
+    #11 0xc4535bc3cab0 in sqlite3SelectDelete /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:125808:30
+    #12 0xc4535bc3cab0 in yy_reduce /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:153208:3
+    #13 0xc4535bb222d8 in sqlite3Parser /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:154496:15
+    #14 0xc4535bb222d8 in sqlite3RunParser /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:155636:5
+    #15 0xc4535bb1d6a8 in sqlite3Prepare /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:125306:5
+    #16 0xc4535bb1d6a8 in sqlite3LockAndPrepare /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:125402:10
+    #17 0xc4535bb1a7a8 in sqlite3_prepare_v2 /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:125486:8
+    #18 0xc4535bb1a7a8 in sqlite3_exec /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:119919:10
+    #19 0xc4535bb36190 in main /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/sqlite_harness.c:82:9
+    #20 0xe4ff672273fc in __libc_start_call_main csu/../sysdeps/nptl/libc_start_call_main.h:58:16
+    #21 0xe4ff672274d4 in __libc_start_main csu/../csu/libc-start.c:392:3
+    #22 0xc4535ba34eac in _start (/home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/test/sqlite_harness_sqlite-3.30.1_test+0x2c4eac) (BuildId: 71be2021f6990d0edd9b783344f267862c8b5bd1)
 
-0xef768cc02ee8 is located 72 bytes inside of 152-byte region [0xef768cc02ea0,0xef768cc02f38)
+0xe4ff63c02ee8 is located 72 bytes inside of 152-byte region [0xe4ff63c02ea0,0xe4ff63c02f38)
 freed by thread T0 here:
-    #0 0xae591861bdcc in free (/home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/test/sqlite_harness_sqlite-3.30.1_test+0x33bdcc) (BuildId: 71be2021f6990d0edd9b783344f267862c8b5bd1)
-    #1 0xae59188cdf08 in sqlite3MemFree /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:23084:3
-    #2 0xae5918657160 in sqlite3_free /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:27000:5
-    #3 0xae59186a7cf8 in sqlite3DbFreeNN /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:27043:3
-    #4 0xae59186559d0 in sqlite3DbFree /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:27047:11
-    #5 0xae59187983c8 in sqlite3WindowDelete /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:147755:5
-    #6 0xae591879861c in sqlite3WindowListDelete /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:147765:5
-    #7 0xae591879861c in clearSelect /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:125721:7
-    #8 0xae59187989a8 in sqlite3SelectDelete /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:125808:30
-    #9 0xae59187989a8 in sqlite3SrcListDelete /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:111827:5
-    #10 0xae5918798508 in clearSelect /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:125713:5
-    #11 0xae59187989a8 in sqlite3SelectDelete /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:125808:30
-    #12 0xae59187989a8 in sqlite3SrcListDelete /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:111827:5
-    #13 0xae5918798508 in clearSelect /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:125713:5
-    #14 0xae5918797e54 in sqlite3SelectDelete /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:125808:30
-    #15 0xae5918797e54 in sqlite3ExprDeleteNN /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:98571:7
-    #16 0xae5918799184 in sqlite3ExprDelete /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:98587:11
-    #17 0xae5918799184 in exprListDeleteNN /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:99297:5
-    #18 0xae59187984e4 in sqlite3ExprListDelete /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:99305:15
-    #19 0xae59187984e4 in clearSelect /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:125712:5
-    #20 0xae59187acab0 in sqlite3SelectDelete /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:125808:30
-    #21 0xae59187acab0 in yy_reduce /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:153208:3
-    #22 0xae59186922d8 in sqlite3Parser /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:154496:15
-    #23 0xae59186922d8 in sqlite3RunParser /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:155636:5
-    #24 0xae591868d6a8 in sqlite3Prepare /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:125306:5
-    #25 0xae591868d6a8 in sqlite3LockAndPrepare /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:125402:10
-    #26 0xae591868a7a8 in sqlite3_prepare_v2 /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:125486:8
-    #27 0xae591868a7a8 in sqlite3_exec /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:119919:10
-    #28 0xae59186a6190 in main /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/sqlite_harness.c:82:9
-    #29 0xef76900c73fc in __libc_start_call_main csu/../sysdeps/nptl/libc_start_call_main.h:58:16
-    #30 0xef76900c74d4 in __libc_start_main csu/../csu/libc-start.c:392:3
-    #31 0xae59185a4eac in _start (/home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/test/sqlite_harness_sqlite-3.30.1_test+0x2c4eac) (BuildId: 71be2021f6990d0edd9b783344f267862c8b5bd1)
+    #0 0xc4535baabdcc in free (/home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/test/sqlite_harness_sqlite-3.30.1_test+0x33bdcc) (BuildId: 71be2021f6990d0edd9b783344f267862c8b5bd1)
+    #1 0xc4535bd5df08 in sqlite3MemFree /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:23084:3
+    #2 0xc4535bae7160 in sqlite3_free /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:27000:5
+    #3 0xc4535bb37cf8 in sqlite3DbFreeNN /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:27043:3
+    #4 0xc4535bae59d0 in sqlite3DbFree /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:27047:11
+    #5 0xc4535bc283c8 in sqlite3WindowDelete /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:147755:5
+    #6 0xc4535bc2861c in sqlite3WindowListDelete /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:147765:5
+    #7 0xc4535bc2861c in clearSelect /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:125721:7
+    #8 0xc4535bc289a8 in sqlite3SelectDelete /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:125808:30
+    #9 0xc4535bc289a8 in sqlite3SrcListDelete /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:111827:5
+    #10 0xc4535bc28508 in clearSelect /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:125713:5
+    #11 0xc4535bc289a8 in sqlite3SelectDelete /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:125808:30
+    #12 0xc4535bc289a8 in sqlite3SrcListDelete /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:111827:5
+    #13 0xc4535bc28508 in clearSelect /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:125713:5
+    #14 0xc4535bc27e54 in sqlite3SelectDelete /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:125808:30
+    #15 0xc4535bc27e54 in sqlite3ExprDeleteNN /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:98571:7
+    #16 0xc4535bc29184 in sqlite3ExprDelete /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:98587:11
+    #17 0xc4535bc29184 in exprListDeleteNN /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:99297:5
+    #18 0xc4535bc284e4 in sqlite3ExprListDelete /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:99305:15
+    #19 0xc4535bc284e4 in clearSelect /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:125712:5
+    #20 0xc4535bc3cab0 in sqlite3SelectDelete /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:125808:30
+    #21 0xc4535bc3cab0 in yy_reduce /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:153208:3
+    #22 0xc4535bb222d8 in sqlite3Parser /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:154496:15
+    #23 0xc4535bb222d8 in sqlite3RunParser /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:155636:5
+    #24 0xc4535bb1d6a8 in sqlite3Prepare /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:125306:5
+    #25 0xc4535bb1d6a8 in sqlite3LockAndPrepare /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:125402:10
+    #26 0xc4535bb1a7a8 in sqlite3_prepare_v2 /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:125486:8
+    #27 0xc4535bb1a7a8 in sqlite3_exec /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:119919:10
+    #28 0xc4535bb36190 in main /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/sqlite_harness.c:82:9
+    #29 0xe4ff672273fc in __libc_start_call_main csu/../sysdeps/nptl/libc_start_call_main.h:58:16
+    #30 0xe4ff672274d4 in __libc_start_main csu/../csu/libc-start.c:392:3
+    #31 0xc4535ba34eac in _start (/home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/test/sqlite_harness_sqlite-3.30.1_test+0x2c4eac) (BuildId: 71be2021f6990d0edd9b783344f267862c8b5bd1)
 
 previously allocated by thread T0 here:
-    #0 0xae591861c060 in __interceptor_malloc (/home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/test/sqlite_harness_sqlite-3.30.1_test+0x33c060) (BuildId: 71be2021f6990d0edd9b783344f267862c8b5bd1)
-    #1 0xae59188cde20 in sqlite3MemMalloc /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:23057:7
-    #2 0xae5918656f54 in mallocWithAlarm /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:26889:7
-    #3 0xae5918656f54 in sqlite3Malloc /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:26919:5
-    #4 0xae59186a8a74 in dbMallocRawFinish /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:27150:7
-    #5 0xae59186a859c in sqlite3DbMallocRawNN /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:27218:10
-    #6 0xae59187f8c70 in sqlite3DbMallocRaw /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:27181:19
-    #7 0xae59187f8c70 in sqlite3DbMallocZero /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:27138:7
-    #8 0xae59187f8c70 in sqlite3WindowAlloc /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:147836:19
-    #9 0xae59187af40c in yy_reduce /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:154200:26
-    #10 0xae59186922d8 in sqlite3Parser /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:154496:15
-    #11 0xae59186922d8 in sqlite3RunParser /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:155636:5
-    #12 0xae591868d6a8 in sqlite3Prepare /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:125306:5
-    #13 0xae591868d6a8 in sqlite3LockAndPrepare /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:125402:10
-    #14 0xae591868a7a8 in sqlite3_prepare_v2 /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:125486:8
-    #15 0xae591868a7a8 in sqlite3_exec /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:119919:10
-    #16 0xae59186a6190 in main /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/sqlite_harness.c:82:9
-    #17 0xef76900c73fc in __libc_start_call_main csu/../sysdeps/nptl/libc_start_call_main.h:58:16
-    #18 0xef76900c74d4 in __libc_start_main csu/../csu/libc-start.c:392:3
-    #19 0xae59185a4eac in _start (/home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/test/sqlite_harness_sqlite-3.30.1_test+0x2c4eac) (BuildId: 71be2021f6990d0edd9b783344f267862c8b5bd1)
+    #0 0xc4535baac060 in __interceptor_malloc (/home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/test/sqlite_harness_sqlite-3.30.1_test+0x33c060) (BuildId: 71be2021f6990d0edd9b783344f267862c8b5bd1)
+    #1 0xc4535bd5de20 in sqlite3MemMalloc /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:23057:7
+    #2 0xc4535bae6f54 in mallocWithAlarm /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:26889:7
+    #3 0xc4535bae6f54 in sqlite3Malloc /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:26919:5
+    #4 0xc4535bb38a74 in dbMallocRawFinish /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:27150:7
+    #5 0xc4535bb3859c in sqlite3DbMallocRawNN /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:27218:10
+    #6 0xc4535bc88c70 in sqlite3DbMallocRaw /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:27181:19
+    #7 0xc4535bc88c70 in sqlite3DbMallocZero /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:27138:7
+    #8 0xc4535bc88c70 in sqlite3WindowAlloc /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:147836:19
+    #9 0xc4535bc3f40c in yy_reduce /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:154200:26
+    #10 0xc4535bb222d8 in sqlite3Parser /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:154496:15
+    #11 0xc4535bb222d8 in sqlite3RunParser /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:155636:5
+    #12 0xc4535bb1d6a8 in sqlite3Prepare /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:125306:5
+    #13 0xc4535bb1d6a8 in sqlite3LockAndPrepare /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:125402:10
+    #14 0xc4535bb1a7a8 in sqlite3_prepare_v2 /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:125486:8
+    #15 0xc4535bb1a7a8 in sqlite3_exec /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:119919:10
+    #16 0xc4535bb36190 in main /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/sqlite_harness.c:82:9
+    #17 0xe4ff672273fc in __libc_start_call_main csu/../sysdeps/nptl/libc_start_call_main.h:58:16
+    #18 0xe4ff672274d4 in __libc_start_main csu/../csu/libc-start.c:392:3
+    #19 0xc4535ba34eac in _start (/home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/test/sqlite_harness_sqlite-3.30.1_test+0x2c4eac) (BuildId: 71be2021f6990d0edd9b783344f267862c8b5bd1)
 
 SUMMARY: AddressSanitizer: heap-use-after-free /home/kienbeovl/Desktop/claude-code-fuzzing/rl-nautilus-phase-2/harness/./../cve_builds/sqlite-3.30.1/sqlite3.c:147764:24 in sqlite3WindowListDelete
 Shadow bytes around the buggy address:
-  0x1dfed1980580: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
-  0x1dfed1980590: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
-  0x1dfed19805a0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
-  0x1dfed19805b0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
-  0x1dfed19805c0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
-=>0x1dfed19805d0: fa fa fa fa fd fd fd fd fd fd fd fd fd[fd]fd fd
-  0x1dfed19805e0: fd fd fd fd fd fd fd fa fa fa fa fa fa fa fa fa
-  0x1dfed19805f0: fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd
-  0x1dfed1980600: fd fd fd fd fa fa fa fa fa fa fa fa fd fd fd fd
-  0x1dfed1980610: fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd fa
-  0x1dfed1980620: fa fa fa fa fa fa fa fa fd fd fd fd fd fd fd fd
+  0x1cafec780580: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x1cafec780590: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x1cafec7805a0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x1cafec7805b0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x1cafec7805c0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+=>0x1cafec7805d0: fa fa fa fa fd fd fd fd fd fd fd fd fd[fd]fd fd
+  0x1cafec7805e0: fd fd fd fd fd fd fd fa fa fa fa fa fa fa fa fa
+  0x1cafec7805f0: fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd
+  0x1cafec780600: fd fd fd fd fa fa fa fa fa fa fa fa fd fd fd fd
+  0x1cafec780610: fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd fa
+  0x1cafec780620: fa fa fa fa fa fa fa fa fd fd fd fd fd fd fd fd
 Shadow byte legend (one shadow byte represents 8 application bytes):
   Addressable:           00
   Partially addressable: 01 02 03 04 05 06 07 
@@ -114,4 +114,4 @@ Shadow byte legend (one shadow byte represents 8 application bytes):
   ASan internal:           fe
   Left alloca redzone:     ca
   Right alloca redzone:    cb
-==23826==ABORTING
+==15074==ABORTING

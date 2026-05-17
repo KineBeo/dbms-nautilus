@@ -5,7 +5,7 @@
 **Key function:** `sqlite3_str_vappendf`
 **CVE:** CVE-2020-13434
 **Versions affected:** 3.30.1, 3.31.1, 3.32.0
-**Total crash count:** 1501
+**Total crash count:** 1729
 **Unique hashes:** 6
 
 ## Error message

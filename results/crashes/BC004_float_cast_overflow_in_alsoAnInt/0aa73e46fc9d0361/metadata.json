@@ -1,0 +1,17 @@
+{
+  "hash": "0aa73e46fc9d0361",
+  "crash_type": "ubsan",
+  "subtype": "float-cast-overflow",
+  "exit_code": -6,
+  "version": "3.32.2",
+  "error_message": "../cve_builds/sqlite-3.32.2/sqlite3.c:85335:16: runtime error: 1.11111e+129 is outside the range of representable values of type 'long long'",
+  "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 DATE UNIQUE); CREATE VIEW IF NOT EXISTS v1 AS VALUES (FALSE); REPLACE INTO p VALUES (TRUE || TRUE || TRUE || TRUE || TRUE || TRUE || TRUE || TRUE || TRUE || TRUE || TRU",
+  "campaigns": [
+    "sqlite-3.32.2_comparison_v3.4_run4"
+  ],
+  "total_count": 1,
+  "sample_file": "5_000056820",
+  "bug_class": "BC004",
+  "cve": null,
+  "severity": "LOW"
+}

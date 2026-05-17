@@ -5,8 +5,8 @@
 **Key function:** `alsoAnInt`
 **CVE:** none
 **Versions affected:** 3.30.1, 3.31.1, 3.32.0, 3.32.2
-**Total crash count:** 110
-**Unique hashes:** 42
+**Total crash count:** 132
+**Unique hashes:** 56
 
 ## Error message
 
@@ -29,6 +29,10 @@ sqlite3VdbeExec
 - `22e03ff823a91eeb`
 - `51834f9aa4aa5764`
 - `139f9b760acdec6c`
+- `ea651014c68a8c63`
+- `8063d7f2dab3aa47`
+- `af42fbc90328ea1b`
+- `9b417ddb2441b15c`
 - `ecb096e874db4127`
 - `f47936504b6ce4f8`
 - `7a150746873bd972`
@@ -51,19 +55,29 @@ sqlite3VdbeExec
 - `c7c06fb639370535`
 - `643205a858474f64`
 - `3e9719a6638492ac`
+- `c0c113d15a713f84`
+- `f959748d4f4b6301`
 - `a44a8765ca6148ae`
 - `6014f3d156178710`
+- `6ac041ad7583ecf6`
+- `cfa8c34bdbc017db`
+- `162f3109adc65df2`
+- `81b86882c247e0c3`
 - `b2fe4ab7b1064eb4`
 - `7a136f84a686af06`
 - `b9c2638dab5a5a63`
 - `3cac9102ffb376dc`
 - `2904e1f2a166c6f0`
 - `2d23c9af326c2626`
-- `cfa8c34bdbc017db`
 - `1dfbd00b4e94e6f1`
-- `81b86882c247e0c3`
 - `b5206ee5283a9260`
 - `77380288837142c8`
+- `082d290a01ade500`
+- `e4da1461ccf620ab`
+- `db1c6705639ceda6`
+- `6cc400f1164c2563`
+- `0aa73e46fc9d0361`
+- `0f7b4b560bea87a3`
 - `195015b3846edaa1`
 - `387b874505511dee`
 - `11592883476d3cf5`
