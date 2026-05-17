@@ -1,161 +1,114 @@
-\documentclass[tikz,border=10pt]{standalone}
+\documentclass[tikz,border=4pt]{standalone}
 \usepackage{tikz}
-\usetikzlibrary{positioning, calc, arrows.meta, fit}
+\usetikzlibrary{positioning, arrows.meta, shapes.geometric}
+
+\definecolor{mutblue}{RGB}{30,90,210}
 
 \begin{document}
 \begin{tikzpicture}[
-    % Node styles
-    nonterm/.style={
-        draw, rounded corners=2pt, inner sep=3pt,
-        font=\scriptsize\sffamily
-    },
-    term/.style={
-        font=\scriptsize\itshape, inner sep=2pt
-    },
-    optext/.style={
-        font=\scriptsize\sffamily, inner sep=1pt
-    },
-    % Edge style
-    edge/.style={draw, thick},
-    % Arrow style
-    arrow/.style={-{Stealth[scale=1.0]}, thick},
-    % Dashed box
-    dashrect/.style={draw, dashed, thick, rounded corners=3pt, inner sep=6pt},
+    x=8mm, y=8mm,
+    every node/.style={font=\tiny},
+    nt/.style={ellipse, draw=black, line width=0.4pt,
+        inner xsep=1.5pt, inner ysep=1pt, font=\tiny\sffamily,
+        minimum height=3.6mm},
+    op/.style={ellipse, draw=black, line width=0.4pt,
+        inner xsep=0.5pt, inner ysep=1pt, font=\tiny\sffamily,
+        minimum width=4mm, minimum height=3.6mm},
+    lf/.style={circle, draw=black, line width=0.4pt,
+        inner sep=0pt, minimum size=3.4mm, font=\tiny\itshape},
+    nth/.style={ellipse, draw=mutblue, line width=0.4pt,
+        inner xsep=1.5pt, inner ysep=1pt, font=\tiny\sffamily,
+        minimum height=3.6mm, text=mutblue},
+    oph/.style={ellipse, draw=mutblue, line width=0.4pt,
+        inner xsep=0.5pt, inner ysep=1pt, font=\tiny\sffamily,
+        minimum width=4mm, minimum height=3.6mm, text=mutblue},
+    te/.style={draw=black, line width=0.3pt},
+    teh/.style={draw=mutblue, line width=0.3pt},
+    mutarrow/.style={-{Stealth[length=1.8mm,width=1.6mm]}, line width=0.6pt},
 ]
 
-% ===== LEFT TREE (Before): SELECT a + b FROM p =====
+% ====== LEFT: SELECT a + b FROM p ======
+\begin{scope}
+    \node[nt] (L-root)   at (0,0)    {Select-Stmt};
+    \node[nt] (L-result) at (-0.9,-1) {Result};
+    \node[nt] (L-from)   at (0.9,-1)  {FROM};
 
-% Root
-\node[nonterm] (L-root) {Select-Stmt};
+    \node[nt] (L-expr)   at (-0.9,-2) {Expr};
+    \node[lf] (L-p)      at (0.9,-2)  {p};
 
-% Level 1: Result, FROM
-\node[nonterm, below left=1.1cm and 1.8cm of L-root] (L-result) {Result};
-\node[nonterm, below right=1.1cm and 1.8cm of L-root] (L-from) {FROM};
+    \node[nth] (L-el)    at (-1.7,-3) {Expr};
+    \node[oph] (L-plus)  at (-0.9,-3) {$+$};
+    \node[nth] (L-er)    at (-0.1,-3) {Expr};
 
-% Edges from root
-\draw[edge] (L-root) -- (L-result);
-\draw[edge] (L-root) -- (L-from);
+    \node[nt] (L-cola)  at (-1.7,-4) {Col};
+    \node[nt] (L-colb)  at (-0.1,-4) {Col};
 
-% FROM child: p
-\node[term, below=0.9cm of L-from] (L-p) {p};
-\draw[edge] (L-from) -- (L-p);
+    \node[lf] (L-a) at (-1.7,-5) {a};
+    \node[lf] (L-b) at (-0.1,-5) {b};
 
-% Level 2: Expr (under Result)
-\node[nonterm, below=1.0cm of L-result] (L-expr) {Expr};
-\draw[edge] (L-result) -- (L-expr);
+    \foreach \a/\b in {L-root/L-result, L-root/L-from,
+        L-result/L-expr, L-from/L-p,
+        L-el/L-cola, L-er/L-colb, L-cola/L-a, L-colb/L-b}
+        \draw[te] (\a) -- (\b);
+    \foreach \a/\b in {L-expr/L-el, L-expr/L-plus, L-expr/L-er}
+        \draw[teh] (\a) -- (\b);
 
-% Level 3: Expr + Expr (children of top Expr)
-\node[nonterm, below left=1.0cm and 1.2cm of L-expr] (L-el) {Expr};
-\node[nonterm, below right=1.0cm and 1.2cm of L-expr] (L-er) {Expr};
-\draw[edge] (L-expr) -- (L-el);
-\draw[edge] (L-expr) -- (L-er);
+    \node[font=\tiny\ttfamily, anchor=north] at (0,-5.7)
+        {SELECT a + b FROM p};
+\end{scope}
 
-% + operator label between children
-\node[optext] at ($(L-el)!0.5!(L-er) + (0, 0.45)$) {+};
+% ====== ARROW ======
+\draw[mutarrow] (1.6,-2.5) -- node[above, font=\tiny\ttfamily, align=center]
+                                  {mut\_random\_recursion}
+                              (3.2,-2.5);
 
-% Level 4: Col nodes
-\node[nonterm, below=0.9cm of L-el] (L-col-a) {Col};
-\node[nonterm, below=0.9cm of L-er] (L-col-b) {Col};
-\draw[edge] (L-el) -- (L-col-a);
-\draw[edge] (L-er) -- (L-col-b);
+% ====== RIGHT: SELECT a + b + a + b FROM p ======
+\begin{scope}[shift={(5.6,0)}]
+    \node[nt] (R-root)   at (-0.4,0)  {Select-Stmt};
+    \node[nt] (R-result) at (-1.4,-1) {Result};
+    \node[nt] (R-from)   at (0.6,-1)  {FROM};
 
-% Level 5: terminals a, b
-\node[term, below=0.8cm of L-col-a] (L-a) {a};
-\node[term, below=0.8cm of L-col-b] (L-b) {b};
-\draw[edge] (L-col-a) -- (L-a);
-\draw[edge] (L-col-b) -- (L-b);
+    \node[nt] (R-top)    at (-1.4,-2) {Expr};
+    \node[lf] (R-p)      at (0.6,-2)  {p};
 
-% Dashed box around recursive pair (Expr -> Expr + Expr)
-\node[dashrect, fit=(L-expr)(L-el)(L-er)(L-col-a)(L-col-b)(L-a)(L-b)] (L-box) {};
-\node[font=\scriptsize, below=2pt of L-box.south, anchor=north] {recursive pair};
+    % First split: blue (children of R-top at -1.4, centered)
+    \node[nth] (R-left)  at (-2.8,-3) {Expr};
+    \node[oph] (R-p0)    at (-1.4,-3) {$+$};
+    \node[nth] (R-right) at (0.0,-3)  {Expr};
+    % R-top is at -1.4, midpoint of R-left and R-right = (-2.8 + 0.0)/2 = -1.4 ✓
 
-% SQL label
-\node[font=\scriptsize\ttfamily, below=0.8cm of L-box.south, anchor=north] (L-sql)
-    {\texttt{SELECT a + b FROM p}};
+    % Second level splits
+    \node[nth] (R-ll)    at (-3.6,-4) {Expr};
+    \node[oph] (R-p1)    at (-2.8,-4) {$+$};
+    \node[nth] (R-lr)    at (-2.0,-4) {Expr};
 
+    \node[nth] (R-rl)    at (-0.8,-4) {Expr};
+    \node[oph] (R-p2)    at ( 0.0,-4) {$+$};
+    \node[nth] (R-rr)    at ( 0.8,-4) {Expr};
 
-% ===== RIGHT TREE (After): SELECT a + b + a + b FROM p =====
-% Shifted far to the right for generous spacing
+    \node[nt] (R-c1) at (-3.6,-5) {Col};
+    \node[nt] (R-c2) at (-2.0,-5) {Col};
+    \node[nt] (R-c3) at (-0.8,-5) {Col};
+    \node[nt] (R-c4) at ( 0.8,-5) {Col};
 
-% Root
-\node[nonterm, right=9.5cm of L-root] (R-root) {Select-Stmt};
+    \node[lf] (R-a1) at (-3.6,-6) {a};
+    \node[lf] (R-b1) at (-2.0,-6) {b};
+    \node[lf] (R-a2) at (-0.8,-6) {a};
+    \node[lf] (R-b2) at ( 0.8,-6) {b};
 
-% Level 1: Result, FROM
-\node[nonterm, below left=1.1cm and 3.5cm of R-root] (R-result) {Result};
-\node[nonterm, below right=1.1cm and 3.5cm of R-root] (R-from) {FROM};
+    \foreach \a/\b in {R-root/R-result, R-root/R-from,
+        R-result/R-top, R-from/R-p,
+        R-ll/R-c1, R-lr/R-c2, R-rl/R-c3, R-rr/R-c4,
+        R-c1/R-a1, R-c2/R-b1, R-c3/R-a2, R-c4/R-b2}
+        \draw[te] (\a) -- (\b);
+    \foreach \a/\b in {R-top/R-left, R-top/R-p0, R-top/R-right,
+        R-left/R-ll, R-left/R-p1, R-left/R-lr,
+        R-right/R-rl, R-right/R-p2, R-right/R-rr}
+        \draw[teh] (\a) -- (\b);
 
-\draw[edge] (R-root) -- (R-result);
-\draw[edge] (R-root) -- (R-from);
-
-% FROM child: p
-\node[term, below=0.9cm of R-from] (R-p) {p};
-\draw[edge] (R-from) -- (R-p);
-
-% Level 2: top Expr
-\node[nonterm, below=1.0cm of R-result] (R-top) {Expr};
-\draw[edge] (R-result) -- (R-top);
-
-% Level 3: Expr + Expr (first split)
-\node[nonterm, below left=1.0cm and 2.8cm of R-top] (R-left) {Expr};
-\node[nonterm, below right=1.0cm and 2.8cm of R-top] (R-right) {Expr};
-\draw[edge] (R-top) -- (R-left);
-\draw[edge] (R-top) -- (R-right);
-
-% + operator at top split
-\node[optext] at ($(R-left)!0.5!(R-right) + (0, 0.45)$) {+};
-
-% Level 4: Left branch splits into Expr + Expr
-\node[nonterm, below left=1.0cm and 1.2cm of R-left] (R-ll) {Expr};
-\node[nonterm, below right=1.0cm and 1.2cm of R-left] (R-lr) {Expr};
-\draw[edge] (R-left) -- (R-ll);
-\draw[edge] (R-left) -- (R-lr);
-
-% + operator for left branch
-\node[optext] at ($(R-ll)!0.5!(R-lr) + (0, 0.45)$) {+};
-
-% Level 4: Right branch splits into Expr + Expr
-\node[nonterm, below left=1.0cm and 1.2cm of R-right] (R-rl) {Expr};
-\node[nonterm, below right=1.0cm and 1.2cm of R-right] (R-rr) {Expr};
-\draw[edge] (R-right) -- (R-rl);
-\draw[edge] (R-right) -- (R-rr);
-
-% + operator for right branch
-\node[optext] at ($(R-rl)!0.5!(R-rr) + (0, 0.45)$) {+};
-
-% Level 5: Col nodes
-\node[nonterm, below=0.9cm of R-ll] (R-col-a1) {Col};
-\node[nonterm, below=0.9cm of R-lr] (R-col-b1) {Col};
-\node[nonterm, below=0.9cm of R-rl] (R-col-a2) {Col};
-\node[nonterm, below=0.9cm of R-rr] (R-col-b2) {Col};
-\draw[edge] (R-ll) -- (R-col-a1);
-\draw[edge] (R-lr) -- (R-col-b1);
-\draw[edge] (R-rl) -- (R-col-a2);
-\draw[edge] (R-rr) -- (R-col-b2);
-
-% Level 6: terminal leaves
-\node[term, below=0.8cm of R-col-a1] (R-a1) {a};
-\node[term, below=0.8cm of R-col-b1] (R-b1) {b};
-\node[term, below=0.8cm of R-col-a2] (R-a2) {a};
-\node[term, below=0.8cm of R-col-b2] (R-b2) {b};
-\draw[edge] (R-col-a1) -- (R-a1);
-\draw[edge] (R-col-b1) -- (R-b1);
-\draw[edge] (R-col-a2) -- (R-a2);
-\draw[edge] (R-col-b2) -- (R-b2);
-
-% Dashed box around expanded recursion level
-\node[dashrect, fit=(R-left)(R-right)(R-ll)(R-lr)(R-rl)(R-rr)(R-col-a1)(R-col-b1)(R-col-a2)(R-col-b2)(R-a1)(R-b1)(R-a2)(R-b2)] (R-box) {};
-\node[font=\scriptsize, below=2pt of R-box.south, anchor=north] {expanded recursion};
-
-% SQL label
-\node[font=\scriptsize\ttfamily, below=0.8cm of R-box.south, anchor=north] (R-sql)
-    {\texttt{SELECT a + b + a + b FROM p}};
-
-
-% ===== ARROW between trees =====
-\draw[arrow] ([xshift=0.5cm]L-root.east)
-    -- node[above, font=\scriptsize, align=center, text width=4.5cm]
-    {mut\_random\_recursion\\(expand $2^n$ times)}
-    ([xshift=-0.5cm]R-root.west);
+    \node[font=\tiny\ttfamily, anchor=north] at (-1.4,-6.6)
+        {SELECT a + b + a + b FROM p};
+\end{scope}
 
 \end{tikzpicture}
 \end{document}
