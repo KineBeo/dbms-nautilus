@@ -1,174 +1,208 @@
 \documentclass[tikz,border=10pt]{standalone}
 \usepackage{tikz}
-\usetikzlibrary{arrows.meta,positioning,fit,calc}
+\usetikzlibrary{positioning, calc, arrows.meta, fit}
 
 \begin{document}
 \begin{tikzpicture}[
     every node/.style={font=\small},
-    % Non-terminals: rounded rectangles
-    nt/.style={rectangle, rounded corners=2pt, draw, thin,
-        inner sep=3pt, minimum height=0.5cm, font=\small},
-    % Terminals: italic
-    tm/.style={font=\small\itshape, inner sep=2pt},
-    % Dashed highlight rectangle
-    highlight/.style={draw, dashed, thick, rounded corners=3pt, inner sep=4pt},
+    % Non-terminal: small rounded rectangle, thin border
+    nterm/.style={rectangle, rounded corners=2pt, draw=black, thin,
+        minimum height=0.5cm, minimum width=1.0cm,
+        inner sep=3pt, font=\scriptsize\sffamily},
+    % Terminal: italic, no border
+    term/.style={font=\scriptsize\itshape, inner sep=2pt},
+    % Edge style
+    edge/.style={thin},
+    % Dashed highlight box
+    highlight/.style={draw=black, dashed, thick, rounded corners=3pt,
+        inner sep=5pt, thin},
     % ChunkStore box: double border
-    chunkstore/.style={rectangle, draw, double, double distance=1.5pt,
-        thick, rounded corners=3pt, inner sep=8pt},
-    % Arrow style
-    arr/.style={-{Stealth[scale=0.8]}, thick},
-    % Section label
-    seclabel/.style={font=\small\bfseries, anchor=south},
+    chunkstore/.style={rectangle, draw=black, double, double distance=1.5pt,
+        thick, rounded corners=3pt, inner sep=10pt},
+    % Arrow between sections
+    mutarrow/.style={-{Stealth[scale=0.8]}, thick},
 ]
 
-% ============================================================
+% ====================================================
 % SECTION 1: Current input (left)
-% Tree: Select-Stmt -> Select, Col-Name(a), From, Table-Name(p), Where, Expr(>)
-% ============================================================
-\node[seclabel] at (0, 4.8) {Current input};
+% Tree: SELECT a FROM p WHERE a > 1
+% ====================================================
+\begin{scope}[shift={(0,0)}]
 
-\node[nt] (s1root) at (0, 4) {Select-Stmt};
+    % Section label
+    \node[font=\small\bfseries] at (0, 0.8) {Current input};
 
-\node[nt] (s1sel) at (-2.2, 2.8) {Select};
-\node[nt] (s1col) at (-0.8, 2.8) {Col-Name};
-\node[nt] (s1from) at (0.4, 2.8) {From};
-\node[nt] (s1tbl) at (1.6, 2.8) {Table-Name};
-\node[nt] (s1where) at (3.0, 2.8) {Where};
-\node[nt] (s1expr) at (3.0, 1.5) {Expr};
+    % Root
+    \node[nterm] (L-root) at (0, 0) {Select-Stmt};
 
-\node[tm] (s1a) at (-0.8, 1.8) {a};
-\node[tm] (s1p) at (1.6, 1.8) {p};
+    % Level 1
+    \node[nterm] (L-result) at (-2.5, -1.3) {Result};
+    \node[nterm] (L-from) at (0, -1.3) {FROM};
+    \node[nterm] (L-where) at (2.5, -1.3) {WHERE};
 
-\node[nt] (s1gt) at (3.0, 0.3) {$>$};
-\node[nt] (s1colr) at (2.0, -0.7) {Col-Name};
-\node[nt] (s1int) at (4.0, -0.7) {Int};
-\node[tm] (s1av) at (2.0, -1.5) {a};
-\node[tm] (s1one) at (4.0, -1.5) {1};
+    % Level 2
+    \node[nterm] (L-expr1) at (-2.5, -2.6) {Expr};
+    \node[term] (L-p) at (0, -2.6) {p};
+    \node[nterm] (L-expr2) at (2.5, -2.6) {Expr};
 
-% Edges section 1
-\draw (s1root) -- (s1sel);
-\draw (s1root) -- (s1col);
-\draw (s1root) -- (s1from);
-\draw (s1root) -- (s1tbl);
-\draw (s1root) -- (s1where);
-\draw (s1col) -- (s1a);
-\draw (s1tbl) -- (s1p);
-\draw (s1where) -- (s1expr);
-\draw (s1expr) -- (s1gt);
-\draw (s1gt) -- (s1colr);
-\draw (s1gt) -- (s1int);
-\draw (s1colr) -- (s1av);
-\draw (s1int) -- (s1one);
+    % Level 3 (left branch)
+    \node[nterm] (L-col1) at (-2.5, -3.9) {Col};
 
-% Dashed rectangle around Expr subtree (splice target)
-\node[highlight, fit=(s1expr)(s1gt)(s1colr)(s1int)(s1av)(s1one)] (s1hl) {};
-\node[font=\scriptsize, anchor=north west] at (s1hl.south west) {splice target};
+    % Level 3 (right branch: comparison)
+    \node[nterm] (L-expr3) at (1.5, -3.9) {Expr};
+    \node[term] (L-gt) at (2.5, -3.9) {$>$};
+    \node[nterm] (L-expr4) at (3.5, -3.9) {Expr};
 
-% ============================================================
+    % Level 4
+    \node[term] (L-a1) at (-2.5, -5.0) {a};
+    \node[nterm] (L-col2) at (1.5, -5.0) {Col};
+    \node[nterm] (L-num) at (3.5, -5.0) {Num};
+
+    % Level 5
+    \node[term] (L-a2) at (1.5, -6.0) {a};
+    \node[term] (L-1) at (3.5, -6.0) {1};
+
+    % Edges
+    \draw[edge] (L-root) -- (L-result);
+    \draw[edge] (L-root) -- (L-from);
+    \draw[edge] (L-root) -- (L-where);
+    \draw[edge] (L-result) -- (L-expr1);
+    \draw[edge] (L-from) -- (L-p);
+    \draw[edge] (L-where) -- (L-expr2);
+    \draw[edge] (L-expr1) -- (L-col1);
+    \draw[edge] (L-expr2) -- (L-expr3);
+    \draw[edge] (L-expr2) -- (L-gt);
+    \draw[edge] (L-expr2) -- (L-expr4);
+    \draw[edge] (L-col1) -- (L-a1);
+    \draw[edge] (L-expr3) -- (L-col2);
+    \draw[edge] (L-expr4) -- (L-num);
+    \draw[edge] (L-col2) -- (L-a2);
+    \draw[edge] (L-num) -- (L-1);
+
+    % Dashed rectangle around the Expr subtree (splice target)
+    \node[highlight, fit=(L-expr2)(L-expr3)(L-gt)(L-expr4)(L-col2)(L-num)(L-a2)(L-1),
+        label={[font=\scriptsize, anchor=west]right:splice target}] (L-box) {};
+
+\end{scope}
+
+% ====================================================
 % SECTION 2: ChunkStore (center)
-% ============================================================
-\node[seclabel] at (9, 4.8) {ChunkStore};
+% ====================================================
+\begin{scope}[shift={(10.5,0)}]
 
-% ChunkStore container
-\node[nt] (csexpr) at (9, 3.8) {Expr};
-\node[nt] (csfunc) at (9, 2.6) {Func-Call};
-\node[nt] (csfname) at (7.5, 1.4) {Func-Name};
-\node[nt] (csargs) at (10.5, 1.4) {Args};
-\node[tm] (csprintf) at (7.5, 0.4) {printf};
-\node[nt] (csfmt) at (9.2, 0.1) {String};
-\node[nt] (csint) at (10.5, 0.1) {Int};
-\node[nt] (csflt) at (11.8, 0.1) {Float};
-\node[tm] (csfmtv) at (9.2, -0.8) {'\%.*g'};
-\node[tm] (csintv) at (10.5, -0.8) {2147483647};
-\node[tm] (csfltv) at (11.8, -0.8) {0.01};
+    % Section label
+    \node[font=\small\bfseries] at (0, 0.8) {ChunkStore};
 
-% Edges section 2
-\draw (csexpr) -- (csfunc);
-\draw (csfunc) -- (csfname);
-\draw (csfunc) -- (csargs);
-\draw (csfname) -- (csprintf);
-\draw (csargs) -- (csfmt);
-\draw (csargs) -- (csint);
-\draw (csargs) -- (csflt);
-\draw (csfmt) -- (csfmtv);
-\draw (csint) -- (csintv);
-\draw (csflt) -- (csfltv);
+    % Tree inside chunk store
+    \node[nterm] (C-expr) at (0, 0) {Expr};
+    \node[nterm] (C-func) at (0, -1.3) {Func-Call};
 
-% ChunkStore double-border box
-\node[chunkstore, fit=(csexpr)(csfunc)(csfname)(csargs)(csprintf)(csfmt)(csint)(csflt)(csfmtv)(csintv)(csfltv)] (csbox) {};
+    \node[term] (C-printf) at (-2.0, -2.8) {printf};
+    \node[nterm] (C-fmt) at (0, -2.8) {Fmt};
+    \node[nterm] (C-args) at (2.0, -2.8) {Args};
 
-% Label below
-\node[font=\scriptsize, anchor=north] at (csbox.south) {Non-terminal: \texttt{Expr} (different rule)};
+    \node[term] (C-fmtv) at (0, -4.1) {\texttt{'\%.*g'}};
+    \node[nterm] (C-int) at (1.2, -4.1) {Num};
+    \node[nterm] (C-flt) at (3.0, -4.1) {Num};
 
-% ============================================================
+    \node[term] (C-intv) at (1.2, -5.3) {\tiny 2147483647};
+    \node[term] (C-fltv) at (3.0, -5.3) {0.01};
+
+    % Edges
+    \draw[edge] (C-expr) -- (C-func);
+    \draw[edge] (C-func) -- (C-printf);
+    \draw[edge] (C-func) -- (C-fmt);
+    \draw[edge] (C-func) -- (C-args);
+    \draw[edge] (C-fmt) -- (C-fmtv);
+    \draw[edge] (C-args) -- (C-int);
+    \draw[edge] (C-args) -- (C-flt);
+    \draw[edge] (C-int) -- (C-intv);
+    \draw[edge] (C-flt) -- (C-fltv);
+
+    % ChunkStore double-border box
+    \node[chunkstore, fit=(C-expr)(C-func)(C-printf)(C-fmt)(C-args)(C-fmtv)(C-int)(C-flt)(C-intv)(C-fltv)] (C-box) {};
+
+    % Label below
+    \node[font=\scriptsize, anchor=north] at (C-box.south)
+        {Non-terminal: \textsf{Expr} (different rule)};
+
+\end{scope}
+
+% ====================================================
 % SECTION 3: Result (right)
 % Tree: SELECT a FROM p WHERE printf('%.*g', 2147483647, 0.01)
-% ============================================================
-\node[seclabel] at (17, 4.8) {Result};
+% ====================================================
+\begin{scope}[shift={(21.5,0)}]
 
-\node[nt] (r1root) at (17, 4) {Select-Stmt};
+    % Section label
+    \node[font=\small\bfseries] at (0, 0.8) {Result};
 
-\node[nt] (r1sel) at (14.8, 2.8) {Select};
-\node[nt] (r1col) at (15.8, 2.8) {Col-Name};
-\node[nt] (r1from) at (16.8, 2.8) {From};
-\node[nt] (r1tbl) at (17.8, 2.8) {Table-Name};
-\node[nt] (r1where) at (19.2, 2.8) {Where};
+    % Root
+    \node[nterm] (R-root) at (0, 0) {Select-Stmt};
 
-\node[tm] (r1a) at (15.8, 1.8) {a};
-\node[tm] (r1p) at (17.8, 1.8) {p};
+    % Level 1
+    \node[nterm] (R-result) at (-3.0, -1.3) {Result};
+    \node[nterm] (R-from) at (0, -1.3) {FROM};
+    \node[nterm] (R-where) at (3.0, -1.3) {WHERE};
 
-% Spliced-in Expr subtree
-\node[nt] (r1expr) at (19.2, 1.5) {Expr};
-\node[nt] (r1func) at (19.2, 0.3) {Func-Call};
-\node[nt] (r1fname) at (17.7, -0.8) {Func-Name};
-\node[nt] (r1args) at (20.7, -0.8) {Args};
-\node[tm] (r1printf) at (17.7, -1.7) {printf};
-\node[nt] (r1fmt) at (19.5, -1.9) {String};
-\node[nt] (r1int) at (20.7, -1.9) {Int};
-\node[nt] (r1flt) at (21.9, -1.9) {Float};
-\node[tm] (r1fmtv) at (19.5, -2.8) {'\%.*g'};
-\node[tm] (r1intv) at (20.7, -2.8) {2147483647};
-\node[tm] (r1fltv) at (21.9, -2.8) {0.01};
+    % Level 2
+    \node[nterm] (R-expr1) at (-3.0, -2.6) {Expr};
+    \node[term] (R-p) at (0, -2.6) {p};
+    \node[nterm] (R-expr2) at (3.0, -2.6) {Expr};
 
-% Edges section 3
-\draw (r1root) -- (r1sel);
-\draw (r1root) -- (r1col);
-\draw (r1root) -- (r1from);
-\draw (r1root) -- (r1tbl);
-\draw (r1root) -- (r1where);
-\draw (r1col) -- (r1a);
-\draw (r1tbl) -- (r1p);
-\draw (r1where) -- (r1expr);
-\draw (r1expr) -- (r1func);
-\draw (r1func) -- (r1fname);
-\draw (r1func) -- (r1args);
-\draw (r1fname) -- (r1printf);
-\draw (r1args) -- (r1fmt);
-\draw (r1args) -- (r1int);
-\draw (r1args) -- (r1flt);
-\draw (r1fmt) -- (r1fmtv);
-\draw (r1int) -- (r1intv);
-\draw (r1flt) -- (r1fltv);
+    % Level 3 (left branch)
+    \node[nterm] (R-col1) at (-3.0, -3.9) {Col};
 
-% Dashed rectangle around the spliced-in Expr subtree
-\node[highlight, fit=(r1expr)(r1func)(r1fname)(r1args)(r1printf)(r1fmt)(r1int)(r1flt)(r1fmtv)(r1intv)(r1fltv)] (r1hl) {};
-\node[font=\scriptsize, anchor=north west] at (r1hl.south west) {spliced subtree};
+    % Level 3 (right branch: spliced func-call)
+    \node[nterm] (R-func) at (3.0, -3.9) {Func-Call};
 
-% ============================================================
+    % Level 4
+    \node[term] (R-a1) at (-3.0, -5.0) {a};
+    \node[term] (R-printf) at (1.0, -5.2) {printf};
+    \node[nterm] (R-fmt) at (3.0, -5.2) {Fmt};
+    \node[nterm] (R-args) at (5.0, -5.2) {Args};
+
+    % Level 5
+    \node[term] (R-fmtv) at (3.0, -6.5) {\texttt{'\%.*g'}};
+    \node[nterm] (R-int) at (4.2, -6.5) {Num};
+    \node[nterm] (R-flt) at (6.0, -6.5) {Num};
+
+    % Level 6
+    \node[term] (R-intv) at (4.2, -7.7) {\tiny 2147483647};
+    \node[term] (R-fltv) at (6.0, -7.7) {0.01};
+
+    % Edges
+    \draw[edge] (R-root) -- (R-result);
+    \draw[edge] (R-root) -- (R-from);
+    \draw[edge] (R-root) -- (R-where);
+    \draw[edge] (R-result) -- (R-expr1);
+    \draw[edge] (R-from) -- (R-p);
+    \draw[edge] (R-where) -- (R-expr2);
+    \draw[edge] (R-expr1) -- (R-col1);
+    \draw[edge] (R-col1) -- (R-a1);
+    \draw[edge] (R-expr2) -- (R-func);
+    \draw[edge] (R-func) -- (R-printf);
+    \draw[edge] (R-func) -- (R-fmt);
+    \draw[edge] (R-func) -- (R-args);
+    \draw[edge] (R-fmt) -- (R-fmtv);
+    \draw[edge] (R-args) -- (R-int);
+    \draw[edge] (R-args) -- (R-flt);
+    \draw[edge] (R-int) -- (R-intv);
+    \draw[edge] (R-flt) -- (R-fltv);
+
+    % Dashed rectangle around the spliced subtree
+    \node[highlight, fit=(R-expr2)(R-func)(R-printf)(R-fmt)(R-args)(R-fmtv)(R-int)(R-flt)(R-intv)(R-fltv),
+        label={[font=\scriptsize, anchor=west]right:spliced subtree}] (R-box) {};
+
+\end{scope}
+
+% ====================================================
 % ARROWS between sections
-% ============================================================
+% ====================================================
 
-% Arrow from ChunkStore to the result (showing insertion)
-\draw[arr] (csbox.east) -- ++(0.8,0) |- (r1hl.west);
-
-% Arrow from Section 1 highlight to ChunkStore (showing replacement)
-\draw[arr] (s1hl.east) -- ++(0.5,0) |- (csbox.west);
-
-% Operation label
-\node[font=\small, align=center, anchor=south] at ($(s1hl.east)!0.5!(csbox.west) + (0, 0.6)$)
-    {\texttt{mut\_splice}: replace with};
-\node[font=\small, align=center, anchor=north] at ($(s1hl.east)!0.5!(csbox.west) + (0, 0.4)$)
-    {ChunkStore subtree};
+% Arrow from Section 1 to Result
+\draw[mutarrow] (5.5, -3.5) -- node[above, font=\small, align=center, text width=4cm]
+    {\texttt{mut\_splice}: replace with\\ChunkStore subtree} (7.0, -3.5);
 
 \end{tikzpicture}
 \end{document}
