@@ -1,0 +1,303 @@
+<mxfile host="app.diagrams.net" modified="2026-05-17T00:00:00.000Z" agent="thesis-figure-skill" version="24.0.0" type="device">
+  <diagram id="minimize-mutation" name="Subtree Minimization">
+    <mxGraphModel dx="900" dy="500" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="900" pageHeight="500" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Title -->
+        <mxCell id="title" value="Subtree Minimization (minimize)" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=14;fontStyle=1;fontFamily=Times New Roman;" vertex="1" parent="1">
+          <mxGeometry x="280" y="10" width="340" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- ========== BEFORE TREE (Left Side) ========== -->
+
+        <!-- Before label -->
+        <mxCell id="before_label" value="Before minimization" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=11;fontStyle=3;fontFamily=Times New Roman;" vertex="1" parent="1">
+          <mxGeometry x="110" y="40" width="150" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- BEFORE: Select-Stmt (root) -->
+        <mxCell id="b_select" value="Select-Stmt" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#333333;fontSize=9;fontFamily=Courier New;arcSize=20;" vertex="1" parent="1">
+          <mxGeometry x="130" y="65" width="90" height="25" as="geometry" />
+        </mxCell>
+
+        <!-- BEFORE: Result Col-List -->
+        <mxCell id="b_result" value="Result Col-List" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#333333;fontSize=8;fontFamily=Courier New;arcSize=20;" vertex="1" parent="1">
+          <mxGeometry x="40" y="115" width="90" height="22" as="geometry" />
+        </mxCell>
+
+        <!-- BEFORE: FROM Table -->
+        <mxCell id="b_from" value="FROM Table" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#333333;fontSize=8;fontFamily=Courier New;arcSize=20;" vertex="1" parent="1">
+          <mxGeometry x="145" y="115" width="70" height="22" as="geometry" />
+        </mxCell>
+
+        <!-- BEFORE: WHERE Expr -->
+        <mxCell id="b_where" value="WHERE Expr" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#333333;fontSize=8;fontFamily=Courier New;arcSize=20;" vertex="1" parent="1">
+          <mxGeometry x="230" y="115" width="75" height="22" as="geometry" />
+        </mxCell>
+
+        <!-- Edges from Select-Stmt -->
+        <mxCell id="b_e1" style="edgeStyle=none;curved=0;strokeColor=#333333;strokeWidth=1;endArrow=none;" edge="1" source="b_select" target="b_result" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="b_e2" style="edgeStyle=none;curved=0;strokeColor=#333333;strokeWidth=1;endArrow=none;" edge="1" source="b_select" target="b_from" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="b_e3" style="edgeStyle=none;curved=0;strokeColor=#333333;strokeWidth=1;endArrow=none;" edge="1" source="b_select" target="b_where" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- BEFORE: Expr (under Result) — THIS IS THE HIGHLIGHTED SUBTREE -->
+        <!-- Red dashed border group for the replaced subtree -->
+        <mxCell id="b_highlight" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#CC0000;strokeWidth=2;dashed=1;dashPattern=5 3;arcSize=10;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="18" y="143" width="132" height="125" as="geometry" />
+        </mxCell>
+
+        <mxCell id="b_expr_top" value="Expr" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF0F0;strokeColor=#CC0000;fontSize=9;fontFamily=Courier New;arcSize=20;" vertex="1" parent="1">
+          <mxGeometry x="55" y="152" width="50" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- BEFORE: Expr + Expr -->
+        <mxCell id="b_expr_l" value="Expr" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF0F0;strokeColor=#CC0000;fontSize=8;fontFamily=Courier New;arcSize=20;" vertex="1" parent="1">
+          <mxGeometry x="28" y="195" width="42" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="b_plus" value="&lt;i&gt;+&lt;/i&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=10;fontStyle=0;fontColor=#CC0000;" vertex="1" parent="1">
+          <mxGeometry x="72" y="192" width="20" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="b_expr_r" value="Expr" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF0F0;strokeColor=#CC0000;fontSize=8;fontFamily=Courier New;arcSize=20;" vertex="1" parent="1">
+          <mxGeometry x="93" y="195" width="42" height="18" as="geometry" />
+        </mxCell>
+
+        <!-- Edges Expr -> Expr + Expr -->
+        <mxCell id="b_e4" style="edgeStyle=none;curved=0;strokeColor=#CC0000;strokeWidth=1;endArrow=none;" edge="1" source="b_expr_top" target="b_expr_l" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="b_e4b" style="edgeStyle=none;curved=0;strokeColor=#CC0000;strokeWidth=1;endArrow=none;" edge="1" source="b_expr_top" target="b_expr_r" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- BEFORE: Col a (left) -->
+        <mxCell id="b_col_a" value="Col" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF0F0;strokeColor=#CC0000;fontSize=8;fontFamily=Courier New;arcSize=20;" vertex="1" parent="1">
+          <mxGeometry x="30" y="228" width="38" height="16" as="geometry" />
+        </mxCell>
+        <mxCell id="b_a1" value="&lt;i&gt;a&lt;/i&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=9;fontFamily=Courier New;fontColor=#CC0000;" vertex="1" parent="1">
+          <mxGeometry x="37" y="248" width="24" height="18" as="geometry" />
+        </mxCell>
+
+        <!-- BEFORE: Col b (right) -->
+        <mxCell id="b_col_b" value="Col" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF0F0;strokeColor=#CC0000;fontSize=8;fontFamily=Courier New;arcSize=20;" vertex="1" parent="1">
+          <mxGeometry x="95" y="228" width="38" height="16" as="geometry" />
+        </mxCell>
+        <mxCell id="b_b1" value="&lt;i&gt;b&lt;/i&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=9;fontFamily=Courier New;fontColor=#CC0000;" vertex="1" parent="1">
+          <mxGeometry x="102" y="248" width="24" height="18" as="geometry" />
+        </mxCell>
+
+        <!-- Edges col -->
+        <mxCell id="b_e5" style="edgeStyle=none;curved=0;strokeColor=#CC0000;strokeWidth=1;endArrow=none;" edge="1" source="b_expr_l" target="b_col_a" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="b_e6" style="edgeStyle=none;curved=0;strokeColor=#CC0000;strokeWidth=1;endArrow=none;" edge="1" source="b_expr_r" target="b_col_b" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Edge Result -> Expr -->
+        <mxCell id="b_e_res_expr" style="edgeStyle=none;curved=0;strokeColor=#333333;strokeWidth=1;endArrow=none;" edge="1" source="b_result" target="b_expr_top" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- BEFORE: Terminal p under FROM -->
+        <mxCell id="b_p" value="&lt;i&gt;p&lt;/i&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=9;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="168" y="148" width="24" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="b_e7" style="edgeStyle=none;curved=0;strokeColor=#333333;strokeWidth=1;endArrow=none;" edge="1" source="b_from" target="b_p" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- BEFORE: WHERE subtree: Expr > Expr -->
+        <mxCell id="b_cmp" value="Expr &gt; Expr" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#333333;fontSize=8;fontFamily=Courier New;arcSize=20;" vertex="1" parent="1">
+          <mxGeometry x="225" y="152" width="70" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="b_e8" style="edgeStyle=none;curved=0;strokeColor=#333333;strokeWidth=1;endArrow=none;" edge="1" source="b_where" target="b_cmp" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- BEFORE: Col a under comparison left -->
+        <mxCell id="b_cmp_col" value="Col" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#333333;fontSize=8;fontFamily=Courier New;arcSize=20;" vertex="1" parent="1">
+          <mxGeometry x="225" y="190" width="30" height="16" as="geometry" />
+        </mxCell>
+        <mxCell id="b_cmp_a" value="&lt;i&gt;a&lt;/i&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=9;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="228" y="212" width="24" height="18" as="geometry" />
+        </mxCell>
+
+        <!-- BEFORE: Num 1 under comparison right -->
+        <mxCell id="b_cmp_num" value="Num" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#333333;fontSize=8;fontFamily=Courier New;arcSize=20;" vertex="1" parent="1">
+          <mxGeometry x="265" y="190" width="30" height="16" as="geometry" />
+        </mxCell>
+        <mxCell id="b_cmp_1" value="&lt;i&gt;1&lt;/i&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=9;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="268" y="212" width="24" height="18" as="geometry" />
+        </mxCell>
+
+        <!-- Edges for WHERE subtree -->
+        <mxCell id="b_e9" style="edgeStyle=none;curved=0;strokeColor=#333333;strokeWidth=1;endArrow=none;" edge="1" source="b_cmp" target="b_cmp_col" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="b_e10" style="edgeStyle=none;curved=0;strokeColor=#333333;strokeWidth=1;endArrow=none;" edge="1" source="b_cmp" target="b_cmp_num" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="b_e11" style="edgeStyle=none;curved=0;strokeColor=#333333;strokeWidth=1;endArrow=none;" edge="1" source="b_cmp_col" target="b_cmp_a" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="b_e12" style="edgeStyle=none;curved=0;strokeColor=#333333;strokeWidth=1;endArrow=none;" edge="1" source="b_cmp_num" target="b_cmp_1" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- BEFORE: SQL output -->
+        <mxCell id="b_sql" value="SELECT a + b FROM p WHERE a &gt; 1" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=9;fontFamily=Courier New;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="55" y="285" width="240" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- ========== ARROW BETWEEN TREES ========== -->
+        <mxCell id="arrow_main" value="" style="shape=mxgraph.arrows2.arrow;dy=0.6;dx=30;notch=0;strokeColor=#333333;fillColor=#555555;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="330" y="155" width="60" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow label -->
+        <mxCell id="arrow_label" value="minimize: replace subtree&#xa;with smallest derivation&#xa;of same non-terminal" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=8;fontFamily=Times New Roman;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="315" y="190" width="150" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- ========== AFTER TREE (Right Side) ========== -->
+
+        <!-- After label -->
+        <mxCell id="after_label" value="After minimization" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=11;fontStyle=3;fontFamily=Times New Roman;" vertex="1" parent="1">
+          <mxGeometry x="560" y="40" width="140" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- AFTER: Select-Stmt (root) -->
+        <mxCell id="a_select" value="Select-Stmt" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#333333;fontSize=9;fontFamily=Courier New;arcSize=20;" vertex="1" parent="1">
+          <mxGeometry x="570" y="65" width="90" height="25" as="geometry" />
+        </mxCell>
+
+        <!-- AFTER: Result Col-List -->
+        <mxCell id="a_result" value="Result Col-List" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#333333;fontSize=8;fontFamily=Courier New;arcSize=20;" vertex="1" parent="1">
+          <mxGeometry x="490" y="115" width="90" height="22" as="geometry" />
+        </mxCell>
+
+        <!-- AFTER: FROM Table -->
+        <mxCell id="a_from" value="FROM Table" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#333333;fontSize=8;fontFamily=Courier New;arcSize=20;" vertex="1" parent="1">
+          <mxGeometry x="595" y="115" width="70" height="22" as="geometry" />
+        </mxCell>
+
+        <!-- AFTER: WHERE Expr -->
+        <mxCell id="a_where" value="WHERE Expr" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#333333;fontSize=8;fontFamily=Courier New;arcSize=20;" vertex="1" parent="1">
+          <mxGeometry x="680" y="115" width="75" height="22" as="geometry" />
+        </mxCell>
+
+        <!-- Edges from Select-Stmt -->
+        <mxCell id="a_e1" style="edgeStyle=none;curved=0;strokeColor=#333333;strokeWidth=1;endArrow=none;" edge="1" source="a_select" target="a_result" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a_e2" style="edgeStyle=none;curved=0;strokeColor=#333333;strokeWidth=1;endArrow=none;" edge="1" source="a_select" target="a_from" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a_e3" style="edgeStyle=none;curved=0;strokeColor=#333333;strokeWidth=1;endArrow=none;" edge="1" source="a_select" target="a_where" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- AFTER: Green highlighted replacement subtree -->
+        <mxCell id="a_highlight" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#009900;strokeWidth=2;dashed=1;dashPattern=5 3;arcSize=10;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="495" y="143" width="80" height="92" as="geometry" />
+        </mxCell>
+
+        <!-- AFTER: Expr (minimal) -->
+        <mxCell id="a_expr_min" value="Expr" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F0FFF0;strokeColor=#009900;fontSize=9;fontFamily=Courier New;arcSize=20;" vertex="1" parent="1">
+          <mxGeometry x="510" y="152" width="50" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- AFTER: Col a (minimal replacement) -->
+        <mxCell id="a_col_min" value="Col" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F0FFF0;strokeColor=#009900;fontSize=8;fontFamily=Courier New;arcSize=20;" vertex="1" parent="1">
+          <mxGeometry x="515" y="192" width="38" height="16" as="geometry" />
+        </mxCell>
+        <mxCell id="a_a_min" value="&lt;i&gt;a&lt;/i&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=9;fontFamily=Courier New;fontColor=#009900;" vertex="1" parent="1">
+          <mxGeometry x="522" y="214" width="24" height="18" as="geometry" />
+        </mxCell>
+
+        <!-- Edges for green subtree -->
+        <mxCell id="a_e_res_expr" style="edgeStyle=none;curved=0;strokeColor=#333333;strokeWidth=1;endArrow=none;" edge="1" source="a_result" target="a_expr_min" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a_e4" style="edgeStyle=none;curved=0;strokeColor=#009900;strokeWidth=1;endArrow=none;" edge="1" source="a_expr_min" target="a_col_min" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- AFTER: Terminal p under FROM -->
+        <mxCell id="a_p" value="&lt;i&gt;p&lt;/i&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=9;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="618" y="148" width="24" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="a_e7" style="edgeStyle=none;curved=0;strokeColor=#333333;strokeWidth=1;endArrow=none;" edge="1" source="a_from" target="a_p" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- AFTER: WHERE subtree: Expr > Expr -->
+        <mxCell id="a_cmp" value="Expr &gt; Expr" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#333333;fontSize=8;fontFamily=Courier New;arcSize=20;" vertex="1" parent="1">
+          <mxGeometry x="675" y="152" width="70" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="a_e8" style="edgeStyle=none;curved=0;strokeColor=#333333;strokeWidth=1;endArrow=none;" edge="1" source="a_where" target="a_cmp" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- AFTER: Col a under comparison left -->
+        <mxCell id="a_cmp_col" value="Col" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#333333;fontSize=8;fontFamily=Courier New;arcSize=20;" vertex="1" parent="1">
+          <mxGeometry x="675" y="190" width="30" height="16" as="geometry" />
+        </mxCell>
+        <mxCell id="a_cmp_a" value="&lt;i&gt;a&lt;/i&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=9;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="678" y="212" width="24" height="18" as="geometry" />
+        </mxCell>
+
+        <!-- AFTER: Num 1 under comparison right -->
+        <mxCell id="a_cmp_num" value="Num" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#333333;fontSize=8;fontFamily=Courier New;arcSize=20;" vertex="1" parent="1">
+          <mxGeometry x="715" y="190" width="30" height="16" as="geometry" />
+        </mxCell>
+        <mxCell id="a_cmp_1" value="&lt;i&gt;1&lt;/i&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=9;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="718" y="212" width="24" height="18" as="geometry" />
+        </mxCell>
+
+        <!-- Edges for AFTER WHERE subtree -->
+        <mxCell id="a_e9" style="edgeStyle=none;curved=0;strokeColor=#333333;strokeWidth=1;endArrow=none;" edge="1" source="a_cmp" target="a_cmp_col" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a_e10" style="edgeStyle=none;curved=0;strokeColor=#333333;strokeWidth=1;endArrow=none;" edge="1" source="a_cmp" target="a_cmp_num" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a_e11" style="edgeStyle=none;curved=0;strokeColor=#333333;strokeWidth=1;endArrow=none;" edge="1" source="a_cmp_col" target="a_cmp_a" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a_e12" style="edgeStyle=none;curved=0;strokeColor=#333333;strokeWidth=1;endArrow=none;" edge="1" source="a_cmp_num" target="a_cmp_1" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- AFTER: SQL output -->
+        <mxCell id="a_sql" value="SELECT a FROM p WHERE a &gt; 1" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=9;fontFamily=Courier New;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="520" y="285" width="210" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- Legend annotations -->
+        <mxCell id="legend_red" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF0F0;strokeColor=#CC0000;strokeWidth=2;dashed=1;dashPattern=5 3;arcSize=10;" vertex="1" parent="1">
+          <mxGeometry x="320" y="320" width="16" height="16" as="geometry" />
+        </mxCell>
+        <mxCell id="legend_red_text" value="= replaced subtree" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=8;fontFamily=Times New Roman;" vertex="1" parent="1">
+          <mxGeometry x="340" y="318" width="100" height="20" as="geometry" />
+        </mxCell>
+
+        <mxCell id="legend_green" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F0FFF0;strokeColor=#009900;strokeWidth=2;dashed=1;dashPattern=5 3;arcSize=10;" vertex="1" parent="1">
+          <mxGeometry x="460" y="320" width="16" height="16" as="geometry" />
+        </mxCell>
+        <mxCell id="legend_green_text" value="= minimal replacement" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=8;fontFamily=Times New Roman;" vertex="1" parent="1">
+          <mxGeometry x="480" y="318" width="110" height="20" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxGraphModel dx="1000" dy="500" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1000" pageHeight="500" math="0" shadow="0">
+  <root>
+    <mxCell id="0" />
+    <mxCell id="1" parent="0" />
+    <!-- ═══════════════════════════════════════════════════════════════════
+         TITLE
+         ═══════════════════════════════════════════════════════════════════ -->
+    <mxCell id="title" value="Random Subtree Regeneration (mut_random)" style="text;html=1;align=center;verticalAlign=middle;fontSize=14;fontStyle=1;fontColor=#2C3E50;" vertex="1" parent="1">
+      <mxGeometry x="250" y="10" width="500" height="30" as="geometry" />
+    </mxCell>
+    <!-- ═══════════════════════════════════════════════════════════════════
+         BEFORE TREE (left side)
+         ═══════════════════════════════════════════════════════════════════ -->
+    <mxCell id="before_label" value="&lt;b&gt;Before&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;fontSize=12;fontColor=#2C3E50;" vertex="1" parent="1">
+      <mxGeometry x="130" y="40" width="150" height="24" as="geometry" />
+    </mxCell>
+    <mxCell id="before_sql" value="&lt;i&gt;SELECT a FROM p WHERE a &amp;gt; 1&lt;/i&gt;" style="text;html=1;align=center;verticalAlign=middle;fontSize=9;fontColor=#7F8C8D;" vertex="1" parent="1">
+      <mxGeometry x="100" y="60" width="210" height="20" as="geometry" />
+    </mxCell>
+    <!-- Select-Stmt (root) -->
+    <mxCell id="b_root" value="Select-Stmt" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#7F8C8D;strokeWidth=1.5;fontSize=10;fontColor=#2C3E50;arcSize=20;" vertex="1" parent="1">
+      <mxGeometry x="150" y="85" width="110" height="30" as="geometry" />
+    </mxCell>
+    <!-- Level 1: Result-Col-List, FROM Table, WHERE Expr -->
+    <mxCell id="b_result" value="Result-Col-List" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#7F8C8D;strokeWidth=1.5;fontSize=9;fontColor=#2C3E50;arcSize=20;" vertex="1" parent="1">
+      <mxGeometry x="50" y="145" width="105" height="26" as="geometry" />
+    </mxCell>
+    <mxCell id="b_from" value="FROM Table" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#7F8C8D;strokeWidth=1.5;fontSize=9;fontColor=#2C3E50;arcSize=20;" vertex="1" parent="1">
+      <mxGeometry x="170" y="145" width="80" height="26" as="geometry" />
+    </mxCell>
+    <mxCell id="b_where" value="WHERE Expr" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#7F8C8D;strokeWidth=1.5;fontSize=9;fontColor=#2C3E50;arcSize=20;" vertex="1" parent="1">
+      <mxGeometry x="270" y="145" width="85" height="26" as="geometry" />
+    </mxCell>
+    <!-- Edges from root -->
+    <mxCell id="b_e1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#7F8C8D;" edge="1" source="b_root" target="b_result" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="b_e2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#7F8C8D;" edge="1" source="b_root" target="b_from" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="b_e3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#7F8C8D;" edge="1" source="b_root" target="b_where" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <!-- Level 2 left: Expr under Result-Col-List -->
+    <mxCell id="b_expr1" value="Expr" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#7F8C8D;strokeWidth=1.5;fontSize=9;fontColor=#2C3E50;arcSize=20;" vertex="1" parent="1">
+      <mxGeometry x="70" y="200" width="55" height="24" as="geometry" />
+    </mxCell>
+    <mxCell id="b_e4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#7F8C8D;" edge="1" source="b_result" target="b_expr1" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <!-- Terminal: a (under Expr in result) -->
+    <mxCell id="b_t_a1" value="&lt;i&gt;a&lt;/i&gt;" style="text;html=1;align=center;verticalAlign=middle;fontSize=9;fontColor=#2C3E50;" vertex="1" parent="1">
+      <mxGeometry x="80" y="240" width="35" height="20" as="geometry" />
+    </mxCell>
+    <mxCell id="b_e5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#7F8C8D;" edge="1" source="b_expr1" target="b_t_a1" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <!-- Terminal: p (under FROM Table) -->
+    <mxCell id="b_t_p" value="&lt;i&gt;p&lt;/i&gt;" style="text;html=1;align=center;verticalAlign=middle;fontSize=9;fontColor=#2C3E50;" vertex="1" parent="1">
+      <mxGeometry x="193" y="200" width="35" height="20" as="geometry" />
+    </mxCell>
+    <mxCell id="b_e6" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#7F8C8D;" edge="1" source="b_from" target="b_t_p" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <!-- ═══════════════════════════════════════════════════════════════════
+         HIGHLIGHTED SUBTREE (red dashed border) - the WHERE Expr subtree
+         ═══════════════════════════════════════════════════════════════════ -->
+    <mxCell id="b_highlight" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#E74C3C;strokeWidth=2;dashed=1;dashPattern=5 3;arcSize=10;" vertex="1" parent="1">
+      <mxGeometry x="255" y="138" width="145" height="175" as="geometry" />
+    </mxCell>
+    <mxCell id="b_hl_label" value="&lt;font color=&quot;#E74C3C&quot;&gt;&lt;i&gt;selected node&lt;/i&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;fontSize=8;" vertex="1" parent="1">
+      <mxGeometry x="260" y="298" width="90" height="16" as="geometry" />
+    </mxCell>
+    <!-- Expr node under WHERE (the comparison a > 1) -->
+    <mxCell id="b_cmp" value="Expr (&gt;)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FDEDEC;strokeColor=#E74C3C;strokeWidth=1.5;fontSize=9;fontColor=#922B21;arcSize=20;" vertex="1" parent="1">
+      <mxGeometry x="280" y="200" width="65" height="24" as="geometry" />
+    </mxCell>
+    <mxCell id="b_e7" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#7F8C8D;" edge="1" source="b_where" target="b_cmp" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <!-- Left child of comparison: Col a -->
+    <mxCell id="b_col_a" value="Col" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FDEDEC;strokeColor=#E74C3C;strokeWidth=1;fontSize=8;fontColor=#922B21;arcSize=20;" vertex="1" parent="1">
+      <mxGeometry x="265" y="250" width="40" height="20" as="geometry" />
+    </mxCell>
+    <mxCell id="b_e8" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#E74C3C;strokeWidth=1;" edge="1" source="b_cmp" target="b_col_a" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="b_t_a2" value="&lt;i&gt;a&lt;/i&gt;" style="text;html=1;align=center;verticalAlign=middle;fontSize=8;fontColor=#922B21;" vertex="1" parent="1">
+      <mxGeometry x="270" y="275" width="30" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="b_e9" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#E74C3C;strokeWidth=1;" edge="1" source="b_col_a" target="b_t_a2" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <!-- Right child of comparison: Num 1 -->
+    <mxCell id="b_num" value="Num" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FDEDEC;strokeColor=#E74C3C;strokeWidth=1;fontSize=8;fontColor=#922B21;arcSize=20;" vertex="1" parent="1">
+      <mxGeometry x="325" y="250" width="40" height="20" as="geometry" />
+    </mxCell>
+    <mxCell id="b_e10" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#E74C3C;strokeWidth=1;" edge="1" source="b_cmp" target="b_num" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="b_t_1" value="&lt;i&gt;1&lt;/i&gt;" style="text;html=1;align=center;verticalAlign=middle;fontSize=8;fontColor=#922B21;" vertex="1" parent="1">
+      <mxGeometry x="332" y="275" width="25" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="b_e11" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#E74C3C;strokeWidth=1;" edge="1" source="b_num" target="b_t_1" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <!-- ═══════════════════════════════════════════════════════════════════
+         ARROW between trees
+         ═══════════════════════════════════════════════════════════════════ -->
+    <mxCell id="arrow" value="" style="shape=flexArrow;endArrow=classic;startArrow=none;html=1;fillColor=#3498DB;strokeColor=#2980B9;width=8;endSize=6;startSize=4;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="420" y="220" as="sourcePoint" />
+        <mxPoint x="500" y="220" as="targetPoint" />
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="arrow_label" value="&lt;b&gt;mut_random&lt;/b&gt;:&#xa;regenerate subtree&#xa;from grammar" style="text;html=1;align=center;verticalAlign=middle;fontSize=8;fontColor=#2980B9;" vertex="1" parent="1">
+      <mxGeometry x="410" y="235" width="110" height="40" as="geometry" />
+    </mxCell>
+    <!-- ═══════════════════════════════════════════════════════════════════
+         AFTER TREE (right side)
+         ═══════════════════════════════════════════════════════════════════ -->
+    <mxCell id="after_label" value="&lt;b&gt;After: fresh subtree from grammar&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;fontSize=12;fontColor=#2C3E50;" vertex="1" parent="1">
+      <mxGeometry x="580" y="40" width="250" height="24" as="geometry" />
+    </mxCell>
+    <mxCell id="after_sql" value="&lt;i&gt;SELECT a FROM p WHERE a IN (SELECT b FROM q)&lt;/i&gt;" style="text;html=1;align=center;verticalAlign=middle;fontSize=9;fontColor=#7F8C8D;" vertex="1" parent="1">
+      <mxGeometry x="540" y="60" width="320" height="20" as="geometry" />
+    </mxCell>
+    <!-- Select-Stmt (root) -->
+    <mxCell id="a_root" value="Select-Stmt" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#7F8C8D;strokeWidth=1.5;fontSize=10;fontColor=#2C3E50;arcSize=20;" vertex="1" parent="1">
+      <mxGeometry x="640" y="85" width="110" height="30" as="geometry" />
+    </mxCell>
+    <!-- Level 1: Result-Col-List, FROM Table, WHERE Expr -->
+    <mxCell id="a_result" value="Result-Col-List" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#7F8C8D;strokeWidth=1.5;fontSize=9;fontColor=#2C3E50;arcSize=20;" vertex="1" parent="1">
+      <mxGeometry x="530" y="145" width="105" height="26" as="geometry" />
+    </mxCell>
+    <mxCell id="a_from" value="FROM Table" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#7F8C8D;strokeWidth=1.5;fontSize=9;fontColor=#2C3E50;arcSize=20;" vertex="1" parent="1">
+      <mxGeometry x="655" y="145" width="80" height="26" as="geometry" />
+    </mxCell>
+    <mxCell id="a_where" value="WHERE Expr" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#7F8C8D;strokeWidth=1.5;fontSize=9;fontColor=#2C3E50;arcSize=20;" vertex="1" parent="1">
+      <mxGeometry x="760" y="145" width="85" height="26" as="geometry" />
+    </mxCell>
+    <!-- Edges from root -->
+    <mxCell id="a_e1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#7F8C8D;" edge="1" source="a_root" target="a_result" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="a_e2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#7F8C8D;" edge="1" source="a_root" target="a_from" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="a_e3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#7F8C8D;" edge="1" source="a_root" target="a_where" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <!-- Level 2 left: Expr under Result-Col-List -->
+    <mxCell id="a_expr1" value="Expr" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#7F8C8D;strokeWidth=1.5;fontSize=9;fontColor=#2C3E50;arcSize=20;" vertex="1" parent="1">
+      <mxGeometry x="555" y="200" width="55" height="24" as="geometry" />
+    </mxCell>
+    <mxCell id="a_e4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#7F8C8D;" edge="1" source="a_result" target="a_expr1" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <!-- Terminal: a -->
+    <mxCell id="a_t_a1" value="&lt;i&gt;a&lt;/i&gt;" style="text;html=1;align=center;verticalAlign=middle;fontSize=9;fontColor=#2C3E50;" vertex="1" parent="1">
+      <mxGeometry x="565" y="240" width="35" height="20" as="geometry" />
+    </mxCell>
+    <mxCell id="a_e5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#7F8C8D;" edge="1" source="a_expr1" target="a_t_a1" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <!-- Terminal: p -->
+    <mxCell id="a_t_p" value="&lt;i&gt;p&lt;/i&gt;" style="text;html=1;align=center;verticalAlign=middle;fontSize=9;fontColor=#2C3E50;" vertex="1" parent="1">
+      <mxGeometry x="678" y="200" width="35" height="20" as="geometry" />
+    </mxCell>
+    <mxCell id="a_e6" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#7F8C8D;" edge="1" source="a_from" target="a_t_p" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <!-- ═══════════════════════════════════════════════════════════════════
+         GREEN HIGHLIGHTED NEW SUBTREE (under WHERE Expr on the right)
+         ═══════════════════════════════════════════════════════════════════ -->
+    <mxCell id="a_highlight" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#27AE60;strokeWidth=2;dashed=1;dashPattern=5 3;arcSize=10;" vertex="1" parent="1">
+      <mxGeometry x="720" y="138" width="260" height="345" as="geometry" />
+    </mxCell>
+    <mxCell id="a_hl_label" value="&lt;font color=&quot;#27AE60&quot;&gt;&lt;i&gt;new subtree&lt;/i&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;fontSize=8;" vertex="1" parent="1">
+      <mxGeometry x="790" y="468" width="80" height="16" as="geometry" />
+    </mxCell>
+    <!-- Expr (IN) node under WHERE -->
+    <mxCell id="a_in" value="Expr (IN)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EAFAF1;strokeColor=#27AE60;strokeWidth=1.5;fontSize=9;fontColor=#1E8449;arcSize=20;" vertex="1" parent="1">
+      <mxGeometry x="770" y="200" width="70" height="24" as="geometry" />
+    </mxCell>
+    <mxCell id="a_e7" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#7F8C8D;" edge="1" source="a_where" target="a_in" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <!-- Left child of IN: Col a -->
+    <mxCell id="a_col_a" value="Col" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EAFAF1;strokeColor=#27AE60;strokeWidth=1;fontSize=8;fontColor=#1E8449;arcSize=20;" vertex="1" parent="1">
+      <mxGeometry x="740" y="255" width="40" height="20" as="geometry" />
+    </mxCell>
+    <mxCell id="a_e8" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#27AE60;strokeWidth=1;" edge="1" source="a_in" target="a_col_a" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="a_t_a2" value="&lt;i&gt;a&lt;/i&gt;" style="text;html=1;align=center;verticalAlign=middle;fontSize=8;fontColor=#1E8449;" vertex="1" parent="1">
+      <mxGeometry x="745" y="280" width="30" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="a_e9" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#27AE60;strokeWidth=1;" edge="1" source="a_col_a" target="a_t_a2" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <!-- Right child of IN: Select-Stmt (subquery) -->
+    <mxCell id="a_sub" value="Select-Stmt" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EAFAF1;strokeColor=#27AE60;strokeWidth=1.5;fontSize=9;fontColor=#1E8449;arcSize=20;" vertex="1" parent="1">
+      <mxGeometry x="820" y="255" width="90" height="24" as="geometry" />
+    </mxCell>
+    <mxCell id="a_e10" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#27AE60;strokeWidth=1;" edge="1" source="a_in" target="a_sub" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <!-- Subquery children: Result-Col (b), FROM Table (q) -->
+    <mxCell id="a_sub_result" value="Result-Col" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EAFAF1;strokeColor=#27AE60;strokeWidth=1;fontSize=8;fontColor=#1E8449;arcSize=20;" vertex="1" parent="1">
+      <mxGeometry x="800" y="310" width="65" height="20" as="geometry" />
+    </mxCell>
+    <mxCell id="a_e11" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#27AE60;strokeWidth=1;" edge="1" source="a_sub" target="a_sub_result" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="a_sub_from" value="FROM Table" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EAFAF1;strokeColor=#27AE60;strokeWidth=1;fontSize=8;fontColor=#1E8449;arcSize=20;" vertex="1" parent="1">
+      <mxGeometry x="885" y="310" width="70" height="20" as="geometry" />
+    </mxCell>
+    <mxCell id="a_e12" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#27AE60;strokeWidth=1;" edge="1" source="a_sub" target="a_sub_from" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <!-- Terminal: b -->
+    <mxCell id="a_sub_col" value="Col" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EAFAF1;strokeColor=#27AE60;strokeWidth=1;fontSize=8;fontColor=#1E8449;arcSize=20;" vertex="1" parent="1">
+      <mxGeometry x="812" y="355" width="40" height="18" as="geometry" />
+    </mxCell>
+    <mxCell id="a_e13" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#27AE60;strokeWidth=1;" edge="1" source="a_sub_result" target="a_sub_col" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="a_t_b" value="&lt;i&gt;b&lt;/i&gt;" style="text;html=1;align=center;verticalAlign=middle;fontSize=8;fontColor=#1E8449;" vertex="1" parent="1">
+      <mxGeometry x="817" y="378" width="30" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="a_e14" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#27AE60;strokeWidth=1;" edge="1" source="a_sub_col" target="a_t_b" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <!-- Terminal: q -->
+    <mxCell id="a_t_q" value="&lt;i&gt;q&lt;/i&gt;" style="text;html=1;align=center;verticalAlign=middle;fontSize=8;fontColor=#1E8449;" vertex="1" parent="1">
+      <mxGeometry x="905" y="340" width="30" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="a_e15" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#27AE60;strokeWidth=1;" edge="1" source="a_sub_from" target="a_t_q" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+  </root>
+</mxGraphModel>
