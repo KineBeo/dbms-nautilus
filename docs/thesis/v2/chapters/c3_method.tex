@@ -40,19 +40,29 @@ A key design decision is that every test case begins from an empty database. The
 Table~\ref{tab:components} groups the twelve components into five functional subsystems, showing their implementation languages and roles in the pipeline.
 
 \begin{table}[htbp]
-\caption{DBMS-Nautilus system components, grouped into five functional subsystems. Individual components (1--12) are shown in Figure~\ref{fig:architecture}.}
+\caption{DBMS-Nautilus system components, grouped into five functional subsystems with implementation sizes. Components (1--12) correspond to Figure~\ref{fig:architecture}. The Grammar column refers to the grammar specification loaded at startup.}
 \label{tab:components}
 \centering
 \footnotesize
-\begin{tabular}{lllp{4.5cm}}
+\begin{tabular}{lllrl}
 \toprule
-\textbf{Component} & \textbf{Language} & \textbf{Module} & \textbf{Role} \\
+\textbf{Subsystem} & \textbf{Lang.} & \textbf{Module} & \textbf{LoC} & \textbf{Key Responsibility} \\
 \midrule
-Grammar Engine & Rust + Python & \texttt{grammartec/} & Load grammar, weighted rule sampling \\
-Generation + Mutation & Rust & \texttt{fuzzer/} & Build and mutate derivation trees \\
-Fork Server + Harness & Rust + C & \texttt{forksrv/}, \texttt{harness/} & Execute SQL against instrumented SQLite \\
-Coverage Feedback & Rust & \texttt{fuzzer/} & Track edges, maintain queue \\
-Triage Pipeline & Python & \texttt{triage/} & Crash dedup, CVE matching, reporting \\
+Grammar Spec.\ (1) & Python & \texttt{grammars/} & 788 & 514 weighted production rules \\
+Context Engine (2) & Rust & \texttt{grammartec/} & \multirow{5}{*}{2{,}466} & Rule storage, weighted selection \\
+Tree Generation (3) & Rust & \texttt{grammartec/} & & Derivation tree construction \\
+Mutation Engine (4) & Rust & \texttt{grammartec/} & & 5 structural mutation operators \\
+Minimization (5) & Rust & \texttt{grammartec/} & & Shrink trees preserving coverage \\
+ChunkStore (6) & Rust & \texttt{grammartec/} & & Index subtrees ($\leq$30 nodes) for splice \\
+\midrule
+Queue (7) & Rust & \texttt{fuzzer/} & \multirow{3}{*}{2{,}384} & Three-state pipeline (Init$\to$Det$\to$Random) \\
+Fuzzer Executor (9) & Rust & \texttt{fuzzer/} & & Per-thread coordination, dedup \\
+Shared State (10) & Rust & \texttt{fuzzer/} & & Global bitmap, counters \\
+\midrule
+Fork Server (8) & Rust & \texttt{forksrv/} & 426 & AFL protocol, shared memory bitmap \\
+Harness & C & \texttt{harness/} & 89 & Empty DB, \texttt{\_\_AFL\_INIT()}, one-exec-per-fork \\
+\midrule
+Triage Pipeline (12) & Python & \texttt{triage/} & 884 & Stack dedup, CVE matching, fidelity scoring \\
 \bottomrule
 \end{tabular}
 \end{table}
