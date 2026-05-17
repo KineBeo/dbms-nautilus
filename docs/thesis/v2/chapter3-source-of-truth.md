@@ -62,7 +62,7 @@
 │                                        │                                  │
 │  ┌───────────────────────────────────────────────────────────────────┐     │
 │  │ ⑦ Queue                                                          │     │
-│  │  State machine: Init ──→ Det ──→ Random     [PENDING VERIFY]     │     │
+│  │  State machine: Init ──→ Det ──→ Random     [RESOLVED: our customization, original has init→det→detafl→random]     │     │
 │  │                                                                   │     │
 │  │  Init:   minimize + minimize_rec → add to ChunkStore             │     │
 │  │  Det:    mut_rules + splice + havoc + havoc_recursion            │     │
@@ -236,7 +236,7 @@ Components 1–10 = fuzzer core:
 | 11 | Instrumented SQLite | Target under test (external) |
 | 12 | Triage Pipeline | Post-campaign crash analysis (external) |
 
-> **[PENDING]** Component 7 Queue state machine (Init→Det→Random): Need to verify whether this is original Nautilus or our customization.
+> **[RESOLVED]** Component 7 Queue state machine (Init→Det→Random): **Confirmed as our customization.** Original Nautilus has 4 states (init→det→detafl→random). We removed `detafl` (AFL byte-level mutations) because they produce parser-invalid SQL. Thesis must explicitly state this modification.
 
 ### Grammar Engine
 
@@ -261,12 +261,232 @@ Loads context-free grammar from Python script. Each production rule maps non-ter
 | Splice | `mut_splice` | Replace random node with ChunkStore subtree of same non-terminal |
 | Bulk random havoc | `mut_random` ×100 | 100 iterations of random subtree replacement |
 
+> **Verified:** `fuzzer/src/state.rs` — `havoc()` calls `mut_random` in loop of 100; `havoc_recursion()` calls `mut_random_recursion` in loop of 20. `splice()` calls `mut_splice` in loop of 100.
+
+> **Note on original Nautilus:** The original paper (NDSS'19) defines 5 mutations: Random, Rules, Random Recursive, Splicing, and AFL Mutation. Our implementation drops AFL Mutation (byte-level bit flips/arithmetic) because it produces parser-invalid SQL. We add bulk havoc (100× random subtree) instead. The original paper has a 4-state queue (init→det→detafl→random); we use 3 states (Init→Det→Random) because we removed the `detafl` stage that applied AFL mutations.
+
+#### Mutation Examples (need figures in thesis, like Nautilus paper Examples IV.2–IV.5)
+
+Each example below needs a **tree diagram figure** showing before→after transformation. The original Nautilus paper uses Examples IV.2–IV.5 with derivation tree visualizations. We need equivalent SQL-domain examples.
+
+---
+
+**Example M1: Subtree Minimization** (`minimize`)
+
+Shrink tree while preserving coverage bits. Replace each subtree with smallest possible derivation of same non-terminal.
+
+```
+BEFORE tree (input: "SELECT a + b FROM p WHERE a > 1"):
+
+        Sql-Stmt
+           |
+      Stress-Query
+           |
+       Select-Stmt
+      /     |      \
+  Result   FROM    WHERE
+  Col-List Table   Expr
+    |       |       |
+   Expr     p    Expr > Expr
+  / + \          |      |
+Expr  Expr      Col    Num
+ |     |         |      |
+Col   Col        a      1
+ |     |
+ a     b
+
+AFTER minimization (replace Expr "a + b" with minimal Expr "a"):
+
+        Sql-Stmt
+           |
+      Stress-Query
+           |
+       Select-Stmt
+      /     |      \
+  Result   FROM    WHERE
+  Col-List Table   Expr
+    |       |       |
+   Expr     p    Expr > Expr
+    |               |      |
+   Col             Col    Num
+    |               |      |
+    a               a      1
+
+Output: "SELECT a FROM p WHERE a > 1"
+```
+
+Coverage bits preserved → minimized version replaces original. Smaller tree = faster mutations later.
+
+---
+
+**Example M2: Deterministic Rule Substitution** (`mut_rules`)
+
+At each node, systematically try every alternative production rule for that non-terminal.
+
+```
+Input tree derives: "SELECT a FROM p WHERE a > 1"
+
+Node targeted: Expr (the "a > 1" comparison)
+Non-terminal: Expr
+Alternative rules for Expr include:
+  - Expr → Col                    (column reference)
+  - Expr → Expr + Expr            (arithmetic)
+  - Expr → Expr AND Expr          (logical)
+  - Expr → Func-Call              (function call)
+  - Expr → (Select-Stmt)          (subquery)
+  - ... (30+ alternatives)
+
+Mutation tries EACH alternative:
+  Try 1: "SELECT a FROM p WHERE a"           (Expr → Col)
+  Try 2: "SELECT a FROM p WHERE a + b"       (Expr → Expr + Expr)
+  Try 3: "SELECT a FROM p WHERE a AND b > 0" (Expr → Expr AND Expr)
+  Try 4: "SELECT a FROM p WHERE coalesce(a)"  (Expr → Func-Call)
+  ...each executed against SQLite, coverage checked
+```
+
+This is deterministic and exhaustive — every rule alternative is tried exactly once per node.
+
+---
+
+**Example M3: Random Subtree Regeneration** (`mut_random`)
+
+Pick a random node, regenerate its entire subtree from the grammar.
+
+```
+Input: "SELECT a FROM p WHERE a > 1"
+
+Random node selected: WHERE clause's Expr node
+Non-terminal at that node: Expr
+
+Grammar regenerates a fresh Expr subtree:
+  New Expr → Expr IN (Select-Stmt)
+           → Col IN (SELECT Col FROM Table-Name)
+           → a IN (SELECT b FROM q)
+
+RESULT: "SELECT a FROM p WHERE a IN (SELECT b FROM q)"
+```
+
+The new subtree is completely fresh — may produce SQL patterns the fuzzer hasn't tried before.
+
+---
+
+**Example M4: Random Recursive Mutation** (`mut_random_recursion`)
+
+Find a recursive non-terminal (one that can derive itself) and expand or collapse recursion levels.
+
+```
+Input: "SELECT a + b FROM p"
+
+Recursive non-terminal found: Expr (rule: Expr → Expr + Expr)
+
+EXPAND (repeat recursion 2 times):
+
+BEFORE:                    AFTER:
+    Expr                      Expr
+   / + \                    / + \
+ Expr  Expr               Expr   Expr
+  |     |                / + \     |
+ Col   Col             Expr  Expr  Col
+  |     |             / + \   |     |
+  a     b           Expr Expr Col   b
+                     |    |    |
+                    Col  Col   a
+                     |    |
+                     a    b
+
+Output: "SELECT a + b + a + b FROM p"
+
+COLLAPSE (replace recursive subtree with base case):
+
+BEFORE:                    AFTER:
+    Expr                      Expr
+   / + \                      |
+ Expr  Expr                  Col
+  |     |                     |
+ Col   Col                    a
+  |     |
+  a     b
+
+Output: "SELECT a FROM p"
+```
+
+Expanding recursion creates deeper, more complex expressions. Collapsing simplifies them.
+
+---
+
+**Example M5: Splice Mutation** (`mut_splice`)
+
+Take a subtree from the ChunkStore (populated by minimized interesting inputs) and splice it into the current tree at a compatible node.
+
+```
+Current input: "SELECT a FROM p WHERE a > 1"
+ChunkStore contains subtree from previous interesting input:
+  Expr subtree: "printf('%.*g', 2147483647, 0.01)"
+  (was minimized from an input that found new coverage)
+
+Random node selected: Expr at "a > 1"
+ChunkStore lookup: get_alternative_to(Expr rule) → printf subtree
+
+BEFORE:                              AFTER:
+   Select-Stmt                         Select-Stmt
+  /     |      \                      /     |      \
+Result FROM   WHERE                Result  FROM   WHERE
+  |     |      |                     |      |      |
+ Col    p    Expr>Expr              Col     p   Func-Call
+  |          |     |                 |           /   |   \
+  a         Col   Num                a       printf  Fmt  Int
+             |     |                         |       |     |
+             a     1                        '%.*g'  ↑  2147483647
+                                              Boundary-Int
+
+Output: "SELECT a FROM p WHERE printf('%.*g', 2147483647, 0.01)"
+```
+
+Splice combines structural elements from different interesting inputs — this is how patterns from one code path get combined with patterns from another, enabling cross-pollination.
+
+---
+
+**Example M6: Bulk Random Havoc** (100× `mut_random`)
+
+Apply 100 consecutive random subtree replacements to the same tree. Each replacement picks a random node and regenerates its subtree.
+
+```
+Input: "SELECT a FROM p WHERE a > 1"
+
+Round 1:  Replace WHERE Expr → "SELECT a FROM p WHERE EXISTS (SELECT b FROM q)"
+Round 2:  Replace FROM Table → "SELECT a FROM q WHERE EXISTS (SELECT b FROM q)"
+Round 3:  Replace Result-Col → "SELECT coalesce(a,b) FROM q WHERE EXISTS (...)"
+...
+Round 100: Multiple overlapping changes → heavily mutated output
+
+Final: "SELECT coalesce(printf('%d',a),b) FROM q NATURAL JOIN p
+        WHERE EXISTS (SELECT sum(c) FROM q GROUP BY c HAVING c > 0)"
+```
+
+Havoc produces high-diversity inputs by stacking many small changes. Each intermediate mutation is executed against SQLite for coverage feedback.
+
+---
+
+#### Figures Needed in Thesis
+
+Each example above should have a corresponding figure showing the **derivation tree before and after** the mutation, similar to Nautilus paper Examples IV.2–IV.5. Recommended figure set:
+
+| Figure | Content | Maps to |
+|--------|---------|---------|
+| Fig 3.X | Subtree minimization: SQL tree shrinks while preserving coverage | Example M1 |
+| Fig 3.X | Deterministic substitution: one Expr node → multiple alternatives tried | Example M2 |
+| Fig 3.X | Random subtree: Expr node replaced with fresh grammar derivation | Example M3 |
+| Fig 3.X | Recursive expansion: Expr→Expr+Expr repeated, tree grows deeper | Example M4 |
+| Fig 3.X | Splice: ChunkStore subtree (from prior interesting input) replaces node | Example M5 |
+
+> **Note:** Havoc (M6) doesn't need its own figure — it's just 100× of M3. Can be described textually.
+> These figures should use **SQL non-terminals** (Sql-Stmt, Expr, Select-Stmt, Table-Name, etc.) not the generic PROG/STMT/VAR from the Nautilus paper.
+
 **Minimize (separate from mutations):**
 - `minimize` + `minimize_rec`: shrink tree preserving coverage bits
 - Runs during Init state before deterministic mutations
 - After minimization: tree added to ChunkStore for splice material
-
-> **Verified:** `fuzzer/src/state.rs` — `havoc()` calls `mut_random` in loop of 100; `havoc_recursion()` calls `mut_random_recursion` in loop of 20. `splice()` calls `mut_splice` in loop of 100.
+- See Example M1 above for visualization
 
 ### Fork Server and Harness
 
@@ -582,7 +802,7 @@ Cross-pollination arises from **independence of Layer 2 selections**:
 
 ## Open Issues for Human Review
 
-1. **[PENDING] State machine Init→Det→Random** — Is this original Nautilus or our customization? Verify before presenting as standard.
+1. **[RESOLVED] State machine Init→Det→Random** — **Confirmed: our customization.** Original Nautilus has 4 states: `init→det→detafl→random` (paper Fig. 2, page 7). We removed `detafl` because we don't use AFL byte-level mutations (bit flips, arithmetic) — they produce parser-invalid SQL. Thesis should explicitly note this as a modification: "DBMS-Nautilus uses a simplified three-state pipeline (Init→Det→Random) that omits the AFL mutation stage from the original Nautilus, since byte-level mutations produce parser-rejected SQL inputs."
 
 2. **[PENDING] CVE-2020-13435 structural requirements** — Table 3.4 says "window OVER()" but Q7 = nested subquery chain, not window functions. Does 13435 actually need window functions from Layer 1 non-terminals?
 
