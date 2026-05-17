@@ -257,11 +257,17 @@ Loads context-free grammar from Python script. Each production rule maps non-ter
 |----------|--------------|-------------|
 | Deterministic substitution | `mut_rules` | Try every alternative rule at each tree node |
 | Random subtree | `mut_random` | Pick random node, regenerate subtree from grammar |
-| Random recursion | `mut_random_recursion` | Expand or collapse recursive productions |
-| Splice | `mut_splice` | Replace random node with ChunkStore subtree of same non-terminal |
-| Bulk random havoc | `mut_random` ×100 | 100 iterations of random subtree replacement |
+| Random recursion | `mut_random_recursion` | **Expand only** — repeat a recursive pair 2^n times (n ∈ [1,11]) |
+| Splice | `mut_splice` | Pick random node → find ChunkStore subtree with **same non-terminal** (different rule) → replace |
+| Bulk random havoc | `mut_random` ×100 + `mut_random_recursion` ×20 | 100 random subtree replacements + 20 recursion expansions |
 
-> **Verified:** `fuzzer/src/state.rs` — `havoc()` calls `mut_random` in loop of 100; `havoc_recursion()` calls `mut_random_recursion` in loop of 20. `splice()` calls `mut_splice` in loop of 100.
+> **Verified from code:**
+> - `mut_random_recursion` (mutator.rs:197-268): ONLY expands. Picks random recursion pair, repeats it `2^n` times. No collapse logic — collapsing is done by `minimize_rec` (separate).
+> - `mut_splice` (mutator.rs:136-153): Matches by **non-terminal** via `ctx.get_nt()`, NOT by rule_id. Filters out chunks with same rule_id (wants different derivation of same NT).
+> - `havoc()` (state.rs:131-143): calls `mut_random` in loop of 100.
+> - `havoc_recursion()` (state.rs:145-165): calls `mut_random_recursion` in loop of 20.
+> - `splice()` (state.rs:167-189): calls `mut_splice` in loop of 100.
+> - ChunkStore `add_tree` (chunkstore.rs:51-80): only indexes subtrees with ≤30 nodes (small fragments only).
 
 > **Note on original Nautilus:** The original paper (NDSS'19) defines 5 mutations: Random, Rules, Random Recursive, Splicing, and AFL Mutation. Our implementation drops AFL Mutation (byte-level bit flips/arithmetic) because it produces parser-invalid SQL. We add bulk havoc (100× random subtree) instead. The original paper has a 4-state queue (init→det→detafl→random); we use 3 states (Init→Det→Random) because we removed the `detafl` stage that applied AFL mutations.
 
@@ -372,14 +378,17 @@ The new subtree is completely fresh — may produce SQL patterns the fuzzer hasn
 
 **Example M4: Random Recursive Mutation** (`mut_random_recursion`)
 
-Find a recursive non-terminal (one that can derive itself) and expand or collapse recursion levels.
+Find a recursive non-terminal (one that can derive itself) and **expand** it by repeating the recursive pattern 2^n times (n randomly chosen from [1,11]).
+
+> **Important:** This mutation ONLY expands. It does NOT collapse. Collapsing recursion is done by `minimize_rec` during the minimization phase (Example M1), not during mutation.
 
 ```
 Input: "SELECT a + b FROM p"
 
 Recursive non-terminal found: Expr (rule: Expr → Expr + Expr)
-
-EXPAND (repeat recursion 2 times):
+The recursion pair is: parent Expr (at "a + b") and child Expr (at "b")
+The "pre" part is: Expr → Expr + [child]
+Repeat this pre-part 2 times (2^1):
 
 BEFORE:                    AFTER:
     Expr                      Expr
@@ -387,45 +396,35 @@ BEFORE:                    AFTER:
  Expr  Expr               Expr   Expr
   |     |                / + \     |
  Col   Col             Expr  Expr  Col
-  |     |             / + \   |     |
-  a     b           Expr Expr Col   b
-                     |    |    |
-                    Col  Col   a
-                     |    |
-                     a    b
+  |     |               |   / + \   |
+  a     b              Col Expr Expr b
+                        |    |    |
+                        a   Col  Col
+                             |    |
+                             a    b
 
-Output: "SELECT a + b + a + b FROM p"
-
-COLLAPSE (replace recursive subtree with base case):
-
-BEFORE:                    AFTER:
-    Expr                      Expr
-   / + \                      |
- Expr  Expr                  Col
-  |     |                     |
- Col   Col                    a
-  |     |
-  a     b
-
-Output: "SELECT a FROM p"
+Output: "SELECT a + a + b + b FROM p"
+(exact output depends on which child subtree is the recursion endpoint)
 ```
 
-Expanding recursion creates deeper, more complex expressions. Collapsing simplifies them.
+Higher values of n (up to 2^11 = 2048) create extremely deep nested expressions, stressing stack depth and recursion limits in SQLite's parser and evaluator.
 
 ---
 
 **Example M5: Splice Mutation** (`mut_splice`)
 
-Take a subtree from the ChunkStore (populated by minimized interesting inputs) and splice it into the current tree at a compatible node.
+Pick a random node, look up its **non-terminal** in the ChunkStore, find a subtree with the **same non-terminal but different rule**, and replace. ChunkStore only stores subtrees ≤30 nodes (small fragments from minimized interesting inputs).
 
 ```
 Current input: "SELECT a FROM p WHERE a > 1"
 ChunkStore contains subtree from previous interesting input:
-  Expr subtree: "printf('%.*g', 2147483647, 0.01)"
-  (was minimized from an input that found new coverage)
+  Non-terminal: Expr
+  Subtree: "printf('%.*g', 2147483647, 0.01)"  (≤30 nodes, from minimized input)
 
-Random node selected: Expr at "a > 1"
-ChunkStore lookup: get_alternative_to(Expr rule) → printf subtree
+Random node selected: Expr node at "a > 1"
+Splice lookup: get_alternative_to(rule_id_of_current_Expr)
+  → finds Expr chunks with DIFFERENT rule_id (wants different derivation)
+  → selects printf subtree (Expr→Func-Call, different from Expr→Expr>Expr)
 
 BEFORE:                              AFTER:
    Select-Stmt                         Select-Stmt
@@ -446,24 +445,31 @@ Splice combines structural elements from different interesting inputs — this i
 
 ---
 
-**Example M6: Bulk Random Havoc** (100× `mut_random`)
+**Example M6: Bulk Random Havoc** (100× `mut_random` + 20× `mut_random_recursion`)
 
-Apply 100 consecutive random subtree replacements to the same tree. Each replacement picks a random node and regenerates its subtree.
+In the Det and Random queue states, each input gets: 100 random subtree replacements (`havoc`), 20 recursion expansions (`havoc_recursion`), and 100 splice attempts (`splice`). Each individual mutation produces a **separate** candidate that is independently executed and coverage-checked — they are NOT stacked sequentially on one tree.
 
 ```
 Input: "SELECT a FROM p WHERE a > 1"
 
-Round 1:  Replace WHERE Expr → "SELECT a FROM p WHERE EXISTS (SELECT b FROM q)"
-Round 2:  Replace FROM Table → "SELECT a FROM q WHERE EXISTS (SELECT b FROM q)"
-Round 3:  Replace Result-Col → "SELECT coalesce(a,b) FROM q WHERE EXISTS (...)"
-...
-Round 100: Multiple overlapping changes → heavily mutated output
+havoc() — 100 independent mut_random calls on the ORIGINAL tree:
+  Attempt 1:  Random node=WHERE Expr → "SELECT a FROM p WHERE EXISTS (SELECT b FROM q)"
+  Attempt 2:  Random node=FROM Table → "SELECT a FROM q WHERE a > 1"
+  Attempt 3:  Random node=Result-Col → "SELECT coalesce(a,b) FROM p WHERE a > 1"
+  ...each attempt starts from the ORIGINAL tree, not from previous attempt's output
+  ...each is executed → coverage checked → if new bits, added to queue
 
-Final: "SELECT coalesce(printf('%d',a),b) FROM q NATURAL JOIN p
-        WHERE EXISTS (SELECT sum(c) FROM q GROUP BY c HAVING c > 0)"
+havoc_recursion() — 20 independent mut_random_recursion calls:
+  Attempt 1:  Expand Expr recursion → "SELECT a + a + b FROM p WHERE a > 1"
+  Attempt 2:  Expand deeper → "SELECT a + a + a + a + b FROM p WHERE a > 1"
+  ...
+
+splice() — 100 independent mut_splice calls:
+  Attempt 1:  Splice ChunkStore Expr → "SELECT printf('%.*g',2147483647) FROM p WHERE a > 1"
+  ...
 ```
 
-Havoc produces high-diversity inputs by stacking many small changes. Each intermediate mutation is executed against SQLite for coverage feedback.
+> **Key detail:** Each mutation call produces ONE candidate from the original tree. They don't chain. This is why 100+20+100 = 220 executions per queue item per round (in Det/Random states).
 
 ---
 
@@ -815,3 +821,5 @@ Cross-pollination arises from **independence of Layer 2 selections**:
 6. **[ISSUE?] Figure 3.2 caption accuracy** — Says Schema-Setup and Stress-Query are "required" in every statement, but Stress-Query only appears in 2/4 Sql-Stmt alternatives, not all 4.
 
 7. **[CHECK] Abstract (page ii)** — Still says "520 rules" and "v3.0 to v3.3, from 449 to 520 rules". Chapter 1 introduction (page 1) also says "449 to 520 rules". These are in different .tex files and were NOT fixed in this session.
+
+8. **[ISSUE] c3_method.tex line 26** — Says "random recursion expansion or collapse" but `mut_random_recursion` ONLY expands (repeats recursive pair 2^n times). Collapse is done by `minimize_rec` during minimization, not mutation. Fix: change to "random recursion expansion (repeating recursive productions to increase nesting depth)".
