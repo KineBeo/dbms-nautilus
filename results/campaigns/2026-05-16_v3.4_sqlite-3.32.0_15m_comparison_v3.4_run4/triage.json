@@ -1,0 +1,4765 @@
+{
+  "total_crashes": 396,
+  "unique_crashes": 396,
+  "summary": {
+    "asan": 0,
+    "ubsan": 0,
+    "debug_assert": 250,
+    "signal": 146,
+    "timeout": 0
+  },
+  "crashes": [
+    {
+      "hash": "0ea98a2755af3f20",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000000357",
+      "top_frames": [
+        "<no-stack-bbad259672d6827e>"
+      ],
+      "sql_preview": "CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c1, c2); WITH RECURSIVE q (c1) AS (SELECT q.* FROM json_tree(CURRENT_TIMESTAMP, '$[#-1]') LEFT JOIN p NOT INDEXED LEFT JOIN json_tree('[1,2,3]') LI"
+    },
+    {
+      "hash": "df37f8195004af93",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000000665",
+      "top_frames": [
+        "<no-stack-79de78c82ab07b13>"
+      ],
+      "sql_preview": "SELECT printf('%.*g', -9223372036854775808); SELECT printf('%.*s', 4294967296); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c1); SELECT * FROM p JOIN p fn8_ ON NOT RAISE(IGNORE); CREATE TABLE"
+    },
+    {
+      "hash": "8c251fdeb7fbdc62",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000000731",
+      "top_frames": [
+        "<no-stack-98160ec976300495>"
+      ],
+      "sql_preview": "SELECT printf('%.*f', 2147483647, -1e308); CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) UNIQUE); INSERT INTO p DEFAULT VALUES; SELECT TRUE NOT BETWEEN TRUE AND TRUE AS k FROM q NATURAL JOIN t3 WHERE c"
+    },
+    {
+      "hash": "d8c437703522041f",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000000960",
+      "top_frames": [
+        "<no-stack-8631bd913e554e40>"
+      ],
+      "sql_preview": "CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(a, a); INSERT OR REPLACE INTO p VALUES (jsonb_remove('{}', '$[0].c') OVER (ORDER BY CASE WHEN count() OVER () THEN NULL COLLATE NOCASE ELSE CASE CU"
+    },
+    {
+      "hash": "3cbcbeef838024c1",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000000981",
+      "top_frames": [
+        "<no-stack-5cf64e39ea949bbb>"
+      ],
+      "sql_preview": "CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a JOIN seed_a b ON 3 = seed_a.c NATURAL JOIN seed_a WHERE seed_a.c IN((SELECT(SELECT coalesce(lead(2) OVER(), SUM(c))) FROM seed_a d WHERE seed"
+    },
+    {
+      "hash": "b1d8b682ae8afd31",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000001441",
+      "top_frames": [
+        "<no-stack-3f7458ee43354218>"
+      ],
+      "sql_preview": "SELECT printf('%.*g', 2147483647, 0.01);"
+    },
+    {
+      "hash": "fbcbf8d8acdf8da2",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000001531",
+      "top_frames": [
+        "<no-stack-e3439285a85716e2>"
+      ],
+      "sql_preview": "SELECT substr('_-W_-  D--J_W---D-', 9223372036854775807, -2147483649); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c3); INSERT INTO q DEFAULT VALUES; EXPLAIN QUERY PLAN SELECT TRUE NOT NULL C"
+    },
+    {
+      "hash": "6cec83a2a1460be2",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000001813",
+      "top_frames": [
+        "<no-stack-f5d145143ec90b03>"
+      ],
+      "sql_preview": "SELECT hex(zeroblob(-9223372036854775808)); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(b); SELECT p.*, CURRENT_TIMESTAMP || FALSE IS c2 << RAISE(IGNORE) + RAISE(IGNORE) IS DISTINCT FROM TRUE"
+    },
+    {
+      "hash": "f3d220ad7c85437c",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000002053",
+      "top_frames": [
+        "<no-stack-0415d07e803e2e4f>"
+      ],
+      "sql_preview": "CREATE TABLE seed_t0 (c0 INTEGER, c1 NOT NULL GENERATED ALWAYS AS (c0 = 0)); INSERT INTO seed_t0(c0) VALUES (0); PRAGMA integrity_check; CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a JOIN"
+    },
+    {
+      "hash": "62177f1092af109c",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000002130",
+      "top_frames": [
+        "<no-stack-7adad1df24d96b9d>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) UNIQUE); VALUES (CURRENT_TIMESTAMP); CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a JOIN seed_a b ON 3 = seed_a.c NATURAL JOIN seed_a WHERE see"
+    },
+    {
+      "hash": "036a312f8c7db30b",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000002325",
+      "top_frames": [
+        "<no-stack-b7029df696543f11>"
+      ],
+      "sql_preview": "SELECT printf('%u', 0, ' b1_N '); CREATE TABLE IF NOT EXISTS p(c2 VARCHAR(255)); INSERT INTO p DEFAULT VALUES; EXPLAIN QUERY PLAN VALUES (TRUE); CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM see"
+    },
+    {
+      "hash": "060789850dc33747",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000002350",
+      "top_frames": [
+        "<no-stack-c2997955a04e0ed6>"
+      ],
+      "sql_preview": "SELECT printf('%u', 0, ' b1_N '); CREATE TABLE IF NOT EXISTS p(c2 VARCHAR(255)); INSERT INTO p DEFAULT VALUES; PRAGMA quick_check; CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a JOIN seed_"
+    },
+    {
+      "hash": "941487a85a6d356f",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000002360",
+      "top_frames": [
+        "<no-stack-455478ba8526dece>"
+      ],
+      "sql_preview": "CREATE TABLE seed_t0 (c0 INTEGER, c1 NOT NULL GENERATED ALWAYS AS (c0 = 0)); INSERT INTO seed_t0(c0) VALUES (0); PRAGMA integrity_check; CREATE TABLE IF NOT EXISTS p(c2 VARCHAR(255)); INSERT INTO p DE"
+    },
+    {
+      "hash": "11150c378e432811",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000002374",
+      "top_frames": [
+        "<no-stack-589f2c8d20842262>"
+      ],
+      "sql_preview": "CREATE TABLE seed_t0 (c0 INTEGER, c1 NOT NULL GENERATED ALWAYS AS (c0 = 0)); INSERT INTO seed_t0(c0) VALUES (0); PRAGMA integrity_check; CREATE TABLE seed_b(b INTEGER); INSERT INTO seed_b VALUES (1),("
+    },
+    {
+      "hash": "ff550518e6b63cee",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000002675",
+      "top_frames": [
+        "<no-stack-c1ec63d492ba9b56>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(rowid INTEGER UNIQUE); INSERT INTO p DEFAULT VALUES; ANALYZE p; CREATE TABLE IF NOT EXISTS p(a REAL PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(rowid INT UNIQUE); INSERT IN"
+    },
+    {
+      "hash": "e0ae7d3b54ff3da1",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000002681",
+      "top_frames": [
+        "<no-stack-93fafc487e0972d0>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(rowid INT UNIQUE); INSERT INTO p DEFAULT VALUES; PRAGMA integrity_check; CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c F"
+    },
+    {
+      "hash": "af3876c6b5cf8301",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000003092",
+      "top_frames": [
+        "<no-stack-ef69e47fc7032be9>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) VALUES (EXISTS (VALUES (CURRENT_TIME)), CURRENT_DATE); CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c "
+    },
+    {
+      "hash": "25225b05a9aa1df2",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000003160",
+      "top_frames": [
+        "<no-stack-bf87c6126b4af526>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) VALUES (NULL, CURRENT_DATE <= count(*) FILTER (WHERE CURRENT_TIME)); CREATE TABLE seed_a(c UNIQUE); SE"
+    },
+    {
+      "hash": "ab2919eb09b9b30d",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000003167",
+      "top_frames": [
+        "<no-stack-d47eeda9f14ae718>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) VALUES (CURRENT_DATE <= count(*) FILTER (WHERE CURRENT_TIME)); CREATE TABLE seed_a(c UNIQUE); SELECT s"
+    },
+    {
+      "hash": "53544c0d475bf9ef",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000003175",
+      "top_frames": [
+        "<no-stack-b7c3811bb96ecf60>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) VALUES (NULL, CURRENT_DATE <= CURRENT_TIME); CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_"
+    },
+    {
+      "hash": "07437d781a5f9d59",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000003205",
+      "top_frames": [
+        "<no-stack-793a291d3a65089e>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) VALUES (NULL, CURRENT_DATE <= NULL); CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a JOIN s"
+    },
+    {
+      "hash": "4b93bdac384e0350",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000003281",
+      "top_frames": [
+        "<no-stack-8c52b5ab54a3ee82>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) VALUES (CASE WHEN FALSE THEN NULL ELSE CURRENT_DATE END, FALSE); CREATE TABLE seed_a(c UNIQUE); SELECT"
+    },
+    {
+      "hash": "67b4e4333997f893",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000004197",
+      "top_frames": [
+        "<no-stack-0f14e53f52d820c0>"
+      ],
+      "sql_preview": "SELECT round(-1e308, 2147483648); CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a JOIN seed_a b ON 3 = seed_a.c NATURAL JOIN seed_a WHERE seed_a.c IN((SELECT(SELECT coalesce(lead(2) OVER(),"
+    },
+    {
+      "hash": "c9f5d8ac43c9ffe2",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000004306",
+      "top_frames": [
+        "<no-stack-d8021fbaa4aec1a0>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 NUMERIC PRIMARY KEY); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; INSERT INTO p DEFAULT VALUES; VALUES (CURRENT_TIME); CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM"
+    },
+    {
+      "hash": "f2ce3827b75fa735",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000004813",
+      "top_frames": [
+        "<no-stack-a19da08461c7b8a6>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, c1 AS(c1) UNIQUE); SELECT CURRENT_TIME AS a FROM p WHERE EXISTS (VALUES (CURRENT_TIMESTAMP)); CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a JOIN seed_"
+    },
+    {
+      "hash": "0c9832fe2c14ec1c",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000005295",
+      "top_frames": [
+        "<no-stack-a40381ace937c3f1>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 BLOB NOT NULL DEFAULT CURRENT_DATE); CREATE VIEW IF NOT EXISTS v1 AS SELECT * UNION SELECT DISTINCT * FROM json_tree('[1,2,3]') WHERE TRUE; INSERT INTO p DEFAULT VALUES"
+    },
+    {
+      "hash": "a4f98a1356df14e8",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000006296",
+      "top_frames": [
+        "<no-stack-88cc4c707872a19f>"
+      ],
+      "sql_preview": "SELECT printf('%.*f', 9223372036854775807, -1e308); CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a JOIN seed_a b ON 3 = seed_a.c NATURAL JOIN seed_a WHERE seed_a.c IN((SELECT(SELECT coales"
+    },
+    {
+      "hash": "3d975afc511fe469",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000007627",
+      "top_frames": [
+        "<no-stack-593a5c3829ac193f>"
+      ],
+      "sql_preview": "SELECT printf('%f', 1, 'B  -1--Q85'); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c3, c2); SELECT CASE -TRUE IN (VALUES (FALSE)) WHEN RAISE(IGNORE) COLLATE NOCASE NOT BETWEEN CURRENT_TIMESTAM"
+    },
+    {
+      "hash": "d760316a4da0abae",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000007761",
+      "top_frames": [
+        "<no-stack-01f0aeaae7570cb2>"
+      ],
+      "sql_preview": "SELECT round(-1e308, 2147483648); SELECT printf('%.*g', 4294967296, 0.01); SELECT hex(zeroblob(0)); SELECT substr('-8MgP-I_p_pa-_u', 9223372036854775807, -2147483648); CREATE VIRTUAL TABLE IF NOT EXIS"
+    },
+    {
+      "hash": "3429c24a92136e9e",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000009952",
+      "top_frames": [
+        "<no-stack-35f45b257878c618>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(rowid TEXT UNIQUE); CREATE VIEW IF NOT EXISTS v1 AS SELECT DISTINCT +RAISE(IGNORE) GLOB CURRENT_TIMESTAMP FROM jsonb_each('{\"a\":{\"b\":1}}') EXCEPT SELECT DISTINCT * FROM js"
+    },
+    {
+      "hash": "3a823db46365ec8c",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000009988",
+      "top_frames": [
+        "<no-stack-20ef2c0527a23a69>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(rowid TEXT UNIQUE); CREATE VIEW IF NOT EXISTS v1 AS SELECT DISTINCT +RAISE(IGNORE) GLOB CURRENT_TIMESTAMP FROM jsonb_each('{\"a\":{\"b\":1}}') EXCEPT SELECT * FROM p WHERE CUR"
+    },
+    {
+      "hash": "1f310c676b961ed0",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000012852",
+      "top_frames": [
+        "<no-stack-84044e0aed1cf05f>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 INTEGER PRIMARY KEY); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; INSERT INTO p DEFAULT VALUES; PRAGMA integrity_check; CREATE TABLE IF NOT EXISTS p(a BOOLEAN, c1 AS(c1) "
+    },
+    {
+      "hash": "4d69e11c9b8a731e",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000013018",
+      "top_frames": [
+        "<no-stack-f2a4904598194fc2>"
+      ],
+      "sql_preview": "CREATE TABLE seed_t0 (c0 INTEGER, c1 NOT NULL GENERATED ALWAYS AS (c0 = 0)); INSERT INTO seed_t0(c0) VALUES (0); PRAGMA integrity_check; CREATE TABLE IF NOT EXISTS p(c1 INTEGER PRIMARY KEY); CREATE VI"
+    },
+    {
+      "hash": "6645ca9d73a77e39",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000013175",
+      "top_frames": [
+        "<no-stack-49d8e45ec5064eae>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a VARCHAR(255) DEFAULT TRUE); CREATE INDEX IF NOT EXISTS idx1 ON p(a); INSERT INTO p DEFAULT VALUES; ANALYZE p; CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a "
+    },
+    {
+      "hash": "28cb59298cccc1bb",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000013211",
+      "top_frames": [
+        "<no-stack-625a443616cb5b5e>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 REAL PRIMARY KEY); CREATE VIEW IF NOT EXISTS v1 AS WITH q AS (SELECT *) SELECT DISTINCT * FROM jsonb_each('[]') LEFT OUTER JOIN p AS zb LEFT OUTER JOIN jsonb_tree('{}')"
+    },
+    {
+      "hash": "a4118be2676a120c",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000013226",
+      "top_frames": [
+        "<no-stack-6a4e40dcc51f2df6>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a INTEGER, b AS(b) NOT NULL); VALUES (CURRENT_TIME) UNION VALUES (CURRENT_TIMESTAMP); CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a JOIN seed_a b ON 3 = seed_"
+    },
+    {
+      "hash": "cc349f062e7137c2",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000013272",
+      "top_frames": [
+        "<no-stack-b39ee1a322acb301>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 INTEGER PRIMARY KEY); CREATE VIEW IF NOT EXISTS v1 AS SELECT ALL CURRENT_TIME IN (NULL), * FROM json_tree('[{\"a\":1},{\"b\":2}]'); SELECT * FROM p NATURAL JOIN p WHERE CAS"
+    },
+    {
+      "hash": "b982ec819eee7335",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000013281",
+      "top_frames": [
+        "<no-stack-e3c6cc6eb7e69cbf>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 BOOLEAN NOT NULL); SELECT * FROM p NATURAL JOIN p WHERE CASE WHEN FALSE NOT BETWEEN NULL AND CURRENT_TIMESTAMP THEN CURRENT_TIME END; CREATE TABLE seed_a(c UNIQUE); SEL"
+    },
+    {
+      "hash": "229606cc25304290",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000013422",
+      "top_frames": [
+        "<no-stack-b7c01339bff704a9>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 INTEGER PRIMARY KEY); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; SELECT * FROM p NATURAL JOIN p WHERE CURRENT_DATE; CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM s"
+    },
+    {
+      "hash": "61519508613583f8",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000013535",
+      "top_frames": [
+        "<no-stack-b2db1c9e826e1b34>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 REAL PRIMARY KEY); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; SELECT * FROM p NATURAL JOIN p WHERE CURRENT_TIME; CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed"
+    },
+    {
+      "hash": "eb281a8e68c9e89b",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000013547",
+      "top_frames": [
+        "<no-stack-0f82d27ad53649df>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 REAL PRIMARY KEY); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; SELECT * FROM p NATURAL JOIN p WHERE FALSE NOT BETWEEN NULL AND CURRENT_TIMESTAMP; CREATE TABLE seed_a(c UN"
+    },
+    {
+      "hash": "f4ad81af2ccd51b0",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000013635",
+      "top_frames": [
+        "<no-stack-47b5f44594f49756>"
+      ],
+      "sql_preview": "SELECT printf('%.*d', 9223372036854775807, -1e308); CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a JOIN seed_a b ON 3 = seed_a.c NATURAL JOIN seed_a WHERE seed_a.c IN((SELECT(SELECT coales"
+    },
+    {
+      "hash": "291bd7f557249ffa",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000013726",
+      "top_frames": [
+        "<no-stack-d43e6769d348ae0f>"
+      ],
+      "sql_preview": "SELECT printf('%x', 4294967296, 'P-w_'); CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a JOIN seed_a b ON 3 = seed_a.c NATURAL JOIN seed_a WHERE seed_a.c IN((SELECT(SELECT coalesce(lead(2) "
+    },
+    {
+      "hash": "6357720244df7f6b",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000014543",
+      "top_frames": [
+        "<no-stack-f2083388ec40a4ab>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); VALUES (NULL) UNION ALL VALUES (NULL); CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a JOIN seed_a b ON 3 = seed_a.c NATURAL JOIN seed_"
+    },
+    {
+      "hash": "1ec28e2c5d0af595",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000014551",
+      "top_frames": [
+        "<no-stack-e0c50d8dbc38ecb1>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 REAL NOT NULL); CREATE VIEW IF NOT EXISTS v1 AS SELECT ALL * FROM jsonb_each('{\"a\":{\"b\":1}}') NATURAL LEFT JOIN (q INDEXED BY rowid) NATURAL LEFT JOIN p INDEXED BY b LI"
+    },
+    {
+      "hash": "ae1ffddf419e86c0",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000014563",
+      "top_frames": [
+        "<no-stack-6e3d67da86646885>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); VALUES (NULL) INTERSECT VALUES (NULL); CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a JOIN seed_a b ON 3 = seed_a.c NATURAL JOIN seed_"
+    },
+    {
+      "hash": "8b7d9d1be7166173",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000014574",
+      "top_frames": [
+        "<no-stack-f05b024d5130d71d>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); VALUES (FALSE LIKE TRUE) EXCEPT VALUES (NULL); CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a JOIN seed_a b ON 3 = seed_a.c NATURAL JO"
+    },
+    {
+      "hash": "1ad635e3a5bdac74",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000014591",
+      "top_frames": [
+        "<no-stack-be25a3eb6aae5f85>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); VALUES (NULL) EXCEPT VALUES (FALSE < CURRENT_DATE); CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a JOIN seed_a b ON 3 = seed_a.c NATUR"
+    },
+    {
+      "hash": "ac9f6c69a1165716",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000014599",
+      "top_frames": [
+        "<no-stack-36eacc2a0322442c>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (FALSE)) VALUES (CURRENT_DATE) EXCEPT VALUES (NULL); CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a JOIN s"
+    },
+    {
+      "hash": "f7f647d47d70e993",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000014641",
+      "top_frames": [
+        "<no-stack-1b2a504f5e0aa230>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); VALUES (-NULL) EXCEPT VALUES (NULL); CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a JOIN seed_a b ON 3 = seed_a.c NATURAL JOIN seed_a "
+    },
+    {
+      "hash": "d21a07dc7f4dbb99",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000014650",
+      "top_frames": [
+        "<no-stack-0188cda5917e19c1>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); VALUES (NULL) EXCEPT VALUES (CAST(CAST(CAST(CAST(CAST(CAST(CAST(CURRENT_TIMESTAMP AS FLOAT) AS FLOAT) AS FLOAT) AS FLOAT) AS FLOAT) AS FLOAT) AS F"
+    },
+    {
+      "hash": "fa8e071d245d82e3",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000014658",
+      "top_frames": [
+        "<no-stack-c97bc94cb1a5c5b7>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); VALUES (NULL) UNION VALUES (NULL); CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a JOIN seed_a b ON 3 = seed_a.c NATURAL JOIN seed_a WH"
+    },
+    {
+      "hash": "16f91114cd91367e",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000014713",
+      "top_frames": [
+        "<no-stack-2fc2c28a4e2ec16e>"
+      ],
+      "sql_preview": "CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts3(b, c1, a); VALUES (NULL) EXCEPT VALUES (NULL); CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a JOIN seed_a b ON 3 = seed_a.c NATURAL JOI"
+    },
+    {
+      "hash": "f0ba4fb7252a726d",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000014739",
+      "top_frames": [
+        "<no-stack-d42efd7bfc520b61>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); SELECT json_patch('{\"a\":1}', '{\"a\":{\"b\":1}}') EXCEPT VALUES (NULL); CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a JOIN seed_a b ON 3 "
+    },
+    {
+      "hash": "cea514062453b9fc",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000014806",
+      "top_frames": [
+        "<no-stack-9f39adc368da373f>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); SELECT changes() EXCEPT VALUES (NULL); CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a JOIN seed_a b ON 3 = seed_a.c NATURAL JOIN seed_"
+    },
+    {
+      "hash": "e24b1cdf7a7acfb6",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000014938",
+      "top_frames": [
+        "<no-stack-096f26c36d3a18c5>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); VALUES (CAST(CAST(CAST(CAST(CAST(CAST(CAST(CAST(CURRENT_TIMESTAMP AS FLOAT) AS FLOAT) AS FLOAT) AS FLOAT) AS FLOAT) AS FLOAT) AS FLOAT) AS FLOAT))"
+    },
+    {
+      "hash": "413e6057c1858b4a",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000014962",
+      "top_frames": [
+        "<no-stack-99d9976aba81949d>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); VALUES (NULL) EXCEPT VALUES (CURRENT_DATE >= NULL); CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a JOIN seed_a b ON 3 = seed_a.c NATUR"
+    },
+    {
+      "hash": "4ca750b37494afd3",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000014969",
+      "top_frames": [
+        "<no-stack-e269b7c7a290c1d1>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); VALUES (NULL) EXCEPT VALUES (NULL <> FALSE); CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a JOIN seed_a b ON 3 = seed_a.c NATURAL JOIN"
+    },
+    {
+      "hash": "3d07f15d8eedf350",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000014985",
+      "top_frames": [
+        "<no-stack-57e83df87c5475d5>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 INT UNIQUE); CREATE TABLE IF NOT EXISTS q(a TEXT NOT NULL DEFAULT -948999301.158532594399517E-9157784527566534955999); VALUES (NULL) EXCEPT VALUES (CURRENT_TIME); CREAT"
+    },
+    {
+      "hash": "5cf1f33a23335143",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000015032",
+      "top_frames": [
+        "<no-stack-46e8bb536215ac90>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); SELECT FALSE * NOT CURRENT_TIMESTAMP IS FALSE FROM json_tree('{\"a\":{\"b\":1}}') WHERE CURRENT_TIMESTAMP GROUP BY NULL WINDOW w1 AS () EXCEPT VALUES "
+    },
+    {
+      "hash": "03bb6b1855fd45c3",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000015038",
+      "top_frames": [
+        "<no-stack-61c6f08833b8c717>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); SELECT FALSE * NOT CURRENT_TIMESTAMP FROM json_tree('{\"a\":{\"b\":1}}') WHERE CURRENT_TIMESTAMP GROUP BY NULL WINDOW w1 AS () EXCEPT VALUES (CURRENT_"
+    },
+    {
+      "hash": "65f0eebb5b716068",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000015107",
+      "top_frames": [
+        "<no-stack-3d494d399b2a551c>"
+      ],
+      "sql_preview": "SELECT round(0.0, 2147483647); CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a JOIN seed_a b ON 3 = seed_a.c NATURAL JOIN seed_a WHERE seed_a.c IN((SELECT(SELECT coalesce(lead(2) OVER(), SU"
+    },
+    {
+      "hash": "483a2bc567d1eda9",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000016904",
+      "top_frames": [
+        "<no-stack-c2b4412b8ae4251f>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a INT); CREATE VIEW IF NOT EXISTS v1 AS VALUES ((SELECT * ORDER BY cume_dist() FILTER (WHERE FALSE) OVER (ORDER BY TRUE DESC NULLS FIRST ROWS BETWEEN NULL PRECEDING AND CU"
+    },
+    {
+      "hash": "cd198cdbbbcbd066",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000016911",
+      "top_frames": [
+        "<no-stack-8148f003b6fe0a17>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a INT); CREATE VIEW IF NOT EXISTS v1 AS SELECT * FROM jsonb_each('{\"a\":{\"b\":1}}') WHERE CURRENT_DATE >= NULL GROUP BY TRUE HAVING TRUE % CURRENT_DATE WINDOW w1 AS (), w2 A"
+    },
+    {
+      "hash": "9efa1153524a5f27",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000016927",
+      "top_frames": [
+        "<no-stack-a2739670bd25b392>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 DATE, b VARCHAR(255) GENERATED ALWAYS AS (FALSE) STORED); CREATE VIEW IF NOT EXISTS v1 AS VALUES (CURRENT_TIMESTAMP); INSERT INTO p DEFAULT VALUES; PRAGMA integrity_che"
+    },
+    {
+      "hash": "1cdb5a6554f5e9af",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000016941",
+      "top_frames": [
+        "<no-stack-f956572ba45a84cb>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a INT); CREATE VIEW IF NOT EXISTS v1 AS VALUES (+~CASE CURRENT_DATE OR CURRENT_TIMESTAMP WHEN CURRENT_DATE THEN NOT CURRENT_TIMESTAMP COLLATE BINARY END COLLATE RTRIM IS C"
+    },
+    {
+      "hash": "911998001f79bf3c",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000016949",
+      "top_frames": [
+        "<no-stack-d1d5ee728e88a808>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a TEXT NOT NULL DEFAULT -948999301.158532594399517E-9157784527566534955999); CREATE VIEW IF NOT EXISTS v1 AS VALUES (CURRENT_TIMESTAMP); INSERT INTO p DEFAULT VALUES; PRAG"
+    },
+    {
+      "hash": "0059bdefb6c7f85c",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000016958",
+      "top_frames": [
+        "<no-stack-6461c139a9a87049>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a INT); CREATE VIEW IF NOT EXISTS v1 AS SELECT * UNION ALL SELECT DISTINCT q.* FROM r NOT INDEXED JOIN jsonb_tree('{\"a\":{\"b\":1}}') CROSS JOIN json_tree('{\"a\":{\"b\":1}}'); I"
+    },
+    {
+      "hash": "fe165774f5fbbc07",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000016964",
+      "top_frames": [
+        "<no-stack-b403332ae9630055>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a INT); CREATE VIEW IF NOT EXISTS v1 AS VALUES (NOT EXISTS (SELECT * ORDER BY CURRENT_TIME DESC NULLS LAST LIMIT FALSE OFFSET RAISE(IGNORE))); INSERT INTO p DEFAULT VALUES"
+    },
+    {
+      "hash": "599cbece0b2f2045",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000016972",
+      "top_frames": [
+        "<no-stack-465f1d1fbce4aa0f>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a INT); CREATE VIEW IF NOT EXISTS v1 AS VALUES (TRUE) UNION ALL SELECT * ORDER BY TRUE ASC NULLS FIRST, percent_rank() FILTER (WHERE TRUE) OVER () ASC NULLS LAST; INSERT I"
+    },
+    {
+      "hash": "91c88165c22a24ba",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000016980",
+      "top_frames": [
+        "<no-stack-64230b3027e078b3>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a INT); CREATE VIEW IF NOT EXISTS v1 AS SELECT * FROM json_each(RAISE(IGNORE), '$'); INSERT INTO p DEFAULT VALUES; PRAGMA integrity_check; CREATE TABLE seed_a(c UNIQUE); S"
+    },
+    {
+      "hash": "fce4bcc19a519b6a",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000016986",
+      "top_frames": [
+        "<no-stack-530b3d8e9954dabf>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a INT); CREATE VIEW IF NOT EXISTS v1 AS VALUES (CURRENT_DATE LIKE NULL NOT LIKE TRUE ESCAPE CURRENT_TIMESTAMP, FALSE); INSERT INTO p DEFAULT VALUES; PRAGMA integrity_check"
+    },
+    {
+      "hash": "a237d4e34cb43c1a",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000016996",
+      "top_frames": [
+        "<no-stack-f349f265fc165f58>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a INT); CREATE VIEW IF NOT EXISTS v1 AS VALUES (CURRENT_TIMESTAMP); INSERT INTO p VALUES (CURRENT_TIME NOT IN (CURRENT_TIME NOT IN (CURRENT_TIME NOT IN (CURRENT_TIME NOT I"
+    },
+    {
+      "hash": "47a7b38960586235",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000017002",
+      "top_frames": [
+        "<no-stack-d268f89aab7f469b>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a INT); CREATE VIEW IF NOT EXISTS v1 AS SELECT * FROM jsonb_each('{\"a\":1}') WHERE CURRENT_TIMESTAMP GROUP BY dense_rank() FILTER (WHERE RAISE(IGNORE)) OVER (ORDER BY TRUE "
+    },
+    {
+      "hash": "7bf183a3c8e6304e",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000017011",
+      "top_frames": [
+        "<no-stack-24bf89508e7681ef>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a INT); CREATE VIEW IF NOT EXISTS v1 AS VALUES (CURRENT_TIMESTAMP); REPLACE INTO p VALUES (NULL NOT BETWEEN FALSE AND FALSE NOT NULL); PRAGMA integrity_check; CREATE TABLE"
+    },
+    {
+      "hash": "ecfb6494ae4f3807",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000017035",
+      "top_frames": [
+        "<no-stack-d3b5287ebc1b4e86>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a INT); CREATE VIEW IF NOT EXISTS v1 AS VALUES (CURRENT_TIMESTAMP); INSERT INTO p VALUES (CURRENT_TIME NOT IN (CURRENT_TIMESTAMP, CURRENT_DATE)); PRAGMA integrity_check; C"
+    },
+    {
+      "hash": "0c3bb5bbc0cc2427",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000017054",
+      "top_frames": [
+        "<no-stack-94d1708941b16f68>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(_rowid_ FLOAT UNIQUE, c1 BOOLEAN PRIMARY KEY); CREATE VIEW IF NOT EXISTS v1 AS VALUES (CURRENT_TIMESTAMP); INSERT INTO p DEFAULT VALUES; PRAGMA integrity_check; CREATE TAB"
+    },
+    {
+      "hash": "8d17ccbc2a75e5d8",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000017075",
+      "top_frames": [
+        "<no-stack-684926cc56840572>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL); CREATE VIEW IF NOT EXISTS v1 AS VALUES (CURRENT_TIMESTAMP); INSERT INTO p DEFAULT VALUES; PRAGMA integrity_check; CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c F"
+    },
+    {
+      "hash": "660beb0e9d1bdab2",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000017129",
+      "top_frames": [
+        "<no-stack-192d3342b5593be3>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a FLOAT, c1 GENERATED ALWAYS AS (a + 0) ); INSERT INTO p DEFAULT VALUES; PRAGMA integrity_check; CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a JOIN seed_a b O"
+    },
+    {
+      "hash": "32a86734279e819f",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000017145",
+      "top_frames": [
+        "<no-stack-a19c6b4d96d9a3ae>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a INT); CREATE VIEW IF NOT EXISTS v1 AS VALUES (CURRENT_TIMESTAMP); INSERT INTO p DEFAULT VALUES; PRAGMA integrity_check; CREATE TABLE IF NOT EXISTS p(a INT); CREATE VIEW "
+    },
+    {
+      "hash": "2302cfdca5598250",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000017169",
+      "top_frames": [
+        "<no-stack-091f69def4703a67>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a INT); CREATE VIEW IF NOT EXISTS v1 AS VALUES (CURRENT_TIMESTAMP); INSERT INTO p (rowid) VALUES (FALSE); PRAGMA integrity_check; CREATE TABLE seed_a(c UNIQUE); SELECT see"
+    },
+    {
+      "hash": "ef20e94d945468dc",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000017175",
+      "top_frames": [
+        "<no-stack-8ce94bffa7199d28>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a INT); CREATE VIEW IF NOT EXISTS v1 AS VALUES (CURRENT_TIMESTAMP); INSERT INTO p (rowid) VALUES (NULL); PRAGMA integrity_check; CREATE TABLE seed_a(c UNIQUE); SELECT seed"
+    },
+    {
+      "hash": "28c5e47b366383a9",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000017189",
+      "top_frames": [
+        "<no-stack-5535a16cb88593a8>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a TEXT NOT NULL DEFAULT FALSE); CREATE VIEW IF NOT EXISTS v1 AS VALUES (CURRENT_TIMESTAMP); INSERT INTO p DEFAULT VALUES; PRAGMA integrity_check; CREATE TABLE seed_a(c UNI"
+    },
+    {
+      "hash": "b8a964bd0ea6ef33",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000017201",
+      "top_frames": [
+        "<no-stack-f8d9abb6a53e5591>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 BLOB NOT NULL DEFAULT CURRENT_DATE); CREATE VIEW IF NOT EXISTS v1 AS SELECT * UNION VALUES (CURRENT_DATE / NULL NOT IN (CURRENT_DATE) || CURRENT_TIMESTAMP & TRUE LIKE N"
+    },
+    {
+      "hash": "e3db893396e52aed",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000017214",
+      "top_frames": [
+        "<no-stack-85fcfe5d0cc73610>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 BLOB NOT NULL DEFAULT CURRENT_DATE); CREATE VIEW IF NOT EXISTS v1 AS SELECT * UNION SELECT DISTINCT * FROM json_tree('[1,2,3]') WHERE cume_dist() OVER (ORDER BY NULL AS"
+    },
+    {
+      "hash": "5b0618abdc75e762",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000017223",
+      "top_frames": [
+        "<no-stack-c2b5588a4fbf37e2>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 BLOB NOT NULL DEFAULT CURRENT_DATE); CREATE VIEW IF NOT EXISTS v1 AS VALUES (NULL) UNION ALL SELECT DISTINCT * FROM (json_tree('[1,2,3]')) NATURAL LEFT JOIN json_each('"
+    },
+    {
+      "hash": "197c054d76e24879",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000017241",
+      "top_frames": [
+        "<no-stack-26f3f0ddda4c73fd>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b REAL PRIMARY KEY); CREATE INDEX IF NOT EXISTS idx1 ON p(b); INSERT INTO p DEFAULT VALUES; PRAGMA integrity_check; CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM see"
+    },
+    {
+      "hash": "ff3aebfc25ec09db",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000017255",
+      "top_frames": [
+        "<no-stack-309c23fc52fcec08>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 DATE PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(b DATE PRIMARY KEY); SELECT * FROM p NOT INDEXED WHERE CURRENT_TIMESTAMP GROUP BY NULL WINDOW w1 AS () UNION ALL VALUES "
+    },
+    {
+      "hash": "f9c091f9561e3033",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000017268",
+      "top_frames": [
+        "<no-stack-177751a6c4173cf3>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 BLOB NOT NULL DEFAULT CURRENT_DATE); CREATE VIEW IF NOT EXISTS v1 AS SELECT * UNION VALUES (CURRENT_DATE / NULL NOT IN (NULL BETWEEN NULL >> CURRENT_TIMESTAMP NOT LIKE "
+    },
+    {
+      "hash": "f1c2841e28ee6869",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000017311",
+      "top_frames": [
+        "<no-stack-c3fc5323448e5c96>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 BLOB NOT NULL DEFAULT CURRENT_DATE); CREATE VIEW IF NOT EXISTS v1 AS SELECT ALL * FROM (VALUES (FALSE)) AS x8_p_t_8_j_3a5_6i_8u7_s_92ii_21o__l2y53n_68uhb536s__2b_3n_37_"
+    },
+    {
+      "hash": "3bcc8b3ea87b3ff1",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000017936",
+      "top_frames": [
+        "<no-stack-26da1e72e0f8620a>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 BOOLEAN UNIQUE, a TEXT UNIQUE); CREATE TABLE IF NOT EXISTS q(rowid DATE NOT NULL); INSERT INTO p DEFAULT VALUES; ANALYZE p; CREATE TABLE seed_a(c UNIQUE); SELECT seed_a"
+    },
+    {
+      "hash": "9b476553c80cce9e",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000017973",
+      "top_frames": [
+        "<no-stack-d9a0a0225910b189>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 BOOLEAN UNIQUE, rowid BLOB GENERATED ALWAYS AS (CASE NULL WHEN NULL THEN NULL END) VIRTUAL); CREATE TABLE IF NOT EXISTS q(rowid DATE NOT NULL); INSERT INTO p DEFAULT VA"
+    },
+    {
+      "hash": "3a840b083e4df8fc",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000019336",
+      "top_frames": [
+        "<no-stack-52158a55f9bcfe05>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(rowid BLOB NOT NULL DEFAULT -80845.1981334504871269533355502482E+73430416); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; INSERT INTO p DEFAULT VALUES; SELECT FALSE * NOT CURR"
+    },
+    {
+      "hash": "7572bc574de999f4",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000020644",
+      "top_frames": [
+        "<no-stack-3bf509262eb3521d>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); VALUES (NULL) EXCEPT SELECT * FROM (VALUES (NULL)) AS m_ GROUP BY NULL; CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a JOIN seed_a b O"
+    },
+    {
+      "hash": "283f0524d1b50306",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000021986",
+      "top_frames": [
+        "<no-stack-d81d7a41237a6d59>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 BLOB); CREATE TABLE IF NOT EXISTS q(c2 VARCHAR(255) UNIQUE); SELECT * FROM (SELECT NULL FROM q WHERE TRUE) AS sub1; CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM "
+    },
+    {
+      "hash": "1660827cc1e85699",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000021998",
+      "top_frames": [
+        "<no-stack-188490d9a5cf97f2>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 BLOB); CREATE TABLE IF NOT EXISTS q(c2 VARCHAR(255) UNIQUE); SELECT * FROM (SELECT * FROM q WHERE TRUE) AS sub1; CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM see"
+    },
+    {
+      "hash": "85569ab573a3c060",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000022182",
+      "top_frames": [
+        "<no-stack-99a0f4b7f333edfd>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, c1 AS(c1) UNIQUE); SELECT CURRENT_TIME AS a FROM p WHERE EXISTS (VALUES (TRUE IS NOT CURRENT_TIME, FALSE / CURRENT_DATE, TRUE)); CREATE TABLE seed_a(c UNIQUE); SEL"
+    },
+    {
+      "hash": "ade3210ffdc72128",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000022189",
+      "top_frames": [
+        "<no-stack-679a59abb8092e25>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, c1 AS(c1) UNIQUE); SELECT CURRENT_TIME AS a FROM p WHERE EXISTS (VALUES (FALSE IN (VALUES (TRUE) UNION VALUES (CURRENT_TIME)), RAISE(IGNORE))); CREATE TABLE seed_a"
+    },
+    {
+      "hash": "93eafe44235034c6",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000022201",
+      "top_frames": [
+        "<no-stack-8788d92268ed2840>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 REAL NOT NULL); CREATE VIEW IF NOT EXISTS v1 AS SELECT ALL * FROM jsonb_each('{\"a\":{\"b\":1}}') NATURAL LEFT JOIN (q INDEXED BY rowid) NATURAL LEFT JOIN (p INDEXED BY b L"
+    },
+    {
+      "hash": "dca9c815c18d6afc",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000022223",
+      "top_frames": [
+        "<no-stack-6477ed6c331f676c>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, c1 AS(c1) UNIQUE); SELECT CURRENT_TIME AS a FROM p WHERE EXISTS (VALUES (FALSE BETWEEN CURRENT_TIME AND CASE TRUE WHEN RAISE(IGNORE) THEN CURRENT_TIME END, RAISE(I"
+    },
+    {
+      "hash": "5f4bf0125122a408",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000022235",
+      "top_frames": [
+        "<no-stack-7edd4a8afef6c3e4>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, c1 AS(c1) UNIQUE); SELECT CURRENT_TIME AS a FROM p WHERE EXISTS (SELECT DISTINCT * FROM p LEFT JOIN json_each('{}') ON CURRENT_DATE); CREATE TABLE seed_a(c UNIQUE)"
+    },
+    {
+      "hash": "246cd71ce311c9fa",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000022257",
+      "top_frames": [
+        "<no-stack-fb854811105a51dc>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, c1 AS(c1) UNIQUE); SELECT CURRENT_TIME AS a FROM p WHERE EXISTS (VALUES (NULL, count(*) FILTER (WHERE CURRENT_TIME))); CREATE TABLE seed_a(c UNIQUE); SELECT seed_a"
+    },
+    {
+      "hash": "05a103ba673130f7",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000022266",
+      "top_frames": [
+        "<no-stack-25a4d65c4b407b22>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, c1 AS(c1) UNIQUE); SELECT CURRENT_TIME AS a FROM p WHERE EXISTS (SELECT DISTINCT * FROM json_each('[1,2,3]') JOIN (VALUES (NULL)) AS m_); CREATE TABLE seed_a(c UNI"
+    },
+    {
+      "hash": "068cda95e902a114",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000022348",
+      "top_frames": [
+        "<no-stack-3c37bebef7d4e99c>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, c1 AS(c1) UNIQUE); SELECT CURRENT_TIME AS a FROM p WHERE EXISTS (VALUES (a IS NOT NULL ISNULL COLLATE RTRIM)); CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM "
+    },
+    {
+      "hash": "82033d8373633e0d",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000025967",
+      "top_frames": [
+        "<no-stack-ed2c287e73138d4c>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 NUMERIC PRIMARY KEY); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; INSERT INTO p DEFAULT VALUES; SELECT * FROM json_each('{\"a\":{\"b\":1}}') WHERE CURRENT_TIMESTAMP GROUP BY "
+    },
+    {
+      "hash": "ca6bffacf598884e",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000026395",
+      "top_frames": [
+        "<no-stack-62d91fb3726bd9a2>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 NUMERIC NOT NULL DEFAULT CURRENT_DATE); CREATE INDEX IF NOT EXISTS idx1 ON p(c3); INSERT INTO p DEFAULT VALUES; SELECT * FROM p WHERE EXISTS (SELECT DISTINCT * FROM p L"
+    },
+    {
+      "hash": "be58849ef97e0f7c",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000032520",
+      "top_frames": [
+        "<no-stack-4b30b510c3da7404>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES ((SELECT * ORDER BY cume_dist() FILTER (WHERE FALSE) OVER (PARTITION BY CURRENT_TIME) DESC), CURRENT_TIME)) VALUES (CA"
+    },
+    {
+      "hash": "1de2fb8cfea2cf3d",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000032527",
+      "top_frames": [
+        "<no-stack-0e3d4757db8d6b4e>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE q (b) AS (VALUES (FALSE)) VALUES (CASE WHEN FALSE THEN NULL ELSE CURRENT_DATE END, FALSE); CREATE TABLE seed_a(c UNIQUE); SELECT se"
+    },
+    {
+      "hash": "b79845c019154be7",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000032539",
+      "top_frames": [
+        "<no-stack-b3f2d75dc080268b>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) VALUES (length(CAST(CURRENT_TIME / CURRENT_TIMESTAMP AS INTEGER))); CREATE TABLE seed_a(c UNIQUE); SEL"
+    },
+    {
+      "hash": "ecb4970b90885178",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000032552",
+      "top_frames": [
+        "<no-stack-7605fba4c5a66fae>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) VALUES (CASE WHEN FALSE THEN NULL ELSE NULL NOT IN (NULL BETWEEN NULL >> CURRENT_TIMESTAMP NOT LIKE co"
+    },
+    {
+      "hash": "d7bf7fd2bcfdbbbc",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000032559",
+      "top_frames": [
+        "<no-stack-865a18f1b635e92f>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) VALUES (CURRENT_DATE / NULL NOT IN (CURRENT_DATE) || CURRENT_TIMESTAMP & TRUE, FALSE); CREATE TABLE se"
+    },
+    {
+      "hash": "66181120a6058d85",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000032565",
+      "top_frames": [
+        "<no-stack-12a2ddb6ffde16c3>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) VALUES (CASE WHEN FALSE THEN NULL ELSE EXISTS (VALUES (CURRENT_TIME)) END, FALSE); CREATE TABLE seed_a"
+    },
+    {
+      "hash": "653c029b2487baef",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000032574",
+      "top_frames": [
+        "<no-stack-cccd261cd06aade1>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE q (c2) AS (SELECT * ORDER BY RAISE(IGNORE) DESC NULLS FIRST LIMIT RAISE(IGNORE)), p AS (SELECT *) VALUES (CASE WHEN FALSE THEN NULL"
+    },
+    {
+      "hash": "0fc5c47f28b6543b",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000032596",
+      "top_frames": [
+        "<no-stack-d28ba069344131d6>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (SELECT * LIMIT percent_rank() FILTER (WHERE CURRENT_TIMESTAMP) OVER (PARTITION BY RAISE(IGNORE) ORDER BY NULL DESC NULLS LAST"
+    },
+    {
+      "hash": "ba86964a43f1af16",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000032602",
+      "top_frames": [
+        "<no-stack-6bb47d7619a98c9a>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (SELECT DISTINCT * FROM json_each('[{\"a\":1},{\"b\":2}]') LEFT OUTER JOIN json_each('{\"a\":{\"b\":1}}') USING (b, c1)) VALUES (CASE "
+    },
+    {
+      "hash": "233d3e7853bc85ce",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000032633",
+      "top_frames": [
+        "<no-stack-f3031b7f2bb29d1f>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) SELECT ALL * FROM json_each('[]'); CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a JOIN see"
+    },
+    {
+      "hash": "c7cf565ddf40a862",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000032751",
+      "top_frames": [
+        "<no-stack-21b139391ba2fc7f>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) VALUES (CASE WHEN CASE WHEN CASE WHEN CASE WHEN CASE WHEN CASE WHEN CASE WHEN CASE WHEN CASE WHEN CASE"
+    },
+    {
+      "hash": "e884c1665030c205",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000032794",
+      "top_frames": [
+        "<no-stack-1b83deb7363f8f22>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) VALUES (CASE WHEN FALSE THEN NULL ELSE CURRENT_DATE || CURRENT_TIMESTAMP & TRUE END, FALSE); CREATE TA"
+    },
+    {
+      "hash": "d855727dbd39465f",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000032800",
+      "top_frames": [
+        "<no-stack-11e24b27532409a2>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) VALUES (CASE WHEN FALSE THEN NULL ELSE NULL NOT IN (FALSE) || CURRENT_TIMESTAMP & TRUE END, FALSE); CR"
+    },
+    {
+      "hash": "41c9747900d9a84d",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000032808",
+      "top_frames": [
+        "<no-stack-88fdd62aa1981365>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) VALUES (CASE WHEN FALSE THEN NULL ELSE NULL NOT IN (NULL BETWEEN NULL >> CURRENT_TIMESTAMP AND CURRENT"
+    },
+    {
+      "hash": "6f4d069d4d676253",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000032933",
+      "top_frames": [
+        "<no-stack-7d62df8ae1d04000>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) SELECT DISTINCT * FROM p NOT INDEXED WHERE TRUE; CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM s"
+    },
+    {
+      "hash": "d174adebf36c2c4f",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000032959",
+      "top_frames": [
+        "<no-stack-f9f2847057446942>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) VALUES (CURRENT_DATE LIKE CURRENT_DATE ESCAPE TRUE); CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FR"
+    },
+    {
+      "hash": "8b5de6732efcfe8d",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000032975",
+      "top_frames": [
+        "<no-stack-124ba1e00bbbfeff>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) VALUES (count() FILTER (WHERE FALSE) OVER (ORDER BY CURRENT_DATE ASC ROWS BETWEEN CURRENT ROW AND UNBO"
+    },
+    {
+      "hash": "6fb0314e1e9d59c3",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000033109",
+      "top_frames": [
+        "<no-stack-d709dffaeb92f39b>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) VALUES (count() FILTER (WHERE FALSE) OVER () <= NULL); CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c "
+    },
+    {
+      "hash": "08a8a795dd85b06c",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000033181",
+      "top_frames": [
+        "<no-stack-43b5bd49c726da34>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) VALUES (NULL, TRUE IS NOT CURRENT_TIME, FALSE / CURRENT_DATE, TRUE); CREATE TABLE seed_a(c UNIQUE); SE"
+    },
+    {
+      "hash": "794c7210acecbc2d",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000033228",
+      "top_frames": [
+        "<no-stack-8559a4e5c3d7a868>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) VALUES (NULL, count(*) FILTER (WHERE +CURRENT_TIME NOTNULL)); CREATE TABLE seed_a(c UNIQUE); SELECT se"
+    },
+    {
+      "hash": "7331900aec3410d7",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000033235",
+      "top_frames": [
+        "<no-stack-ef9b288d0454dd1e>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 NUMERIC UNIQUE); INSERT OR ABORT INTO p VALUES (total_changes()); PRAGMA integrity_check; CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a JOIN seed_a b ON 3 "
+    },
+    {
+      "hash": "838a1bc158af0b6a",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000033333",
+      "top_frames": [
+        "<no-stack-1174490cfe8de9f9>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (SELECT DISTINCT * FROM r NOT INDEXED LEFT OUTER JOIN (jsonb_tree('[{\"a\":1},{\"b\":2}]')) LEFT OUTER JOIN (VALUES (CURRENT_TIMES"
+    },
+    {
+      "hash": "2d45cdc2de345031",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000033346",
+      "top_frames": [
+        "<no-stack-b76f877bd2e13bc0>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CASE WHEN RAISE(IGNORE) THEN RAISE(IGNORE) END COLLATE RTRIM MATCH TRUE >= +CURRENT_TIMESTAMP IN (~RAISE(IGNORE)) == "
+    },
+    {
+      "hash": "44b5b5633b3e1bcd",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000033356",
+      "top_frames": [
+        "<no-stack-c72ba6f2313cfedf>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) VALUES (CURRENT_DATE <= ~CASE CURRENT_DATE OR CURRENT_TIMESTAMP WHEN CURRENT_DATE THEN NOT CURRENT_TIM"
+    },
+    {
+      "hash": "435dffe98825fc29",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000033401",
+      "top_frames": [
+        "<no-stack-5ae531f4721b1017>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) VALUES (CAST(CAST(CAST(CAST(CAST(CAST(CAST(CAST(CURRENT_TIMESTAMP AS FLOAT) AS FLOAT) AS FLOAT) AS FLO"
+    },
+    {
+      "hash": "387026852d4a97a3",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000033409",
+      "top_frames": [
+        "<no-stack-ec9e48f4ccf56d71>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) VALUES (CURRENT_DATE <= NOT CURRENT_TIMESTAMP COLLATE BINARY); CREATE TABLE seed_a(c UNIQUE); SELECT s"
+    },
+    {
+      "hash": "a492204f414b75a9",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000033446",
+      "top_frames": [
+        "<no-stack-20f668f891273228>"
+      ],
+      "sql_preview": "CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts3(rowid); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) VALUES (CURRENT_DATE <= CURRENT_TIME); CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed"
+    },
+    {
+      "hash": "3f3e497d2fe50eca",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000033772",
+      "top_frames": [
+        "<no-stack-4fc001e9f8afb7e1>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) SELECT TRUE > NULL NOT IN (CURRENT_TIME) AS a; CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM see"
+    },
+    {
+      "hash": "90118099caaf1754",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000033791",
+      "top_frames": [
+        "<no-stack-5bb0dc3d2a999e11>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) VALUES (ntile(CURRENT_DATE) OVER ()); CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a JOIN "
+    },
+    {
+      "hash": "deee22810b543086",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000033800",
+      "top_frames": [
+        "<no-stack-85838a0a4013ce60>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) VALUES (count() FILTER (WHERE FALSE) NOT LIKE count() FILTER (WHERE FALSE)); CREATE TABLE seed_a(c UNI"
+    },
+    {
+      "hash": "a549db1dae363316",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000033843",
+      "top_frames": [
+        "<no-stack-75caad18ce0da6fa>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) SELECT * FROM p WHERE CURRENT_TIME GROUP BY CURRENT_TIMESTAMP; CREATE TABLE seed_a(c UNIQUE); SELECT s"
+    },
+    {
+      "hash": "276d0601c86d4df2",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000033974",
+      "top_frames": [
+        "<no-stack-c5e66a0d13529f12>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) VALUES (FALSE, group_concat(CURRENT_TIMESTAMP, '') FILTER (WHERE CURRENT_TIMESTAMP)); CREATE TABLE see"
+    },
+    {
+      "hash": "3f2819c0eccfdad4",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000034024",
+      "top_frames": [
+        "<no-stack-183e01a872f5a693>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) VALUES (row_number() OVER ()); CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a JOIN seed_a "
+    },
+    {
+      "hash": "d246ad3f99c51b0f",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000035252",
+      "top_frames": [
+        "<no-stack-4265a7760e89dd3f>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 NUMERIC PRIMARY KEY, _rowid_ VARCHAR(255) UNIQUE); CREATE TABLE IF NOT EXISTS q(b BOOLEAN NOT NULL); INSERT OR ROLLBACK INTO p VALUES (CURRENT_DATE != CURRENT_TIMESTAMP"
+    },
+    {
+      "hash": "907efebb7ecaea82",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000035388",
+      "top_frames": [
+        "<no-stack-dd548bd6976932f3>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 NUMERIC PRIMARY KEY, _rowid_ VARCHAR(255) UNIQUE); CREATE TABLE IF NOT EXISTS q(b BOOLEAN NOT NULL); INSERT OR ROLLBACK INTO p VALUES (CURRENT_TIME, NULL); VALUES (CURR"
+    },
+    {
+      "hash": "7fb740456b33626e",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000037289",
+      "top_frames": [
+        "<no-stack-e0ea079c895bab06>"
+      ],
+      "sql_preview": "CREATE TABLE seed_t0 (c0 INTEGER, c1 NOT NULL GENERATED ALWAYS AS (c0 = 0)); INSERT INTO seed_t0(c0) VALUES (0); PRAGMA integrity_check; CREATE TABLE IF NOT EXISTS p(a TEXT); INSERT INTO p DEFAULT VAL"
+    },
+    {
+      "hash": "54c44a3656ef91c0",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000037689",
+      "top_frames": [
+        "<no-stack-78751752864c9e39>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 BOOLEAN UNIQUE, a TEXT PRIMARY KEY, c2 TEXT UNIQUE); CREATE TABLE IF NOT EXISTS q(rowid DATE NOT NULL); INSERT INTO p DEFAULT VALUES; ANALYZE p; CREATE TABLE IF NOT EXI"
+    },
+    {
+      "hash": "91e92a19859c581e",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000037695",
+      "top_frames": [
+        "<no-stack-94fc09e24f4fae91>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 FLOAT PRIMARY KEY); INSERT INTO p DEFAULT VALUES; ANALYZE p; CREATE TABLE IF NOT EXISTS p(a DATE, c1 AS(c1) UNIQUE); INSERT INTO p DEFAULT VALUES; PRAGMA integrity_chec"
+    },
+    {
+      "hash": "11bdf97b81912e3d",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000037723",
+      "top_frames": [
+        "<no-stack-75a78f69842f4d71>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 FLOAT PRIMARY KEY); INSERT INTO p VALUES (CURRENT_TIME NOT IN (CURRENT_TIMESTAMP, CURRENT_DATE, TRUE)); ANALYZE p; CREATE TABLE IF NOT EXISTS p(a DATE, c1 AS(c1) UNIQUE"
+    },
+    {
+      "hash": "2c9de82cc032aeeb",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000037737",
+      "top_frames": [
+        "<no-stack-8b49581b17a0ae16>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 FLOAT PRIMARY KEY); INSERT INTO p DEFAULT VALUES; ANALYZE p; CREATE TABLE IF NOT EXISTS p(a DATE, c1 AS(c1) UNIQUE); INSERT INTO p DEFAULT VALUES; ANALYZE p; CREATE TAB"
+    },
+    {
+      "hash": "720295a2b9542d4c",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000037744",
+      "top_frames": [
+        "<no-stack-d90779f9e32db221>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 FLOAT PRIMARY KEY); INSERT INTO p DEFAULT VALUES; ANALYZE p; CREATE TABLE IF NOT EXISTS p(b TEXT CHECK (NULL NOT BETWEEN CURRENT_TIMESTAMP AND CURRENT_DATE), a VARCHAR("
+    },
+    {
+      "hash": "d52a691a2dc0b3ff",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000037756",
+      "top_frames": [
+        "<no-stack-6da44274bb0868f0>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a VARCHAR(255) DEFAULT X'aCDe1a'); CREATE INDEX IF NOT EXISTS idx1 ON p(a); INSERT INTO p DEFAULT VALUES; ANALYZE p; CREATE TABLE IF NOT EXISTS p(a DATE, c1 AS(c1) UNIQUE)"
+    },
+    {
+      "hash": "cef756b63eda2a2d",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000037762",
+      "top_frames": [
+        "<no-stack-42993a591ae41764>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 BOOLEAN NOT NULL DEFAULT X'7DeA60E1f7ae'); CREATE TABLE IF NOT EXISTS q(c2 VARCHAR(255) UNIQUE); INSERT INTO p DEFAULT VALUES; ANALYZE p; CREATE TABLE IF NOT EXISTS p(a"
+    },
+    {
+      "hash": "56296d2b75bac103",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000037773",
+      "top_frames": [
+        "<no-stack-31a863319b0ddfc4>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b TEXT CHECK (TRUE), rowid INT CHECK (NULL)); CREATE TABLE IF NOT EXISTS q(a INT NOT NULL); INSERT INTO p DEFAULT VALUES; ANALYZE p; CREATE TABLE IF NOT EXISTS p(a DATE, c"
+    },
+    {
+      "hash": "92e97a5b22772318",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000037798",
+      "top_frames": [
+        "<no-stack-4e592f9aeb594385>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 FLOAT PRIMARY KEY); INSERT INTO p DEFAULT VALUES; ANALYZE p; CREATE TABLE IF NOT EXISTS p(a DATE, c1 AS(c1) UNIQUE); INSERT OR ABORT INTO p VALUES (CAST(CURRENT_TIMESTA"
+    },
+    {
+      "hash": "b43b618812d308d4",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000037829",
+      "top_frames": [
+        "<no-stack-3b3b73dd8d6b24d3>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a INT DEFAULT ''); INSERT INTO p DEFAULT VALUES; ANALYZE p; CREATE TABLE IF NOT EXISTS p(a DATE, c1 AS(c1) UNIQUE); INSERT INTO p DEFAULT VALUES; PRAGMA integrity_check; C"
+    },
+    {
+      "hash": "cdbd187ccdcf1295",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000037848",
+      "top_frames": [
+        "<no-stack-2376059d1ff5557a>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BLOB DEFAULT -60340015708127.8e-0679870997538089); INSERT INTO p DEFAULT VALUES; ANALYZE p; CREATE TABLE IF NOT EXISTS p(a DATE, c1 AS(c1) UNIQUE); INSERT INTO p DEFAULT"
+    },
+    {
+      "hash": "9d2e31164f73a533",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000037893",
+      "top_frames": [
+        "<no-stack-381a17168ea5962b>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 FLOAT PRIMARY KEY); INSERT INTO p DEFAULT VALUES; ANALYZE p; CREATE TABLE IF NOT EXISTS p(a DATE, c1 AS(c1) UNIQUE); INSERT INTO p DEFAULT VALUES; PRAGMA integrity_chec"
+    },
+    {
+      "hash": "367dd88b7e20a069",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000037899",
+      "top_frames": [
+        "<no-stack-50a7ded7bd75b6af>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 FLOAT PRIMARY KEY); INSERT INTO p DEFAULT VALUES; ANALYZE p; CREATE TABLE IF NOT EXISTS p(c1 FLOAT PRIMARY KEY); INSERT INTO p DEFAULT VALUES; ANALYZE p; CREATE TABLE I"
+    },
+    {
+      "hash": "c3d5e36e3cea7e6b",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000039837",
+      "top_frames": [
+        "<no-stack-1e3565288deb01ef>"
+      ],
+      "sql_preview": "CREATE TABLE seed_t0 (c0 INTEGER, c1 NOT NULL GENERATED ALWAYS AS (c0 = 0)); INSERT INTO seed_t0(c0) VALUES (0); PRAGMA integrity_check; CREATE TABLE IF NOT EXISTS p(c2 VARCHAR(255)); INSERT INTO p SE"
+    },
+    {
+      "hash": "e5c4d0d5c000f37a",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000040057",
+      "top_frames": [
+        "<no-stack-8bfc99b403d3ef2f>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 VARCHAR(255)); INSERT INTO p DEFAULT VALUES; EXPLAIN QUERY PLAN VALUES (TRUE % CURRENT_DATE); CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a JOIN seed_a b O"
+    },
+    {
+      "hash": "1b86dacbd5dd8fcf",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000040826",
+      "top_frames": [
+        "<no-stack-b3230bc08c48d52a>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) UNIQUE); WITH RECURSIVE p (c2) AS (VALUES (NULL)) SELECT * FROM p; CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a JOIN seed_a b ON 3 = seed_a.c"
+    },
+    {
+      "hash": "e03fe7db8774ac03",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000040836",
+      "top_frames": [
+        "<no-stack-a5c0d56a8979c950>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (TRUE IS NOT CURRENT_TIME, FALSE / CURRENT_DATE, TRUE)) SELECT * FROM p; CREATE TABLE seed_a(c UNIQUE); SELECT seed_a."
+    },
+    {
+      "hash": "149c4e7fb5bb46fb",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000040845",
+      "top_frames": [
+        "<no-stack-2cebc037ce3f877d>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_DATE / NULL NOT IN (CURRENT_DATE) || CURRENT_TIMESTAMP & TRUE LIKE NULL)) SELECT * FROM p; CREATE TABLE seed_"
+    },
+    {
+      "hash": "d7ec435489e83b5c",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000040876",
+      "top_frames": [
+        "<no-stack-b821a05f418e0000>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) UNIQUE); WITH RECURSIVE p AS (SELECT DISTINCT * FROM json_each('[1,2,3]') JOIN (VALUES (NULL)) AS m_) SELECT * FROM p; CREATE TABLE seed_a(c UNIQUE); SELEC"
+    },
+    {
+      "hash": "29bf57d5faafd445",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000040884",
+      "top_frames": [
+        "<no-stack-7443b27526f49376>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) UNIQUE); WITH RECURSIVE p AS (SELECT FALSE * CURRENT_TIMESTAMP FROM json_tree('{\"a\":{\"b\":1}}') WHERE CURRENT_TIMESTAMP GROUP BY NULL WINDOW w1 AS ()) SELEC"
+    },
+    {
+      "hash": "8cc68ba16406552c",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000041670",
+      "top_frames": [
+        "<no-stack-51403ecfca9fc5ee>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) UNIQUE); WITH RECURSIVE p AS (SELECT DISTINCT * FROM json_each(CASE TRUE WHEN CASE TRUE WHEN CASE TRUE WHEN CASE TRUE WHEN CASE TRUE WHEN CASE TRUE WHEN CA"
+    },
+    {
+      "hash": "fd6c938647adfdf1",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000041678",
+      "top_frames": [
+        "<no-stack-18da28459ceae4c2>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) UNIQUE); WITH RECURSIVE p AS (SELECT DISTINCT * FROM json_each(CAST(CAST(CAST(CAST(CURRENT_TIMESTAMP AS FLOAT) AS FLOAT) AS FLOAT) AS FLOAT), '$')) SELECT "
+    },
+    {
+      "hash": "8e6b5c3715085888",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000041688",
+      "top_frames": [
+        "<no-stack-3466e93921359d6f>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) UNIQUE); WITH RECURSIVE p AS (SELECT FALSE IS FALSE FROM json_tree('{\"a\":{\"b\":1}}') WHERE CURRENT_TIMESTAMP GROUP BY NULL WINDOW w1 AS ()) SELECT * FROM p;"
+    },
+    {
+      "hash": "d1099797db4c540c",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000041902",
+      "top_frames": [
+        "<no-stack-4c2bc00130fb6ed2>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) UNIQUE); WITH RECURSIVE p AS (SELECT DISTINCT NULL AS a FROM json_each('[]')) SELECT * FROM p; CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a J"
+    },
+    {
+      "hash": "0f4b3427aa8df222",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000041967",
+      "top_frames": [
+        "<no-stack-41944d9c23d3ee1d>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) UNIQUE); VALUES (count(*) OVER (PARTITION BY FALSE ORDER BY TRUE NOT IN (NULL) ASC ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE CURRENT ROW)); "
+    },
+    {
+      "hash": "c862aa17f65d9f7c",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000041992",
+      "top_frames": [
+        "<no-stack-d6d5108d964311da>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(_rowid_ NUMERIC); CREATE VIEW IF NOT EXISTS v1 AS SELECT * FROM r NOT INDEXED NATURAL LEFT JOIN p NOT INDEXED USING (c2, c1) ORDER BY TRUE ASC; VALUES (CURRENT_TIMESTAMP);"
+    },
+    {
+      "hash": "b0299a44dda656e9",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000042021",
+      "top_frames": [
+        "<no-stack-7950f08767367e95>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 INTEGER PRIMARY KEY); CREATE INDEX IF NOT EXISTS idx1 ON p(c3); VALUES (CURRENT_TIMESTAMP); CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a JOIN seed_a b ON "
+    },
+    {
+      "hash": "6fc995c3950d34f3",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000049236",
+      "top_frames": [
+        "<no-stack-2e5528a60f09df11>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BOOLEAN, c1 AS(c1) UNIQUE); EXPLAIN QUERY PLAN SELECT DISTINCT count(*) OVER () FROM json_each('[1,2,3]'); CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a JOI"
+    },
+    {
+      "hash": "2462ea8ad83acc25",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000049433",
+      "top_frames": [
+        "<no-stack-7c84028327e69897>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BOOLEAN, c1 AS(c1) UNIQUE); WITH RECURSIVE p AS (SELECT ALL * FROM json_each('[]') LIMIT TRUE) SELECT * FROM p; CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_"
+    },
+    {
+      "hash": "db96ea6ce2638f8d",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000051697",
+      "top_frames": [
+        "<no-stack-290490ee463a80da>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a NUMERIC, c1 AS(c1) UNIQUE); EXPLAIN QUERY PLAN SELECT FALSE * NOT CURRENT_TIMESTAMP IS +FALSE FROM p AS y_f3 INNER JOIN p USING (a) GROUP BY FALSE ORDER BY CURRENT_TIMES"
+    },
+    {
+      "hash": "680416c8e40daa5b",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000051911",
+      "top_frames": [
+        "<no-stack-c4309f89ceb58c42>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a NUMERIC, c1 AS(c1) UNIQUE); EXPLAIN QUERY PLAN SELECT DISTINCT * FROM json_each('{}') ORDER BY CURRENT_TIMESTAMP DESC NULLS FIRST; CREATE TABLE seed_a(c UNIQUE); SELECT "
+    },
+    {
+      "hash": "ea71b320af3c7318",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000052310",
+      "top_frames": [
+        "<no-stack-370cc9fe3bbeb6e0>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) UNIQUE); WITH RECURSIVE r AS (SELECT *) SELECT count(*) OVER (PARTITION BY FALSE ORDER BY FALSE DESC ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLU"
+    },
+    {
+      "hash": "b67e682a4c9a4059",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000053747",
+      "top_frames": [
+        "<no-stack-5eb57b81c7d2d09d>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) UNIQUE); WITH RECURSIVE p AS (SELECT DISTINCT * FROM json_each(CAST(CURRENT_TIMESTAMP AS BOOLEAN), '$')) SELECT * FROM p; CREATE TABLE seed_a(c UNIQUE); SE"
+    },
+    {
+      "hash": "ea8455c8a6a9448f",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000053762",
+      "top_frames": [
+        "<no-stack-0d8ad467b7b9c901>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) UNIQUE); WITH RECURSIVE p AS (SELECT DISTINCT * FROM json_each(CAST(CURRENT_TIMESTAMP AS FLOAT), '$[#-1]')) SELECT * FROM p; CREATE TABLE seed_a(c UNIQUE);"
+    },
+    {
+      "hash": "7bd2c847fe20fb8f",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000053769",
+      "top_frames": [
+        "<no-stack-a73437da3e06a9b9>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (min(FALSE))) SELECT * FROM p; CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a JOIN seed_a b ON 3 = seed_a."
+    },
+    {
+      "hash": "3b12b47d2c36debe",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000053795",
+      "top_frames": [
+        "<no-stack-f613eb70b2f2eac6>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b REAL PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(c3 BLOB UNIQUE); INSERT OR REPLACE INTO q VALUES (NOT EXISTS (VALUES (RAISE(IGNORE)))); EXPLAIN QUERY PLAN VALUES (FALSE)"
+    },
+    {
+      "hash": "dc87781c4910dd10",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000053819",
+      "top_frames": [
+        "<no-stack-b8f9d2bc7ec41b23>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) UNIQUE); WITH RECURSIVE p AS (SELECT DISTINCT * FROM json_each(CAST(TRUE % CURRENT_DATE AS FLOAT), '$')) SELECT * FROM p; CREATE TABLE seed_a(c UNIQUE); SE"
+    },
+    {
+      "hash": "5bd17f4d09b77485",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000053846",
+      "top_frames": [
+        "<no-stack-de032994bd74b5bd>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) UNIQUE); WITH RECURSIVE p AS (SELECT DISTINCT * FROM json_each(CAST(CURRENT_TIMESTAMP AS FLOAT), '$.a')) SELECT * FROM p; CREATE TABLE seed_a(c UNIQUE); SE"
+    },
+    {
+      "hash": "3d7671b9a1b3681f",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000053943",
+      "top_frames": [
+        "<no-stack-5e98ba297e9747b0>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) UNIQUE); WITH RECURSIVE p AS (SELECT DISTINCT * FROM json_each(CAST(NULL AS FLOAT), '$')) SELECT * FROM p; CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c F"
+    },
+    {
+      "hash": "24eeb52c486eb159",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000053963",
+      "top_frames": [
+        "<no-stack-d8fc38c8fd7f17b0>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) UNIQUE); WITH RECURSIVE p AS (SELECT DISTINCT * FROM json_each(FALSE, '$')) SELECT * FROM p; CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a JOI"
+    },
+    {
+      "hash": "6ebe69fdb2f82327",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000054090",
+      "top_frames": [
+        "<no-stack-45fcf343a79a26ac>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (TRUE) UNION VALUES (count() FILTER (WHERE FALSE) OVER ())) SELECT * FROM p; CREATE TABLE seed_a(c UNIQUE); SELECT see"
+    },
+    {
+      "hash": "eeadac0f617221e8",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000054223",
+      "top_frames": [
+        "<no-stack-230d999346326435>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) UNIQUE); WITH RECURSIVE p AS (SELECT DISTINCT count(*) AS a FROM (VALUES (CURRENT_TIMESTAMP)) AS a) SELECT * FROM p; CREATE TABLE seed_a(c UNIQUE); SELECT "
+    },
+    {
+      "hash": "a80c5cc898bdecc1",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000054230",
+      "top_frames": [
+        "<no-stack-9530d8038d09d780>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) UNIQUE); WITH RECURSIVE p AS (SELECT DISTINCT count(*) AS a FROM (json_tree('[1,2,3]'))) SELECT * FROM p; CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FR"
+    },
+    {
+      "hash": "c94327c58631fbbd",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000054458",
+      "top_frames": [
+        "<no-stack-4a950ef3d719ff5d>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 INTEGER PRIMARY KEY); CREATE INDEX IF NOT EXISTS idx1 ON p(c3); INSERT INTO p DEFAULT VALUES; EXPLAIN QUERY PLAN VALUES (FALSE); CREATE TABLE seed_a(c UNIQUE); SELECT s"
+    },
+    {
+      "hash": "725718a77addf01e",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000054602",
+      "top_frames": [
+        "<no-stack-3b72a694d62d10a9>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) UNIQUE); WITH RECURSIVE p AS (SELECT DISTINCT * FROM json_each('[1,2,3]') JOIN json_tree('[{\"a\":1},{\"b\":2}]')) SELECT * FROM p; CREATE TABLE seed_a(c UNIQU"
+    },
+    {
+      "hash": "56d427030cab2ea1",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000055377",
+      "top_frames": [
+        "<no-stack-a210f0c781a7b77f>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) UNIQUE); WITH RECURSIVE p AS (SELECT DISTINCT * FROM json_each('{\"a\":1}')) SELECT * FROM p; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c2, c3); S"
+    },
+    {
+      "hash": "9ac0bb8387b28c06",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000058424",
+      "top_frames": [
+        "<no-stack-063321b94151b35e>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) UNIQUE); WITH RECURSIVE p AS (SELECT *, *, *, *, *, *, *, *, *, *, *, * FROM json_tree('{\"a\":{\"b\":1}}') WHERE CURRENT_TIMESTAMP GROUP BY NULL WINDOW w1 AS "
+    },
+    {
+      "hash": "b609b876ff1ff5db",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000058445",
+      "top_frames": [
+        "<no-stack-5ddc4070b4fb4f35>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) UNIQUE); WITH RECURSIVE p AS (SELECT *, *, *, *, *, *, *, *, count(*) OVER (), * FROM json_tree('{\"a\":{\"b\":1}}') WHERE CURRENT_TIMESTAMP GROUP BY NULL WIND"
+    },
+    {
+      "hash": "d7f3f215cbe04772",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000058457",
+      "top_frames": [
+        "<no-stack-9a1b320ed7272829>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) UNIQUE); WITH RECURSIVE p AS (SELECT * FROM json_tree('{\"a\":{\"b\":1}}') WHERE CURRENT_TIMESTAMP GROUP BY NULL, CURRENT_TIMESTAMP WINDOW w1 AS ()) SELECT * F"
+    },
+    {
+      "hash": "9bbc5d3378a2fc3a",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000058475",
+      "top_frames": [
+        "<no-stack-c7261b2697ffe19e>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) UNIQUE); WITH RECURSIVE p AS (SELECT * FROM json_tree('{\"a\":{\"b\":1}}') WHERE CURRENT_TIMESTAMP GROUP BY NULL WINDOW w1 AS (PARTITION BY CURRENT_TIMESTAMP O"
+    },
+    {
+      "hash": "bd09f3c0697d4e44",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000058484",
+      "top_frames": [
+        "<no-stack-08188b544c7caeaf>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) UNIQUE); WITH RECURSIVE p AS (SELECT * FROM json_each('[1,2,3]') JOIN json_tree('[{\"a\":1},{\"b\":2}]') WHERE CURRENT_TIMESTAMP GROUP BY NULL WINDOW w1 AS ())"
+    },
+    {
+      "hash": "bab0f4a4c1d73c2e",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000058561",
+      "top_frames": [
+        "<no-stack-fd375df57618d6f3>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) UNIQUE); WITH RECURSIVE p AS (SELECT * FROM json_tree('{\"a\":{\"b\":1}}') WHERE '-_6' GROUP BY NULL WINDOW w1 AS ()) SELECT * FROM p; CREATE TABLE seed_a(c UN"
+    },
+    {
+      "hash": "7f49256b04a820c3",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000062212",
+      "top_frames": [
+        "<no-stack-45016033aa597970>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 REAL NOT NULL DEFAULT -64588); INSERT INTO p DEFAULT VALUES; PRAGMA quick_check; CREATE TABLE IF NOT EXISTS p(a REAL, c1 AS(c1) UNIQUE); INSERT INTO p DEFAULT VALUES; P"
+    },
+    {
+      "hash": "6e9ffbb4dbe75420",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000062530",
+      "top_frames": [
+        "<no-stack-03cd7a0141314be7>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BLOB NOT NULL DEFAULT X'Acee'); INSERT INTO p DEFAULT VALUES; PRAGMA quick_check; CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a JOIN seed_a b ON 3 = seed_a."
+    },
+    {
+      "hash": "d8f0fa3d24f90b52",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000062802",
+      "top_frames": [
+        "<no-stack-9fab0820542db041>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 FLOAT PRIMARY KEY); INSERT INTO p VALUES (CURRENT_TIME NOT IN (CURRENT_TIMESTAMP, CURRENT_DATE, TRUE)); PRAGMA integrity_check; CREATE TABLE IF NOT EXISTS p(a REAL, c1 "
+    },
+    {
+      "hash": "5b40e2d668ac23c9",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000063085",
+      "top_frames": [
+        "<no-stack-c87c2825851d48e9>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 FLOAT PRIMARY KEY); INSERT INTO p DEFAULT VALUES; PRAGMA integrity_check; CREATE TABLE IF NOT EXISTS p(a DATE, c1 AS(c1) UNIQUE); INSERT INTO p SELECT * FROM p; ANALYZE"
+    },
+    {
+      "hash": "e4451bd6ac52fdb3",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000063117",
+      "top_frames": [
+        "<no-stack-f98d1e9c3da46d87>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 FLOAT PRIMARY KEY); INSERT INTO p DEFAULT VALUES; PRAGMA integrity_check; CREATE TABLE IF NOT EXISTS p(a DATE, c1 AS(c1) UNIQUE); INSERT OR ABORT INTO p VALUES (length("
+    },
+    {
+      "hash": "13e3d677d86aca4f",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000063288",
+      "top_frames": [
+        "<no-stack-0eae438fd6683084>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a VARCHAR(255) DEFAULT X'aCDe1a'); CREATE INDEX IF NOT EXISTS idx1 ON p(a); INSERT INTO p DEFAULT VALUES; PRAGMA integrity_check; CREATE TABLE IF NOT EXISTS p(a DATE, c1 A"
+    },
+    {
+      "hash": "0d15e3b79d3ff3c6",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000063297",
+      "top_frames": [
+        "<no-stack-2ef3fadfdea1ed5c>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a VARCHAR(255) DEFAULT X'aCDe1a'); CREATE INDEX IF NOT EXISTS idx1 ON p(a); INSERT INTO p DEFAULT VALUES; PRAGMA integrity_check; CREATE TABLE IF NOT EXISTS p(a DATE, c1 A"
+    },
+    {
+      "hash": "63b8b9753dd79af9",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000063358",
+      "top_frames": [
+        "<no-stack-5c9e9917ac0d9da7>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a VARCHAR(255) DEFAULT -23762014736071.062395441157E051751605251703269); CREATE INDEX IF NOT EXISTS idx1 ON p(a); INSERT INTO p DEFAULT VALUES; PRAGMA integrity_check; CRE"
+    },
+    {
+      "hash": "497bc691d513a7fe",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000063364",
+      "top_frames": [
+        "<no-stack-8479c1dee7e93b65>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a VARCHAR(255) DEFAULT X''); CREATE INDEX IF NOT EXISTS idx1 ON p(a); INSERT INTO p DEFAULT VALUES; PRAGMA integrity_check; CREATE TABLE IF NOT EXISTS p(a DATE, c1 AS(c1) "
+    },
+    {
+      "hash": "7c34db928ebfc0f1",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000063388",
+      "top_frames": [
+        "<no-stack-a03bf8a09a4d2097>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a VARCHAR(255) DEFAULT X'aCDe1a'); CREATE INDEX IF NOT EXISTS idx1 ON p(a); INSERT INTO p DEFAULT VALUES; PRAGMA integrity_check; CREATE TABLE IF NOT EXISTS p(a VARCHAR(25"
+    },
+    {
+      "hash": "fbe37c04c5ae9aca",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000063441",
+      "top_frames": [
+        "<no-stack-f8c7f998f75737bf>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a VARCHAR(255) DEFAULT X'aCDe1a'); CREATE INDEX IF NOT EXISTS idx1 ON p(a); INSERT INTO p DEFAULT VALUES; PRAGMA integrity_check; CREATE TABLE IF NOT EXISTS p(a DATE, c1 A"
+    },
+    {
+      "hash": "e9b9ebf93302b508",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000063590",
+      "top_frames": [
+        "<no-stack-28dd57986bd4d6d0>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 FLOAT PRIMARY KEY); INSERT INTO p DEFAULT VALUES; ANALYZE p; CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) UNIQUE); WITH RECURSIVE p AS (SELECT DISTINCT ntile(CURRENT_DA"
+    },
+    {
+      "hash": "7cd27d9dcb6a7c99",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000063597",
+      "top_frames": [
+        "<no-stack-6a744f3a1886d514>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 FLOAT PRIMARY KEY); INSERT INTO p DEFAULT VALUES; ANALYZE p; CREATE TABLE IF NOT EXISTS p(a DATE, c1 AS(c1) UNIQUE); INSERT OR FAIL INTO p VALUES (CURRENT_TIMESTAMP); P"
+    },
+    {
+      "hash": "def26981d037d665",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000063616",
+      "top_frames": [
+        "<no-stack-6831ad795ff85f4e>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 FLOAT PRIMARY KEY); INSERT INTO p DEFAULT VALUES; ANALYZE p; CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) UNIQUE); SELECT DISTINCT * FROM (VALUES (NULL)) AS j_ LEFT JOI"
+    },
+    {
+      "hash": "6d0ac4a5c05ee278",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000063636",
+      "top_frames": [
+        "<no-stack-fc66627298d90db9>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 FLOAT PRIMARY KEY); INSERT INTO p DEFAULT VALUES; ANALYZE p; CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) UNIQUE); WITH RECURSIVE p AS (SELECT DISTINCT count(*) OVER (P"
+    },
+    {
+      "hash": "d4e645e7dde83680",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000066290",
+      "top_frames": [
+        "<no-stack-96cfd7f0cffe83d6>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 NUMERIC PRIMARY KEY, _rowid_ VARCHAR(255) UNIQUE); CREATE TABLE IF NOT EXISTS q(b BOOLEAN NOT NULL); INSERT OR ROLLBACK INTO p VALUES (CURRENT_DATE, NULL); VALUES (CURR"
+    },
+    {
+      "hash": "e54f5e63ccf8f9b3",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000067154",
+      "top_frames": [
+        "<no-stack-d72f02ef0a1e1b7d>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 NUMERIC PRIMARY KEY, _rowid_ VARCHAR(255) UNIQUE); CREATE TABLE IF NOT EXISTS q(b BOOLEAN NOT NULL); INSERT OR ROLLBACK INTO p VALUES (CURRENT_TIME, NULL); VALUES (FALS"
+    },
+    {
+      "hash": "9a3bf53109afa43f",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000067171",
+      "top_frames": [
+        "<no-stack-d24c7f1ba7bd4a06>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 NUMERIC PRIMARY KEY, _rowid_ VARCHAR(255) UNIQUE); CREATE TABLE IF NOT EXISTS q(b BOOLEAN NOT NULL); INSERT INTO p (rowid) VALUES (TRUE) ON CONFLICT(_rowid_) DO UPDATE "
+    },
+    {
+      "hash": "5176ab56b0b8b725",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000067180",
+      "top_frames": [
+        "<no-stack-382bcd07682b4071>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 NUMERIC PRIMARY KEY, _rowid_ VARCHAR(255) UNIQUE); CREATE TABLE IF NOT EXISTS q(b BOOLEAN NOT NULL); INSERT OR ROLLBACK INTO p VALUES (CURRENT_TIME, NULL); VALUES (CURR"
+    },
+    {
+      "hash": "372ebbda710487d4",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000068264",
+      "top_frames": [
+        "<no-stack-3700d98e6995338e>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 INTEGER PRIMARY KEY); EXPLAIN QUERY PLAN SELECT * FROM p NOT INDEXED WHERE CURRENT_TIMESTAMP GROUP BY NULL WINDOW w1 AS (); CREATE TABLE IF NOT EXISTS p(a INT, c1 AS(c1"
+    },
+    {
+      "hash": "e0652d4e939bde6a",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000068945",
+      "top_frames": [
+        "<no-stack-1c42eb9633a04577>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) UNIQUE); WITH RECURSIVE r AS (SELECT *) SELECT count() FILTER (WHERE FALSE) FROM p; CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a JOIN seed_a "
+    },
+    {
+      "hash": "e92a0aa45eb5e9f4",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000069096",
+      "top_frames": [
+        "<no-stack-8e1e56e5d7480004>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b DATE UNIQUE); CREATE TABLE IF NOT EXISTS q(c2 DATE PRIMARY KEY); INSERT INTO p SELECT CURRENT_TIME FROM json_tree('{\"a\":{\"b\":1}}') WHERE CURRENT_TIMESTAMP GROUP BY NULL "
+    },
+    {
+      "hash": "43d05ad501bf1e9d",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000069329",
+      "top_frames": [
+        "<no-stack-ab1eb5f338d451ae>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) VALUES (dense_rank() OVER ()); CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a JOIN seed_a "
+    },
+    {
+      "hash": "b6258784667c31f7",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000069336",
+      "top_frames": [
+        "<no-stack-66808b5831651f6c>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) VALUES (row_number() OVER (PARTITION BY FALSE ORDER BY FALSE DESC ROWS BETWEEN CURRENT ROW AND CURRENT"
+    },
+    {
+      "hash": "63c1ef735ebe5bae",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000069349",
+      "top_frames": [
+        "<no-stack-11749b095a27857a>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) VALUES (rank() OVER ()); CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a JOIN seed_a b ON 3"
+    },
+    {
+      "hash": "fb213f3e3a7e603e",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000069356",
+      "top_frames": [
+        "<no-stack-b2b7049e98d0b91d>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) VALUES (group_concat(CURRENT_TIMESTAMP, '') OVER ()); CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c F"
+    },
+    {
+      "hash": "d812eb24f6dfedcb",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000069384",
+      "top_frames": [
+        "<no-stack-49d1043d9634457a>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (SELECT FALSE OR NULL) SELECT * FROM p; CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a JOIN seed_a b ON 3 = seed_a"
+    },
+    {
+      "hash": "3e63579b088dc70e",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000069397",
+      "top_frames": [
+        "<no-stack-bea21c3dabda1959>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) VALUES (row_number() OVER (ORDER BY NULL DESC NULLS LAST GROUPS BETWEEN UNBOUNDED PRECEDING AND UNBOUN"
+    },
+    {
+      "hash": "5e4ad72aad6852bb",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000069412",
+      "top_frames": [
+        "<no-stack-f3e0db5541326e12>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) VALUES (NULL IS NOT TRUE, CURRENT_DATE); CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a JO"
+    },
+    {
+      "hash": "e7298051579e3ebc",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000069428",
+      "top_frames": [
+        "<no-stack-299a22376a0f244e>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH t2 (c3, rowid, b, a, c1) AS (SELECT DISTINCT NULL > CURRENT_DATE AS a, p.* FROM jsonb_tree('[1,2,3]') NATURAL LEFT JOIN json_tree(~TRUE - CUR"
+    },
+    {
+      "hash": "0916236b519cd3c3",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000069562",
+      "top_frames": [
+        "<no-stack-bdd81c53f7ecd862>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) VALUES (ntile(CURRENT_DATE) OVER (ORDER BY NULL DESC, TRUE)); CREATE TABLE seed_a(c UNIQUE); SELECT se"
+    },
+    {
+      "hash": "9998398f926fc228",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000069598",
+      "top_frames": [
+        "<no-stack-b03c6529f00b1153>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) VALUES (FALSE IN (VALUES (TRUE) UNION VALUES (CURRENT_TIME))); CREATE TABLE seed_a(c UNIQUE); SELECT s"
+    },
+    {
+      "hash": "4e3d78d3e4446e18",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000069643",
+      "top_frames": [
+        "<no-stack-c02ea750e6083f79>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE r AS (SELECT *) SELECT CURRENT_TIMESTAMP NOT LIKE count() FILTER (WHERE FALSE) FROM p; CREATE TABLE seed_a(c UNIQUE); SELECT seed_a"
+    },
+    {
+      "hash": "c3d2f971c91e5222",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000069764",
+      "top_frames": [
+        "<no-stack-c4dbd59b5658fa8f>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) VALUES (ntile(TRUE) OVER ()); CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a JOIN seed_a b"
+    },
+    {
+      "hash": "d30249aeacc562eb",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000069816",
+      "top_frames": [
+        "<no-stack-87027c8ae8a7ce7e>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES ((SELECT * ORDER BY RAISE(IGNORE) ASC LIMIT CURRENT_TIME) IN (SELECT * ORDER BY FALSE ASC NULLS LAST LIMIT FALSE))) VA"
+    },
+    {
+      "hash": "0fe05a1c1c8f7df3",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000069874",
+      "top_frames": [
+        "<no-stack-d05b40ef617828ee>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) VALUES (FALSE >> TRUE NOT LIKE FALSE); CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a JOIN"
+    },
+    {
+      "hash": "e05efc3eeddb5bf8",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000069992",
+      "top_frames": [
+        "<no-stack-a789e3aa729a872f>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) VALUES (count(DISTINCT NULL) FILTER (WHERE CURRENT_TIMESTAMP)); CREATE TABLE seed_a(c UNIQUE); SELECT "
+    },
+    {
+      "hash": "54ee4cf9ced56f47",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000070014",
+      "top_frames": [
+        "<no-stack-f71b6673db2b2ef1>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) VALUES (group_concat(CURRENT_TIMESTAMP, '') FILTER (WHERE CURRENT_TIME IS NULL COLLATE NOCASE)); CREAT"
+    },
+    {
+      "hash": "82d17fb362fa82b4",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000070020",
+      "top_frames": [
+        "<no-stack-ec30d18ef7f89d43>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) VALUES (count(DISTINCT TRUE) FILTER (WHERE CURRENT_TIMESTAMP)); CREATE TABLE seed_a(c UNIQUE); SELECT "
+    },
+    {
+      "hash": "5f49aa3a0a25b29e",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000070063",
+      "top_frames": [
+        "<no-stack-6121ca6e221c527c>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); VALUES (TRUE) UNION VALUES (CURRENT_TIME) INTERSECT VALUES (FALSE); CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a JOIN seed_a b ON 3 "
+    },
+    {
+      "hash": "fe3489d52ed55933",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000070762",
+      "top_frames": [
+        "<no-stack-c8701f7d4a6fbab9>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) VALUES (CAST(FALSE AS FLOAT) <= FALSE COLLATE RTRIM >> CURRENT_DATE COLLATE NOCASE); CREATE TABLE seed"
+    },
+    {
+      "hash": "ff82aaa4457c58e6",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000070836",
+      "top_frames": [
+        "<no-stack-4df67666c511510e>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) VALUES (CAST(FALSE AS VARCHAR(255)) <= CURRENT_TIME); CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c F"
+    },
+    {
+      "hash": "94184a71a1b1253d",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000070874",
+      "top_frames": [
+        "<no-stack-5b2a949f86173df0>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) VALUES (CAST(FALSE AS FLOAT) <= CAST(FALSE AS FLOAT) <= CAST(FALSE AS FLOAT) <= CAST(FALSE AS FLOAT) <"
+    },
+    {
+      "hash": "6ae6fe9628662b0e",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000070897",
+      "top_frames": [
+        "<no-stack-f95bef8bd32e52d6>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) VALUES (CURRENT_TIMESTAMP <= CAST(FALSE AS FLOAT) <= CAST(FALSE AS FLOAT) <= CAST(FALSE AS FLOAT) <= C"
+    },
+    {
+      "hash": "199736f80d1e16eb",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000070969",
+      "top_frames": [
+        "<no-stack-e36ba6396eb13cd7>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) VALUES (CAST(FALSE AS FLOAT) <= TRUE); CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a JOIN"
+    },
+    {
+      "hash": "3ecdcc6de3126fb1",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000070991",
+      "top_frames": [
+        "<no-stack-ba7468488a69c04d>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (SELECT CURRENT_TIME FROM json_tree('{\"a\":{\"b\":1}}') WHERE CURRENT_TIMESTAMP GROUP BY NULL WINDOW w1 AS () ORDER BY FALSE LIMI"
+    },
+    {
+      "hash": "3490df318e37c1a8",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000071003",
+      "top_frames": [
+        "<no-stack-cd6e0eddd86b8875>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) SELECT DISTINCT * FROM p NOT INDEXED WHERE CASE WHEN FALSE THEN NULL ELSE EXISTS (VALUES (CURRENT_TIME"
+    },
+    {
+      "hash": "aa71ca7e0b4d9889",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000071011",
+      "top_frames": [
+        "<no-stack-72cf57b6efd11b98>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 REAL DEFAULT X'EC2BA6'); CREATE INDEX IF NOT EXISTS idx1 ON p(c2); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) SELECT DISTINCT * FROM p NOT INDEXED WHERE TRUE; CREATE T"
+    },
+    {
+      "hash": "ed76189a5ad30ffa",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000071024",
+      "top_frames": [
+        "<no-stack-b09c3c121ef82a8e>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) SELECT DISTINCT * FROM p NOT INDEXED WHERE CASE CURRENT_DATE OR CURRENT_TIMESTAMP WHEN CURRENT_DATE TH"
+    },
+    {
+      "hash": "83de1be2e8820283",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000071050",
+      "top_frames": [
+        "<no-stack-94cfdbd86bb3e327>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) SELECT DISTINCT * FROM p NOT INDEXED WHERE CURRENT_TIME NOT LIKE CURRENT_DATE; CREATE TABLE seed_a(c U"
+    },
+    {
+      "hash": "88dafbbb770a2911",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000071064",
+      "top_frames": [
+        "<no-stack-20ec3984de844c59>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) SELECT DISTINCT count(*) OVER (PARTITION BY FALSE ORDER BY FALSE DESC ROWS BETWEEN UNBOUNDED PRECEDING"
+    },
+    {
+      "hash": "557e853ad211f071",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000071188",
+      "top_frames": [
+        "<no-stack-0eccb1cd50f9dbc2>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (WITH RECURSIVE p AS (WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) SELECT DISTINCT * FROM p NOT INDEXED WHERE TRUE) SELECT DIST"
+    },
+    {
+      "hash": "6e2c97bf9eede7b3",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000071222",
+      "top_frames": [
+        "<no-stack-2cc1b7d9cf57b9cd>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (SELECT * FROM json_tree('{\"a\":{\"b\":1}}') WHERE CURRENT_TIMESTAMP GROUP BY NULL WINDOW w1 AS () ORDER BY FALSE LIMIT FALSE) SE"
+    },
+    {
+      "hash": "665bddd286bc394f",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000071257",
+      "top_frames": [
+        "<no-stack-73be930ae2df4135>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 REAL NOT NULL DEFAULT CURRENT_DATE, b DATE PRIMARY KEY); CREATE INDEX IF NOT EXISTS idx1 ON p(c3); INSERT INTO p DEFAULT VALUES; SELECT * FROM p NATURAL JOIN p WHERE FA"
+    },
+    {
+      "hash": "5a4ce50308775abc",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000071263",
+      "top_frames": [
+        "<no-stack-88fe6fe0f383243e>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) VALUES (CURRENT_DATE LIKE CASE TRUE WHEN CASE TRUE WHEN CASE TRUE WHEN CASE TRUE WHEN CASE TRUE WHEN C"
+    },
+    {
+      "hash": "682b9407e3462cc0",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000071272",
+      "top_frames": [
+        "<no-stack-7cc33b4204bed8a1>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (CURRENT_TIME)) VALUES (CURRENT_DATE LIKE CURRENT_DATE ESCAPE CASE CURRENT_DATE OR CURRENT_TIMESTAMP WHEN CURRENT_DATE"
+    },
+    {
+      "hash": "71eea10860152c8f",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000001891",
+      "top_frames": [
+        "<no-stack-4e0c438ed84a77bf>"
+      ],
+      "sql_preview": "CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 VALUES(12),(123),(1234); CREATE TABLE seed_t2(c2 INTEGER); INSERT INTO seed_t2 VALUES(44),(55),(123); CREATE TABLE seed_t3(c3 INTEGER, c4 INTEGER)"
+    },
+    {
+      "hash": "f95b2fca86b0a807",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000002014",
+      "top_frames": [
+        "<no-stack-86f4755c00de4e36>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) UNIQUE); WITH RECURSIVE p AS (SELECT DISTINCT * FROM json_tree('[1,2,3]')) SELECT * FROM p; CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 VALUES(12"
+    },
+    {
+      "hash": "a4ab5dcc7f947d6d",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000002023",
+      "top_frames": [
+        "<no-stack-7d61369e37d1e60b>"
+      ],
+      "sql_preview": "CREATE TABLE seed_t0 (c0 INTEGER, c1 NOT NULL GENERATED ALWAYS AS (c0 = 0)); INSERT INTO seed_t0(c0) VALUES (0); PRAGMA integrity_check; CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 VALUES(12"
+    },
+    {
+      "hash": "1f86b7e07c79cf74",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000002283",
+      "top_frames": [
+        "<no-stack-5856dbc7ecd1d022>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a NUMERIC, b AS(b) NOT NULL); EXPLAIN QUERY PLAN VALUES (NULL); CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 VALUES(12),(123),(1234); CREATE TABLE seed_t2(c2 INTE"
+    },
+    {
+      "hash": "b92b80a6a1cf85ac",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000002556",
+      "top_frames": [
+        "<no-stack-95e44a1a9c7a10b3>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(rowid INT CHECK (NULL AND CURRENT_TIME), c3 DATE PRIMARY KEY); INSERT INTO p DEFAULT VALUES; ANALYZE p; CREATE TABLE IF NOT EXISTS p(a TEXT UNIQUE, a TEXT GENERATED ALWAYS"
+    },
+    {
+      "hash": "f99c3b1657a572b0",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000002562",
+      "top_frames": [
+        "<no-stack-43279462188df84d>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(rowid INT CHECK (NULL), c3 DATE PRIMARY KEY); INSERT INTO p DEFAULT VALUES; ANALYZE p; CREATE TABLE IF NOT EXISTS p(a TEXT UNIQUE, a TEXT GENERATED ALWAYS AS (NULL) STORED"
+    },
+    {
+      "hash": "48ab927cb9811aa1",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000002569",
+      "top_frames": [
+        "<no-stack-ee4a7b0c34efd445>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 DATE PRIMARY KEY); INSERT INTO p DEFAULT VALUES; ANALYZE p; CREATE TABLE IF NOT EXISTS p(a TEXT UNIQUE, a TEXT GENERATED ALWAYS AS (NULL) STORED); CREATE TABLE IF NOT E"
+    },
+    {
+      "hash": "553041aa395a7432",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000002582",
+      "top_frames": [
+        "<no-stack-491e2bcee92a41f2>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 DATE UNIQUE); INSERT INTO p DEFAULT VALUES; ANALYZE p; CREATE TABLE IF NOT EXISTS p(a TEXT UNIQUE, a TEXT GENERATED ALWAYS AS (NULL) STORED); CREATE TABLE IF NOT EXISTS"
+    },
+    {
+      "hash": "18c037801ad3e61c",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000002589",
+      "top_frames": [
+        "<no-stack-9595128a5c83f606>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(rowid INT CHECK (NULL), c3 DATE PRIMARY KEY); INSERT INTO p DEFAULT VALUES; PRAGMA quick_check; CREATE TABLE IF NOT EXISTS p(a TEXT UNIQUE, a TEXT GENERATED ALWAYS AS (NUL"
+    },
+    {
+      "hash": "5c59a3e43e19567e",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000002603",
+      "top_frames": [
+        "<no-stack-e135ff5d3d919e2b>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 DATE UNIQUE, c3 DATE PRIMARY KEY); INSERT INTO p DEFAULT VALUES; PRAGMA quick_check; CREATE TABLE IF NOT EXISTS p(a TEXT UNIQUE, a TEXT GENERATED ALWAYS AS (NULL) STORE"
+    },
+    {
+      "hash": "0e2e99039b0a8526",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000002648",
+      "top_frames": [
+        "<no-stack-d99a42a67e727a30>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a FLOAT UNIQUE); INSERT INTO p DEFAULT VALUES; PRAGMA quick_check; CREATE TABLE IF NOT EXISTS p(a TEXT UNIQUE, a TEXT GENERATED ALWAYS AS (NULL) STORED); CREATE TABLE IF N"
+    },
+    {
+      "hash": "75f62a129ba1d900",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000002874",
+      "top_frames": [
+        "<no-stack-59a0096e79cb49f8>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 NUMERIC PRIMARY KEY, _rowid_ VARCHAR(255) UNIQUE); CREATE TABLE IF NOT EXISTS q(b BOOLEAN NOT NULL); INSERT OR ROLLBACK INTO p VALUES (NULL NOT NULL != CURRENT_TIMESTAM"
+    },
+    {
+      "hash": "e3be028fa60bab60",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000002882",
+      "top_frames": [
+        "<no-stack-0ace65c6377c75dc>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 NUMERIC PRIMARY KEY, _rowid_ VARCHAR(255) UNIQUE); CREATE TABLE IF NOT EXISTS q(b BOOLEAN NOT NULL); INSERT OR ROLLBACK INTO p VALUES (NULL != CURRENT_TIMESTAMP, NULL);"
+    },
+    {
+      "hash": "830bd36983edc23a",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000002888",
+      "top_frames": [
+        "<no-stack-43f6b520c0c9fb68>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 NUMERIC PRIMARY KEY, _rowid_ VARCHAR(255) UNIQUE); CREATE TABLE IF NOT EXISTS q(b BOOLEAN NOT NULL); INSERT OR ROLLBACK INTO p VALUES (CURRENT_TIMESTAMP, NULL); VALUES "
+    },
+    {
+      "hash": "eccc9bf55d8206cf",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000002903",
+      "top_frames": [
+        "<no-stack-2c70da58f2260649>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 NUMERIC PRIMARY KEY, _rowid_ VARCHAR(255) UNIQUE); CREATE TABLE IF NOT EXISTS q(b BOOLEAN NOT NULL); INSERT OR ROLLBACK INTO p VALUES (FALSE, NULL); VALUES (CURRENT_DAT"
+    },
+    {
+      "hash": "27f7555c04d6fa2d",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000002909",
+      "top_frames": [
+        "<no-stack-a5024069af298a8d>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 NUMERIC PRIMARY KEY, _rowid_ VARCHAR(255) UNIQUE); CREATE TABLE IF NOT EXISTS q(b BOOLEAN NOT NULL); INSERT OR ROLLBACK INTO p VALUES (CURRENT_DATE != CURRENT_TIMESTAMP"
+    },
+    {
+      "hash": "c0f7cb1a5c612ff1",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000003366",
+      "top_frames": [
+        "<no-stack-03758eb14f6a546b>"
+      ],
+      "sql_preview": "SELECT hex(zeroblob(1)); CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 VALUES(12),(123),(1234); CREATE TABLE seed_t2(c2 INTEGER); INSERT INTO seed_t2 VALUES(44),(55),(123); CREATE TABLE seed_t"
+    },
+    {
+      "hash": "b132628365fe196f",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000003772",
+      "top_frames": [
+        "<no-stack-dd6b6a591caccd83>"
+      ],
+      "sql_preview": "SELECT substr('', 4294967296, -9223372036854775808); CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 VALUES(12),(123),(1234); CREATE TABLE seed_t2(c2 INTEGER); INSERT INTO seed_t2 VALUES(44),(55"
+    },
+    {
+      "hash": "c46897f5621dd97b",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000003921",
+      "top_frames": [
+        "<no-stack-b6988f5fb03d05f8>"
+      ],
+      "sql_preview": "SELECT round(0.01, 2147483647); CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 VALUES(12),(123),(1234); CREATE TABLE seed_t2(c2 INTEGER); INSERT INTO seed_t2 VALUES(44),(55),(123); CREATE TABLE"
+    },
+    {
+      "hash": "95580e34b73af1f3",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000003943",
+      "top_frames": [
+        "<no-stack-fe61f6b96ac6531c>"
+      ],
+      "sql_preview": "SELECT printf('%f', 9223372036854775807, ' ft N_V-3n_4'); CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 VALUES(12),(123),(1234); CREATE TABLE seed_t2(c2 INTEGER); INSERT INTO seed_t2 VALUES(44"
+    },
+    {
+      "hash": "f5fc51c31fb7fdaf",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000004150",
+      "top_frames": [
+        "<no-stack-7761a68097a945c4>"
+      ],
+      "sql_preview": "SELECT substr('r2Y_r6_JRj   ', -2147483648); CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 VALUES(12),(123),(1234); CREATE TABLE seed_t2(c2 INTEGER); INSERT INTO seed_t2 VALUES(44),(55),(123);"
+    },
+    {
+      "hash": "5f15dc3e08ae9165",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000004159",
+      "top_frames": [
+        "<no-stack-64344964ce778c76>"
+      ],
+      "sql_preview": "SELECT substr('r2Y_r6_JRj   ', -2147483648); SELECT printf('%.*e', 0, 0.01); CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 VALUES(12),(123),(1234); CREATE TABLE seed_t2(c2 INTEGER); INSERT INT"
+    },
+    {
+      "hash": "1f15cdd5acbfb1f3",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000004571",
+      "top_frames": [
+        "<no-stack-69cea1ec75f27b67>"
+      ],
+      "sql_preview": "SELECT round(-0.0, -1); CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 VALUES(12),(123),(1234); CREATE TABLE seed_t2(c2 INTEGER); INSERT INTO seed_t2 VALUES(44),(55),(123); CREATE TABLE seed_t3"
+    },
+    {
+      "hash": "182e5adc38073f0b",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000004864",
+      "top_frames": [
+        "<no-stack-c2e58a04a1cdf67a>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b INT PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(c2 FLOAT GENERATED ALWAYS AS (FALSE) VIRTUAL, c3 REAL); INSERT INTO p DEFAULT VALUES; EXPLAIN QUERY PLAN VALUES (FALSE); C"
+    },
+    {
+      "hash": "ad11202b46b88a7d",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000005640",
+      "top_frames": [
+        "<no-stack-a1c7c1212fb27cad>"
+      ],
+      "sql_preview": "SELECT printf('%.*g', 2147483648, -0.0); CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 VALUES(12),(123),(1234); CREATE TABLE seed_t2(c2 INTEGER); INSERT INTO seed_t2 VALUES(44),(55),(123); CRE"
+    },
+    {
+      "hash": "08e05c10506457cd",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000005871",
+      "top_frames": [
+        "<no-stack-47b4fe8c8c527220>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); VALUES (NULL) EXCEPT VALUES (NULL); SELECT printf('%.*g', -2147483648); CREATE TABLE seed_b(b INTEGER); INSERT INTO seed_b VALUES (1),(2),(3); SEL"
+    },
+    {
+      "hash": "37bddad4378780bf",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000005893",
+      "top_frames": [
+        "<no-stack-39e41a1bbc3d775d>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); VALUES (NULL) EXCEPT VALUES (CURRENT_TIME); SELECT printf('%.*g', -2147483648); CREATE TABLE seed_b(b INTEGER); INSERT INTO seed_b VALUES (1),(2),"
+    },
+    {
+      "hash": "ad2d3d5c255a18ca",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000005962",
+      "top_frames": [
+        "<no-stack-9a3ef871f672287c>"
+      ],
+      "sql_preview": "SELECT printf('%.*s', 9223372036854775807, 1.0); CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 VALUES(12),(123),(1234); CREATE TABLE seed_t2(c2 INTEGER); INSERT INTO seed_t2 VALUES(44),(55),(1"
+    },
+    {
+      "hash": "6f64fbad4d925bd0",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000007131",
+      "top_frames": [
+        "<no-stack-d660579f5a98144b>"
+      ],
+      "sql_preview": "SELECT substr('', -2147483648); CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 VALUES(12),(123),(1234); CREATE TABLE seed_t2(c2 INTEGER); INSERT INTO seed_t2 VALUES(44),(55),(123); CREATE TABLE"
+    },
+    {
+      "hash": "72e4233b96ccb627",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000007331",
+      "top_frames": [
+        "<no-stack-e4fc5f8f8b4785da>"
+      ],
+      "sql_preview": "SELECT round(1e308, -2147483648); CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 VALUES(12),(123),(1234); CREATE TABLE seed_t2(c2 INTEGER); INSERT INTO seed_t2 VALUES(44),(55),(123); CREATE TAB"
+    },
+    {
+      "hash": "3335159436f3fc7e",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000007339",
+      "top_frames": [
+        "<no-stack-c8d7044128be619b>"
+      ],
+      "sql_preview": "SELECT round(1e308, -2147483648); SELECT printf('%.*e', 0, -1e308); CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 VALUES(12),(123),(1234); CREATE TABLE seed_t2(c2 INTEGER); INSERT INTO seed_t2"
+    },
+    {
+      "hash": "3a26042fc2fad035",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000007474",
+      "top_frames": [
+        "<no-stack-e3993daba2a570d6>"
+      ],
+      "sql_preview": "SELECT printf('%.*e', 2147483647, 1.0); CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 VALUES(12),(123),(1234); CREATE TABLE seed_t2(c2 INTEGER); INSERT INTO seed_t2 VALUES(44),(55),(123); CREA"
+    },
+    {
+      "hash": "19f8fc2e6923602e",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000008875",
+      "top_frames": [
+        "<no-stack-75a17dc5c3f83f83>"
+      ],
+      "sql_preview": "SELECT printf('%.*d', -1); CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 VALUES(12),(123),(1234); CREATE TABLE seed_t2(c2 INTEGER); INSERT INTO seed_t2 VALUES(44),(55),(123); CREATE TABLE seed"
+    },
+    {
+      "hash": "8437b7737ff2792c",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000008881",
+      "top_frames": [
+        "<no-stack-611980a92b5a6279>"
+      ],
+      "sql_preview": "SELECT printf('%d', -9223372036854775808, ''); CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 VALUES(12),(123),(1234); CREATE TABLE seed_t2(c2 INTEGER); INSERT INTO seed_t2 VALUES(44),(55),(123"
+    },
+    {
+      "hash": "c84ae51f41221b79",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000008893",
+      "top_frames": [
+        "<no-stack-153d03ac9d5515e9>"
+      ],
+      "sql_preview": "SELECT round(1e-308, -2147483648); CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 VALUES(12),(123),(1234); CREATE TABLE seed_t2(c2 INTEGER); INSERT INTO seed_t2 VALUES(44),(55),(123); CREATE TA"
+    },
+    {
+      "hash": "e6115c1cf152d932",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000008919",
+      "top_frames": [
+        "<no-stack-9845e374c717742f>"
+      ],
+      "sql_preview": "SELECT printf('%.*s', 9223372036854775807); CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 VALUES(12),(123),(1234); CREATE TABLE seed_t2(c2 INTEGER); INSERT INTO seed_t2 VALUES(44),(55),(123); "
+    },
+    {
+      "hash": "f80dee072dfba3ea",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000008946",
+      "top_frames": [
+        "<no-stack-3abd5e9643f64b25>"
+      ],
+      "sql_preview": "SELECT printf('%d', -1, 'TV_ _-_p- b_'); CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 VALUES(12),(123),(1234); CREATE TABLE seed_t2(c2 INTEGER); INSERT INTO seed_t2 VALUES(44),(55),(123); CRE"
+    },
+    {
+      "hash": "0e255ab75d989334",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000008961",
+      "top_frames": [
+        "<no-stack-9e38a67377cf7682>"
+      ],
+      "sql_preview": "SELECT substr('_ 1frq10m- g-O_', 9223372036854775807, 9223372036854775807); CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 VALUES(12),(123),(1234); CREATE TABLE seed_t2(c2 INTEGER); INSERT INTO"
+    },
+    {
+      "hash": "cd931ecf256f1f50",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000008967",
+      "top_frames": [
+        "<no-stack-3d98da2113f87583>"
+      ],
+      "sql_preview": "SELECT substr('a9Ju_4_9 --0-_u-', 0); CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 VALUES(12),(123),(1234); CREATE TABLE seed_t2(c2 INTEGER); INSERT INTO seed_t2 VALUES(44),(55),(123); CREATE"
+    },
+    {
+      "hash": "e479f85b4875a55e",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000010165",
+      "top_frames": [
+        "<no-stack-b4132473f6362bb8>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) UNIQUE); WITH RECURSIVE p AS (SELECT DISTINCT * FROM json_each('[1,2,3]')) SELECT * FROM p; CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 VALUES(12"
+    },
+    {
+      "hash": "0c14b83a5cdc5e86",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000010182",
+      "top_frames": [
+        "<no-stack-65b513a33930733f>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b REAL PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(c3 BLOB UNIQUE); INSERT OR REPLACE INTO q VALUES (~CURRENT_DATE OR CURRENT_TIMESTAMP IS CURRENT_TIME); EXPLAIN QUERY PLAN"
+    },
+    {
+      "hash": "21e1f68d65d77708",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000010199",
+      "top_frames": [
+        "<no-stack-276351798f65981b>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b REAL PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(c3 BLOB UNIQUE); INSERT OR REPLACE INTO q VALUES (TRUE | CURRENT_TIMESTAMP); EXPLAIN QUERY PLAN VALUES (FALSE); CREATE TA"
+    },
+    {
+      "hash": "c52a622d44884156",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000010205",
+      "top_frames": [
+        "<no-stack-fb9d72e61a31afaf>"
+      ],
+      "sql_preview": "SELECT substr('', 9223372036854775807); CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 VALUES(12),(123),(1234); CREATE TABLE seed_t2(c2 INTEGER); INSERT INTO seed_t2 VALUES(44),(55),(123); CREA"
+    },
+    {
+      "hash": "2e2847f3f6228c2e",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000010235",
+      "top_frames": [
+        "<no-stack-27c2f682e89b6f6f>"
+      ],
+      "sql_preview": "SELECT substr('1qTp8_1-aj1U', 2147483647); CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 VALUES(12),(123),(1234); CREATE TABLE seed_t2(c2 INTEGER); INSERT INTO seed_t2 VALUES(44),(55),(123); C"
+    },
+    {
+      "hash": "a6ff41afd74f397a",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000010250",
+      "top_frames": [
+        "<no-stack-5995f61dc5eadf78>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(rowid NUMERIC NOT NULL DEFAULT CURRENT_TIMESTAMP); INSERT OR ABORT INTO p VALUES (-1474891422520.01E6); ANALYZE p; CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 VA"
+    },
+    {
+      "hash": "cfdb870e061ae912",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000010274",
+      "top_frames": [
+        "<no-stack-ba2f4c51e66f4dc4>"
+      ],
+      "sql_preview": "SELECT printf('%.*g', 2147483648, -1e308); CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 VALUES(12),(123),(1234); CREATE TABLE seed_t2(c2 INTEGER); INSERT INTO seed_t2 VALUES(44),(55),(123); C"
+    },
+    {
+      "hash": "9eff427090fe22ab",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000010316",
+      "top_frames": [
+        "<no-stack-2adac04fc8fc6beb>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 DATE NOT NULL); INSERT OR ABORT INTO p VALUES (-1474891422520.01E6); PRAGMA quick_check; CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 VALUES(12),(123),(1234); "
+    },
+    {
+      "hash": "d99850116d9cdd3e",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000015875",
+      "top_frames": [
+        "<no-stack-05bf6d64c75a16e7>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 BOOLEAN UNIQUE, rowid BLOB GENERATED ALWAYS AS (-FALSE) VIRTUAL); CREATE TABLE IF NOT EXISTS q(rowid DATE NOT NULL); INSERT INTO p DEFAULT VALUES; PRAGMA quick_check; C"
+    },
+    {
+      "hash": "b32aa72904949fee",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000015907",
+      "top_frames": [
+        "<no-stack-1c1421a580c03873>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b REAL PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(c3 BLOB UNIQUE); INSERT OR REPLACE INTO q VALUES (TRUE | ~CASE CURRENT_DATE OR CURRENT_TIMESTAMP WHEN CURRENT_DATE THEN T"
+    },
+    {
+      "hash": "29c82eb967c39049",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000017612",
+      "top_frames": [
+        "<no-stack-d957d3cc56b454bb>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) UNIQUE); SELECT FALSE * NOT CURRENT_TIMESTAMP IS FALSE FROM p JOIN p e0 ON CURRENT_TIME MATCH NULL; CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 V"
+    },
+    {
+      "hash": "3b5007b3745eef3a",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000017648",
+      "top_frames": [
+        "<no-stack-3555fee76d646e9e>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b REAL PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(c3 BLOB UNIQUE); INSERT OR REPLACE INTO q VALUES (TRUE << TRUE); EXPLAIN QUERY PLAN VALUES (FALSE); CREATE TABLE seed_t1("
+    },
+    {
+      "hash": "432592cc1c410f15",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000017664",
+      "top_frames": [
+        "<no-stack-c4f229565c99d795>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) UNIQUE); SELECT CURRENT_TIME IN (NULL) FROM p JOIN p e0 ON CURRENT_TIME MATCH NULL; CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 VALUES(12),(123),"
+    },
+    {
+      "hash": "008fa7691886bf59",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000017684",
+      "top_frames": [
+        "<no-stack-4c9f0b5a1a0cae07>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 NUMERIC NOT NULL); CREATE VIEW IF NOT EXISTS v1 AS VALUES (RAISE(IGNORE)) INTERSECT SELECT * ORDER BY FALSE ASC, NULL DESC NULLS LAST; SELECT * FROM p JOIN p e0 ON CURR"
+    },
+    {
+      "hash": "8cf5b2731811635d",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000017694",
+      "top_frames": [
+        "<no-stack-f58f5ed9afa83c54>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a DATE GENERATED ALWAYS AS (RAISE(IGNORE)) STORED, c1 DATE PRIMARY KEY); SELECT * FROM p JOIN p e0 ON CURRENT_TIME MATCH NULL; CREATE TABLE seed_t1(c1 INTEGER); INSERT INT"
+    },
+    {
+      "hash": "83a0160f77c3d830",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000017745",
+      "top_frames": [
+        "<no-stack-57c02a23e3c2ff0e>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 DATE NOT NULL, c3 FLOAT NOT NULL DEFAULT NULL); SELECT * FROM p JOIN p e0 ON CURRENT_TIME MATCH NULL; CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 VALUES(12),("
+    },
+    {
+      "hash": "0385cc0005950f77",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000017761",
+      "top_frames": [
+        "<no-stack-ebaf897ee6baf0cd>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) UNIQUE); SELECT CURRENT_TIMESTAMP LIKE FALSE NOT NULL COLLATE NOCASE AS h_65__93554_2___7_26_4n3p0md7zq_2hpwj_hej_5vt FROM p JOIN p e0 ON CURRENT_TIME MATC"
+    },
+    {
+      "hash": "400629d81674b95e",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000017819",
+      "top_frames": [
+        "<no-stack-f76b9da1260afb58>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) NOT NULL); EXPLAIN QUERY PLAN SELECT ALL * FROM json_each('[]') LIMIT CURRENT_DATE; CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 VALUES(12),(123),"
+    },
+    {
+      "hash": "2035562d046ef340",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000019155",
+      "top_frames": [
+        "<no-stack-b348ac07affc190a>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) UNIQUE); WITH RECURSIVE p AS (SELECT DISTINCT * FROM json_each('{\"a\":{\"b\":1}}')) SELECT * FROM p; CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 VAL"
+    },
+    {
+      "hash": "8e657b802aea76a0",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000019162",
+      "top_frames": [
+        "<no-stack-ab68c900c5a91d1b>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b TEXT CHECK (TRUE)); CREATE VIEW IF NOT EXISTS v1 AS VALUES (CURRENT_DATE); INSERT INTO p DEFAULT VALUES; PRAGMA integrity_check; CREATE TABLE seed_t1(c1 INTEGER); INSERT"
+    },
+    {
+      "hash": "9f50bce1e3474892",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000019183",
+      "top_frames": [
+        "<no-stack-81706fb14d622e9f>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 DATE, b VARCHAR(255) GENERATED ALWAYS AS (FALSE) STORED); CREATE INDEX IF NOT EXISTS idx1 ON p(b); INSERT INTO p DEFAULT VALUES; PRAGMA integrity_check; CREATE TABLE se"
+    },
+    {
+      "hash": "a15d3b4976934300",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000019260",
+      "top_frames": [
+        "<no-stack-f9bf19fe711cd633>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 FLOAT DEFAULT -2316); CREATE VIEW IF NOT EXISTS v1 AS VALUES (CURRENT_DATE); INSERT INTO p DEFAULT VALUES; PRAGMA integrity_check; CREATE TABLE seed_t1(c1 INTEGER); INS"
+    },
+    {
+      "hash": "ed593c6062e5f876",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000023760",
+      "top_frames": [
+        "<no-stack-4e02318aaf640be0>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b REAL PRIMARY KEY); CREATE INDEX IF NOT EXISTS idx1 ON p(b); SELECT * FROM p WHERE CURRENT_TIME GROUP BY CURRENT_TIME ORDER BY CURRENT_TIME ASC NULLS FIRST; CREATE TABLE "
+    },
+    {
+      "hash": "d4710fa420974c50",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000023781",
+      "top_frames": [
+        "<no-stack-8f996b476cd06d1a>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); SELECT DISTINCT * FROM json_each(TRUE, '$'); CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 VALUES(12),(123),(1234); CREATE TABLE seed_t2(c"
+    },
+    {
+      "hash": "7a47a917d2818e8a",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000023806",
+      "top_frames": [
+        "<no-stack-8518ef0eb2fef451>"
+      ],
+      "sql_preview": "SELECT round(-1.0, -1); CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 VALUES(12),(123),(1234); CREATE TABLE seed_t2(c2 INTEGER); INSERT INTO seed_t2 VALUES(44),(55),(123); CREATE TABLE seed_t3"
+    },
+    {
+      "hash": "ffec1a57c9f0b2af",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000028549",
+      "top_frames": [
+        "<no-stack-c20fb617988e61d8>"
+      ],
+      "sql_preview": "SELECT printf('%.*d', 2147483647, 0.01); CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 VALUES(12),(123),(1234); CREATE TABLE seed_t2(c2 INTEGER); INSERT INTO seed_t2 VALUES(44),(55),(123); CRE"
+    },
+    {
+      "hash": "44eb010696e32f65",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000028797",
+      "top_frames": [
+        "<no-stack-9012ad9096eb9d3d>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b TEXT CHECK (TRUE), rowid INT CHECK (NULL)); CREATE TABLE IF NOT EXISTS q(a INT NOT NULL); VALUES (NULL); CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 VALUES(12)"
+    },
+    {
+      "hash": "7cee07b4f46922e7",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000029310",
+      "top_frames": [
+        "<no-stack-1e11307555982ea7>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a NUMERIC, c1 AS(c1) UNIQUE); VALUES (TRUE - FALSE); CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 VALUES(12),(123),(1234); CREATE TABLE seed_t2(c2 INTEGER); INSER"
+    },
+    {
+      "hash": "8dbd124b4d1623ef",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000029338",
+      "top_frames": [
+        "<no-stack-2849a09165a50f96>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 BOOLEAN NOT NULL DEFAULT X'7DeA60E1f7ae'); CREATE TABLE IF NOT EXISTS q(c2 VARCHAR(255) UNIQUE); INSERT INTO q DEFAULT VALUES; PRAGMA integrity_check; CREATE TABLE seed"
+    },
+    {
+      "hash": "78098d5e542c234f",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000029358",
+      "top_frames": [
+        "<no-stack-a3822797e7100f69>"
+      ],
+      "sql_preview": "SELECT round(-1.0, 1); CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 VALUES(12),(123),(1234); CREATE TABLE seed_t2(c2 INTEGER); INSERT INTO seed_t2 VALUES(44),(55),(123); CREATE TABLE seed_t3("
+    },
+    {
+      "hash": "5019720772cfbce7",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000029417",
+      "top_frames": [
+        "<no-stack-e0e982bd88d57e21>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 FLOAT PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(c3 INT UNIQUE); SELECT * FROM q JOIN q e ON CAST(TRUE AS DATE); CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 V"
+    },
+    {
+      "hash": "c8ee9fe84a86a490",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000030076",
+      "top_frames": [
+        "<no-stack-362d0f2a7d01dcf0>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a NUMERIC, b AS(b) UNIQUE); SELECT DISTINCT *, * FROM json_each('{\"a\":{\"b\":1}}'); CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 VALUES(12),(123),(1234); CREATE TAB"
+    },
+    {
+      "hash": "8e87555765ca3eee",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000031887",
+      "top_frames": [
+        "<no-stack-b611a84a3cfbff2f>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 VARCHAR(255) PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(c2 INTEGER DEFAULT 76782192891242715200479936.3E5); INSERT INTO q DEFAULT VALUES; PRAGMA integrity_check; CREATE"
+    },
+    {
+      "hash": "5294d9883cec0876",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000034516",
+      "top_frames": [
+        "<no-stack-dd295ef5d4b913b6>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 INTEGER CHECK (CURRENT_TIME), c3 INTEGER PRIMARY KEY); EXPLAIN QUERY PLAN VALUES (CURRENT_DATE); CREATE TABLE IF NOT EXISTS p(c3 NUMERIC PRIMARY KEY, _rowid_ VARCHAR(25"
+    },
+    {
+      "hash": "c41c7a5a567a8562",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000035136",
+      "top_frames": [
+        "<no-stack-e6524af6b007d507>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 INTEGER PRIMARY KEY, _rowid_ VARCHAR(255) UNIQUE); CREATE TABLE IF NOT EXISTS q(b BOOLEAN NOT NULL); INSERT OR ROLLBACK INTO p VALUES (CURRENT_DATE != CURRENT_TIMESTAMP"
+    },
+    {
+      "hash": "52d1f322eb720d81",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000035172",
+      "top_frames": [
+        "<no-stack-a4a7e46f1eb2735d>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b TEXT CHECK (CURRENT_DATE OR CURRENT_TIMESTAMP IS CURRENT_TIME), _rowid_ VARCHAR(255) UNIQUE); CREATE TABLE IF NOT EXISTS q(b BOOLEAN NOT NULL); INSERT OR ROLLBACK INTO p"
+    },
+    {
+      "hash": "40d2631155b0af85",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000035194",
+      "top_frames": [
+        "<no-stack-0f1aea10969f12b7>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 NUMERIC PRIMARY KEY, b TEXT CHECK (NULL NOT BETWEEN CURRENT_TIMESTAMP AND CURRENT_DATE)); CREATE TABLE IF NOT EXISTS q(b BOOLEAN NOT NULL); INSERT OR ROLLBACK INTO p VA"
+    },
+    {
+      "hash": "ec5254c2e800b4a2",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000035200",
+      "top_frames": [
+        "<no-stack-5aa21f8386367aca>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 REAL UNIQUE, _rowid_ VARCHAR(255) UNIQUE); CREATE TABLE IF NOT EXISTS q(b BOOLEAN NOT NULL); INSERT OR ROLLBACK INTO p VALUES (CURRENT_DATE != CURRENT_TIMESTAMP, NULL);"
+    },
+    {
+      "hash": "53e40f7e07da9e3d",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000035223",
+      "top_frames": [
+        "<no-stack-71e66eedc7e16a82>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 NUMERIC PRIMARY KEY, _rowid_ VARCHAR(255) UNIQUE); CREATE TABLE IF NOT EXISTS q(b BOOLEAN NOT NULL); INSERT OR ROLLBACK INTO p VALUES (CURRENT_DATE != CURRENT_TIMESTAMP"
+    },
+    {
+      "hash": "365b93a91d8f1244",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000035230",
+      "top_frames": [
+        "<no-stack-d3dfd738f9c4ed54>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 NUMERIC PRIMARY KEY, _rowid_ VARCHAR(255) UNIQUE); CREATE TABLE IF NOT EXISTS q(b BOOLEAN NOT NULL); INSERT OR ROLLBACK INTO p VALUES (CURRENT_TIME IS NULL, NULL); VALU"
+    },
+    {
+      "hash": "6b3969ff5d251edd",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000035523",
+      "top_frames": [
+        "<no-stack-ee4d1038c017c7f5>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a TEXT NOT NULL DEFAULT FALSE, _rowid_ VARCHAR(255) UNIQUE); CREATE TABLE IF NOT EXISTS q(b BOOLEAN NOT NULL); INSERT OR ROLLBACK INTO p VALUES (NULL NOT NULL != CURRENT_T"
+    },
+    {
+      "hash": "316fa3be2275aad6",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000035540",
+      "top_frames": [
+        "<no-stack-40b50b1faabb2ebf>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 NUMERIC PRIMARY KEY, _rowid_ VARCHAR(255) UNIQUE); CREATE TABLE IF NOT EXISTS q(b BOOLEAN NOT NULL); INSERT OR ROLLBACK INTO p VALUES (NULL NOT NULL != CURRENT_TIMESTAM"
+    },
+    {
+      "hash": "bf83ec79631a9e7b",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000035557",
+      "top_frames": [
+        "<no-stack-64e6e107564697d9>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 NUMERIC PRIMARY KEY, b TEXT CHECK (NULL NOT BETWEEN CURRENT_TIMESTAMP AND CURRENT_DATE >= FALSE IN (CURRENT_TIME))); CREATE TABLE IF NOT EXISTS q(b BOOLEAN NOT NULL); I"
+    },
+    {
+      "hash": "5e54f7daf4a5c0b5",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000035570",
+      "top_frames": [
+        "<no-stack-8dceb68966ab5d95>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 NUMERIC PRIMARY KEY, _rowid_ VARCHAR(255) UNIQUE); CREATE TABLE IF NOT EXISTS q(b BOOLEAN NOT NULL); INSERT OR ROLLBACK INTO p VALUES (NULL NOT NULL != CURRENT_TIMESTAM"
+    },
+    {
+      "hash": "192d94df80cb6e4a",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000035598",
+      "top_frames": [
+        "<no-stack-ebba58c680449453>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 NUMERIC PRIMARY KEY, _rowid_ VARCHAR(255) UNIQUE); CREATE TABLE IF NOT EXISTS q(c3 BOOLEAN UNIQUE, rowid BLOB GENERATED ALWAYS AS (FALSE LIKE TRUE) VIRTUAL); INSERT OR "
+    },
+    {
+      "hash": "b5631e90d1f1ab75",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000037434",
+      "top_frames": [
+        "<no-stack-9fb7b086d7f7c889>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a TEXT); INSERT INTO p DEFAULT VALUES; PRAGMA quick_check; CREATE TABLE seed_b(b INTEGER); INSERT INTO seed_b VALUES (1),(2),(3); SELECT(SELECT b FROM seed_b GROUP BY b HA"
+    },
+    {
+      "hash": "45f185d815b2b967",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000037483",
+      "top_frames": [
+        "<no-stack-d8605e5d1b5d48db>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(rowid INT CHECK (CASE TRUE WHEN TRUE IS CURRENT_TIME THEN NULL END), c3 DATE PRIMARY KEY); INSERT INTO p DEFAULT VALUES; PRAGMA integrity_check; CREATE TABLE seed_t1(c1 IN"
+    },
+    {
+      "hash": "aa8557ddfc7f9f4c",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000037555",
+      "top_frames": [
+        "<no-stack-a869581656c8c548>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(_rowid_ REAL NOT NULL DEFAULT FALSE, c3 DATE PRIMARY KEY); INSERT INTO p DEFAULT VALUES; PRAGMA integrity_check; CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 VALU"
+    },
+    {
+      "hash": "016b1cf7c14872bb",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000038089",
+      "top_frames": [
+        "<no-stack-44a46ba13563fd5c>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 DATE UNIQUE, c3 DATE PRIMARY KEY); INSERT INTO p DEFAULT VALUES; PRAGMA quick_check; CREATE TABLE IF NOT EXISTS p(b VARCHAR(255) UNIQUE); CREATE TABLE IF NOT EXISTS q(c"
+    },
+    {
+      "hash": "3439b5f66fe79ea3",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000038121",
+      "top_frames": [
+        "<no-stack-757105cdd1eb52d4>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 DATE UNIQUE, b TEXT CHECK (FALSE >= NULL)); INSERT INTO p DEFAULT VALUES; PRAGMA quick_check; CREATE TABLE IF NOT EXISTS p(a TEXT, b AS(b) UNIQUE); INSERT INTO p DEFAUL"
+    },
+    {
+      "hash": "fe9f9cf300403899",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000038168",
+      "top_frames": [
+        "<no-stack-cb04ae618dc84b38>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 DATE UNIQUE, c3 DATE PRIMARY KEY); INSERT INTO p DEFAULT VALUES; PRAGMA quick_check; CREATE TABLE IF NOT EXISTS p(a TEXT, b AS(b) UNIQUE); INSERT INTO p (rowid) VALUES "
+    },
+    {
+      "hash": "c675ad56d3bc7153",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000038190",
+      "top_frames": [
+        "<no-stack-e81b6ed037eeca89>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 DATE UNIQUE, b TEXT CHECK (CASE TRUE WHEN CASE TRUE WHEN CASE TRUE WHEN CASE TRUE WHEN CASE TRUE WHEN CURRENT_TIMESTAMP THEN NULL END THEN NULL END THEN NULL END THEN N"
+    },
+    {
+      "hash": "3ab2ee7cd6bd9011",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000038198",
+      "top_frames": [
+        "<no-stack-46838a8c99747c61>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 DATE UNIQUE, c3 DATE PRIMARY KEY); INSERT INTO p DEFAULT VALUES; PRAGMA quick_check; CREATE TABLE IF NOT EXISTS p(c1 BOOLEAN NOT NULL DEFAULT X'7DeA60E1f7ae'); CREATE T"
+    },
+    {
+      "hash": "5618b3260fda3a88",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000038232",
+      "top_frames": [
+        "<no-stack-074fb59dd3179851>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b INTEGER NOT NULL DEFAULT 0, c3 DATE PRIMARY KEY); INSERT INTO p DEFAULT VALUES; PRAGMA quick_check; CREATE TABLE IF NOT EXISTS p(a TEXT, b AS(b) UNIQUE); INSERT INTO p D"
+    },
+    {
+      "hash": "9ceb143afb619edc",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000038269",
+      "top_frames": [
+        "<no-stack-43b78e4330e02e02>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b BOOLEAN DEFAULT -38101, c3 DATE PRIMARY KEY); INSERT INTO p DEFAULT VALUES; PRAGMA quick_check; CREATE TABLE IF NOT EXISTS p(a TEXT, b AS(b) UNIQUE); INSERT INTO p DEFAU"
+    },
+    {
+      "hash": "790e90da48e4f4db",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000038551",
+      "top_frames": [
+        "<no-stack-82924ace888e0ecc>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(rowid INT CHECK (NULL), b TEXT CHECK (CASE TRUE WHEN CASE TRUE WHEN CASE TRUE WHEN CASE TRUE WHEN CASE TRUE WHEN CASE TRUE WHEN CASE TRUE WHEN CASE TRUE WHEN CURRENT_TIMES"
+    },
+    {
+      "hash": "35a0cba62909878f",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000038569",
+      "top_frames": [
+        "<no-stack-ab7ab0e9208ab333>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(rowid INT CHECK (NULL), c3 DATE PRIMARY KEY); INSERT INTO p DEFAULT VALUES; PRAGMA quick_check; CREATE TABLE IF NOT EXISTS p(a INTEGER, b AS(b) NOT NULL); SELECT * FROM p "
+    },
+    {
+      "hash": "cca9140e73d101fb",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000038583",
+      "top_frames": [
+        "<no-stack-f26a0b8bf1e6c20b>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(rowid INT CHECK (NULL), c3 DATE PRIMARY KEY); INSERT INTO p DEFAULT VALUES; PRAGMA quick_check; CREATE TABLE IF NOT EXISTS p(c3 REAL NOT NULL DEFAULT -64588, b DATE PRIMAR"
+    },
+    {
+      "hash": "96329ac974e69e27",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000038605",
+      "top_frames": [
+        "<no-stack-0805956d7538e94d>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 BLOB NOT NULL DEFAULT -0826933089679854844712852225540510065366366106334344702293404555108921431991026853490665760.6e948, c3 DATE PRIMARY KEY); INSERT INTO p DEFAULT VA"
+    },
+    {
+      "hash": "dd48846a4ed17b28",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000039778",
+      "top_frames": [
+        "<no-stack-3fe285490fe888d5>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 INTEGER DEFAULT X'EfBaEa48'); INSERT INTO p DEFAULT VALUES; PRAGMA integrity_check; CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 VALUES(12),(123),(1234); CREAT"
+    },
+    {
+      "hash": "52483cb91e91c9aa",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000040413",
+      "top_frames": [
+        "<no-stack-b672d732673550dc>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(b REAL PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(rowid INT CHECK (FALSE)); SELECT FALSE * NOT CURRENT_TIMESTAMP IS FALSE, * FROM p WHERE EXISTS (VALUES (TRUE)); CREATE TA"
+    },
+    {
+      "hash": "cf095a071fc1f8e5",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000040644",
+      "top_frames": [
+        "<no-stack-efa5e2c45629d7f4>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a NUMERIC, b AS(b) NOT NULL); SELECT * FROM json_tree('{\"a\":{\"b\":1}}') WHERE CURRENT_TIMESTAMP GROUP BY NULL WINDOW w1 AS () ORDER BY NULL ASC NULLS LAST; CREATE TABLE see"
+    },
+    {
+      "hash": "73e21feec79b9bc0",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000043441",
+      "top_frames": [
+        "<no-stack-b6070abc96785d66>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) UNIQUE); WITH RECURSIVE p AS (SELECT DISTINCT FALSE * NOT CURRENT_TIMESTAMP IS FALSE FROM json_tree('[1,2,3]')) SELECT * FROM p; CREATE TABLE seed_t1(c1 IN"
+    },
+    {
+      "hash": "1b9d5898eee13e64",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000043453",
+      "top_frames": [
+        "<no-stack-feabe483ebe2a0e9>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (ntile(CURRENT_DATE) OVER ())) SELECT * FROM p; CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 VALUES(12),(123)"
+    },
+    {
+      "hash": "cd4c9868cabd23f4",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000043470",
+      "top_frames": [
+        "<no-stack-b8020454570be9d1>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) UNIQUE); WITH RECURSIVE p AS (VALUES (count(DISTINCT NULL) FILTER (WHERE FALSE))) SELECT * FROM p; CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 VA"
+    },
+    {
+      "hash": "d76becb7aadd8213",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000043481",
+      "top_frames": [
+        "<no-stack-200e9c696987cbf8>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) UNIQUE); WITH RECURSIVE p AS (SELECT DISTINCT * FROM json_tree('[1,2,3]')) SELECT count() FILTER (WHERE FALSE) OVER (), * FROM p; CREATE TABLE seed_t1(c1 I"
+    },
+    {
+      "hash": "72f764cf904dce5f",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000043494",
+      "top_frames": [
+        "<no-stack-97f0b86af558bd9f>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) UNIQUE); WITH RECURSIVE p AS (SELECT DISTINCT * FROM json_tree('[{\"a\":1},{\"b\":2}]')) SELECT * FROM p; CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1"
+    },
+    {
+      "hash": "51eb0531453c47a8",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000043529",
+      "top_frames": [
+        "<no-stack-40c8af9175ad64a4>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) UNIQUE); WITH RECURSIVE p AS (SELECT DISTINCT *, * FROM json_tree('[1,2,3]')) SELECT * FROM p; CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 VALUES"
+    },
+    {
+      "hash": "c7a1cc36ad9abd44",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000043557",
+      "top_frames": [
+        "<no-stack-b4129273cdbe7d6d>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) UNIQUE); WITH RECURSIVE p AS (SELECT DISTINCT * FROM json_tree('[1,2,3]')) SELECT p.* FROM p; CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 VALUES("
+    },
+    {
+      "hash": "3d70808cb7cecf0a",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000043626",
+      "top_frames": [
+        "<no-stack-ed9c13d408e252b1>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) UNIQUE); WITH RECURSIVE p AS (SELECT DISTINCT * FROM json_tree('[1,2,3]')) SELECT * FROM p; CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) UNIQUE); WITH RECU"
+    },
+    {
+      "hash": "ed90bae5b2b748f4",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000050769",
+      "top_frames": [
+        "<no-stack-ce8335ef58b3ed88>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) UNIQUE); WITH RECURSIVE p AS (SELECT DISTINCT CURRENT_TIMESTAMP IN (VALUES (NULL)) AS y89__ FROM json_tree('[1,2,3]')) SELECT * FROM p; CREATE TABLE seed_t"
+    },
+    {
+      "hash": "14377856d85b13a2",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000050778",
+      "top_frames": [
+        "<no-stack-938c1669df2938a0>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) UNIQUE); WITH RECURSIVE p AS (SELECT DISTINCT count() FILTER (WHERE FALSE) OVER (), * FROM json_tree('[1,2,3]')) SELECT * FROM p; CREATE TABLE seed_t1(c1 I"
+    },
+    {
+      "hash": "2658bf2887ad8b73",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000050787",
+      "top_frames": [
+        "<no-stack-cf30f2bb4adc98ae>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) UNIQUE); WITH RECURSIVE p AS (SELECT DISTINCT * FROM json_each('[{\"a\":1},{\"b\":2}]')) SELECT * FROM p; CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1"
+    },
+    {
+      "hash": "4a703e0e7d805d38",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000050805",
+      "top_frames": [
+        "<no-stack-90b251f64ebedb8b>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a BLOB, b AS(b) UNIQUE); WITH RECURSIVE p AS (SELECT DISTINCT count(*) OVER (PARTITION BY FALSE ORDER BY FALSE DESC ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUD"
+    },
+    {
+      "hash": "4182f7e5659268e3",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000051594",
+      "top_frames": [
+        "<no-stack-d7130450c1fed879>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a NUMERIC, c1 AS(c1) UNIQUE); EXPLAIN QUERY PLAN SELECT count(*) OVER (PARTITION BY FALSE ORDER BY FALSE DESC ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE CURR"
+    },
+    {
+      "hash": "8b350e46bf551c47",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000058641",
+      "top_frames": [
+        "<no-stack-6ba6eb81614158ef>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 NUMERIC, a GENERATED ALWAYS AS (a) NOT NULL UNIQUE, c1 BOOLEAN PRIMARY KEY); SELECT * FROM json_tree(CURRENT_TIME, '$') JOIN json_each('{}') NATURAL LEFT JOIN json_each"
+    },
+    {
+      "hash": "ddc37af4be19d414",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000058651",
+      "top_frames": [
+        "<no-stack-9353bba64e9ce4d6>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 NUMERIC, a GENERATED ALWAYS AS (a) NOT NULL UNIQUE, c1 BOOLEAN PRIMARY KEY); SELECT count(*) OVER (PARTITION BY FALSE ORDER BY FALSE DESC ROWS BETWEEN UNBOUNDED PRECEDI"
+    },
+    {
+      "hash": "91ff253b4e9c0180",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000058731",
+      "top_frames": [
+        "<no-stack-1ca4f085a60aa599>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 NUMERIC, a GENERATED ALWAYS AS (c2) NOT NULL UNIQUE, c1 BOOLEAN PRIMARY KEY); SELECT * FROM p WHERE EXISTS (VALUES (FALSE)); CREATE TABLE seed_t1(c1 INTEGER); INSERT IN"
+    },
+    {
+      "hash": "e8cac1c7bc980055",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000058818",
+      "top_frames": [
+        "<no-stack-6138e193b5bc22ec>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a NUMERIC, b AS(b) NOT NULL); WITH RECURSIVE p AS (SELECT DISTINCT cume_dist() OVER () FROM json_each('[1,2,3]')) SELECT * FROM p; CREATE TABLE seed_t1(c1 INTEGER); INSERT"
+    },
+    {
+      "hash": "29ac38843dd0d54d",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000059017",
+      "top_frames": [
+        "<no-stack-765d36acf3207360>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a NUMERIC, b AS(b) NOT NULL); SELECT X'900fc5A8' AS o__l_2869_ FROM p WHERE EXISTS (VALUES (FALSE)); CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 VALUES(12),(123)"
+    },
+    {
+      "hash": "35ac64960bff09ee",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000059050",
+      "top_frames": [
+        "<no-stack-027c1b6c87be3a69>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a NUMERIC, b AS(b) NOT NULL); WITH RECURSIVE r AS (SELECT *) SELECT count(*) OVER (PARTITION BY FALSE ORDER BY CURRENT_TIME COLLATE BINARY ASC NULLS LAST ROWS BETWEEN UNBO"
+    },
+    {
+      "hash": "58cee1ac7bc26734",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000059267",
+      "top_frames": [
+        "<no-stack-9b79a42c89fc14dc>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a NUMERIC, b AS(b) NOT NULL); SELECT count() FILTER (WHERE FALSE) OVER (), CURRENT_TIMESTAMP IN (VALUES (NULL)) AS y89__ FROM p WHERE EXISTS (VALUES (TRUE)); CREATE TABLE "
+    },
+    {
+      "hash": "6fee666fac42e936",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000059289",
+      "top_frames": [
+        "<no-stack-8957e2584bbe1300>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a NUMERIC, b AS(b) NOT NULL); SELECT count() FILTER (WHERE FALSE) OVER (), first_value(CURRENT_TIME) OVER () FROM p WHERE EXISTS (VALUES (TRUE)); CREATE TABLE seed_t1(c1 I"
+    },
+    {
+      "hash": "63b290bfafdf750f",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000059298",
+      "top_frames": [
+        "<no-stack-cfaaff91c6cfeacf>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a NUMERIC, b AS(b) NOT NULL); SELECT dense_rank() OVER () FROM p WHERE EXISTS (VALUES (TRUE)); CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 VALUES(12),(123),(1234"
+    },
+    {
+      "hash": "06ed00d9ab178bfc",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000059317",
+      "top_frames": [
+        "<no-stack-c2fcec41050be87e>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a NUMERIC, b AS(b) NOT NULL); WITH RECURSIVE p AS (SELECT DISTINCT CAST(TRUE AS BLOB) AS a FROM json_each('[1,2,3]')) SELECT * FROM p; CREATE TABLE seed_t1(c1 INTEGER); IN"
+    },
+    {
+      "hash": "844e0d0b4743fcdc",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000059354",
+      "top_frames": [
+        "<no-stack-96c951ce3a5b5b28>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 NUMERIC UNIQUE); INSERT OR ABORT INTO p VALUES (random()); PRAGMA quick_check; CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 VALUES(12),(123),(1234); CREATE TAB"
+    },
+    {
+      "hash": "e3299c9f200f1f26",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000059368",
+      "top_frames": [
+        "<no-stack-535cffcfbd9bbff5>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a NUMERIC, b AS(b) NOT NULL); SELECT rank() OVER () FROM p WHERE EXISTS (VALUES (TRUE)); CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 VALUES(12),(123),(1234); CRE"
+    },
+    {
+      "hash": "c4d639cec8bf08e2",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000059488",
+      "top_frames": [
+        "<no-stack-7dfce04ec1ec7f70>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a NUMERIC, b AS(b) NOT NULL); SELECT count() FILTER (WHERE FALSE) OVER (), count(*) OVER () FROM p WHERE EXISTS (VALUES (TRUE)); CREATE TABLE seed_t1(c1 INTEGER); INSERT I"
+    },
+    {
+      "hash": "dfb0877b683d1663",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000059495",
+      "top_frames": [
+        "<no-stack-d7c6d6fc10b460fb>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a NUMERIC, b AS(b) NOT NULL); SELECT count() FILTER (WHERE FALSE) OVER (), count(*) OVER (PARTITION BY TRUE, TRUE) FROM p WHERE EXISTS (VALUES (TRUE)); CREATE TABLE seed_t"
+    },
+    {
+      "hash": "0813b25ca2a2aa6d",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000059529",
+      "top_frames": [
+        "<no-stack-d9fd94ac2f9639ef>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a NUMERIC, b AS(b) NOT NULL); SELECT TRUE, first_value(CURRENT_TIME) OVER () FROM p WHERE EXISTS (VALUES (TRUE)); CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 VAL"
+    },
+    {
+      "hash": "d6e54ead12d5c3ba",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000060390",
+      "top_frames": [
+        "<no-stack-ec9d6694f0e3aeb9>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL DEFAULT X'abb4B45203AD'); INSERT INTO p DEFAULT VALUES; PRAGMA integrity_check; CREATE TABLE IF NOT EXISTS p(c1 NUMERIC); CREATE TABLE IF NOT EXISTS q(rowid INT UNI"
+    },
+    {
+      "hash": "b05197cb757a6db8",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000060557",
+      "top_frames": [
+        "<no-stack-9947121ba16f9845>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 INTEGER DEFAULT X'EfBaEa48'); WITH q (c2) AS (SELECT * ORDER BY RAISE(IGNORE) DESC NULLS FIRST LIMIT RAISE(IGNORE)), p AS (SELECT *) INSERT INTO p VALUES (CURRENT_TIMES"
+    },
+    {
+      "hash": "491aa440184f874f",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000060592",
+      "top_frames": [
+        "<no-stack-2211686396d91044>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 BOOLEAN UNIQUE, rowid BLOB GENERATED ALWAYS AS (FALSE LIKE TRUE) VIRTUAL); INSERT INTO p DEFAULT VALUES; PRAGMA integrity_check; CREATE TABLE seed_t1(c1 INTEGER); INSER"
+    },
+    {
+      "hash": "6592a72596221acc",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000062385",
+      "top_frames": [
+        "<no-stack-d04b0a635019a462>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 INT PRIMARY KEY); INSERT INTO p DEFAULT VALUES; PRAGMA quick_check; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts3(rowid, b); INSERT INTO p DEFAULT VALUES; PRAGMA"
+    },
+    {
+      "hash": "b15bacb95d5dddb6",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000063744",
+      "top_frames": [
+        "<no-stack-1a18d4d2340ec623>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(rowid INT CHECK (TRUE || CURRENT_TIMESTAMP NOT NULL), b TEXT CHECK (TRUE)); INSERT INTO p DEFAULT VALUES; PRAGMA integrity_check; CREATE TABLE seed_t1(c1 INTEGER); INSERT "
+    },
+    {
+      "hash": "4a941697e2a397f9",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000063771",
+      "top_frames": [
+        "<no-stack-4359670ccce1df8a>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(rowid INTEGER NOT NULL DEFAULT -676629749962.853626459253872629507202616677, b TEXT CHECK (TRUE)); INSERT INTO p DEFAULT VALUES; PRAGMA integrity_check; CREATE TABLE seed_"
+    },
+    {
+      "hash": "97aa294cbfafe4fa",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000063805",
+      "top_frames": [
+        "<no-stack-f18ff97bd2cb93c2>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(rowid INT CHECK (CASE TRUE WHEN CASE TRUE WHEN CASE TRUE WHEN CASE TRUE WHEN CASE TRUE WHEN CASE TRUE WHEN CURRENT_TIMESTAMP THEN NULL END THEN NULL END THEN NULL END THEN"
+    },
+    {
+      "hash": "ec4707453a620a10",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000063969",
+      "top_frames": [
+        "<no-stack-c34fba0acff9943b>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 TEXT CHECK (CURRENT_DATE IS NOT CURRENT_TIME COLLATE RTRIM)); CREATE TABLE IF NOT EXISTS q(c3 DATE); INSERT INTO p DEFAULT VALUES; PRAGMA integrity_check; CREATE TABLE "
+    },
+    {
+      "hash": "7d2eb7f65a236137",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000064001",
+      "top_frames": [
+        "<no-stack-61bb81e2aa340536>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(rowid INT CHECK (NULL <= CURRENT_TIMESTAMP IS NULL), c3 DATE PRIMARY KEY); INSERT INTO p DEFAULT VALUES; PRAGMA integrity_check; CREATE TABLE seed_t1(c1 INTEGER); INSERT I"
+    },
+    {
+      "hash": "d8b99b5f4388a80e",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000064018",
+      "top_frames": [
+        "<no-stack-5a3dfb8898f59054>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(rowid INT CHECK (TRUE AND CURRENT_DATE), c3 DATE PRIMARY KEY); INSERT INTO p DEFAULT VALUES; PRAGMA integrity_check; CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 "
+    },
+    {
+      "hash": "dcf8ed3866655853",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000065999",
+      "top_frames": [
+        "<no-stack-70d7089daf8f93a2>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 NUMERIC PRIMARY KEY, _rowid_ VARCHAR(255) UNIQUE); CREATE TABLE IF NOT EXISTS q(b BOOLEAN NOT NULL); INSERT OR ROLLBACK INTO p VALUES (TRUE, NULL); VALUES (NULL) EXCEPT"
+    },
+    {
+      "hash": "b9365c48538bd4f5",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000066033",
+      "top_frames": [
+        "<no-stack-9d00d873f6b705d1>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 REAL NOT NULL DEFAULT -64588, b DATE PRIMARY KEY); CREATE INDEX IF NOT EXISTS idx1 ON p(c3); INSERT OR ROLLBACK INTO p VALUES (TRUE, NULL); SELECT DISTINCT * FROM p LEF"
+    },
+    {
+      "hash": "eebbbc31a7fe06f9",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000066053",
+      "top_frames": [
+        "<no-stack-7c93bc2cef62e316>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 NUMERIC PRIMARY KEY, _rowid_ VARCHAR(255) UNIQUE); CREATE TABLE IF NOT EXISTS q(b BOOLEAN NOT NULL); INSERT OR ROLLBACK INTO p VALUES (TRUE, NULL); SELECT DISTINCT *, *"
+    },
+    {
+      "hash": "5fa9a9a36e74df59",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000066069",
+      "top_frames": [
+        "<no-stack-d286d41593d8dc63>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 NUMERIC PRIMARY KEY, _rowid_ VARCHAR(255) UNIQUE); CREATE TABLE IF NOT EXISTS q(b BOOLEAN NOT NULL); INSERT OR ROLLBACK INTO p VALUES (TRUE, NULL); SELECT DISTINCT FALS"
+    },
+    {
+      "hash": "82c1c0e14a7497a9",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000066152",
+      "top_frames": [
+        "<no-stack-8ff61e65cc0fc82c>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 NUMERIC PRIMARY KEY, _rowid_ VARCHAR(255) UNIQUE); CREATE TABLE IF NOT EXISTS q(b BOOLEAN NOT NULL); INSERT OR ROLLBACK INTO p VALUES (TRUE, NULL); SELECT DISTINCT * FR"
+    },
+    {
+      "hash": "54c3b29a9e3368af",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000066159",
+      "top_frames": [
+        "<no-stack-e34b8a3a7106e62d>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 NUMERIC PRIMARY KEY, _rowid_ VARCHAR(255) UNIQUE); CREATE TABLE IF NOT EXISTS q(b BOOLEAN NOT NULL); INSERT OR ROLLBACK INTO p VALUES (TRUE, NULL); SELECT DISTINCT * FR"
+    },
+    {
+      "hash": "a1009174a4bb267d",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000068516",
+      "top_frames": [
+        "<no-stack-8673da2e25de769d>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 INTEGER PRIMARY KEY); EXPLAIN QUERY PLAN SELECT DISTINCT * FROM p NOT INDEXED WHERE TRUE; CREATE TABLE IF NOT EXISTS p(a TEXT UNIQUE, a TEXT GENERATED ALWAYS AS (NULL) "
+    }
+  ]
+}

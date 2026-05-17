@@ -1,0 +1,217 @@
+{
+  "total_crashes": 17,
+  "unique_crashes": 17,
+  "summary": {
+    "asan": 0,
+    "ubsan": 0,
+    "debug_assert": 17,
+    "signal": 0,
+    "timeout": 0
+  },
+  "crashes": [
+    {
+      "hash": "2632ad3a906b881c",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": 0,
+      "count": 1,
+      "sample_file": "5_000000358",
+      "top_frames": [
+        "<no-stack-64727ac16e6b8a9d>"
+      ],
+      "sql_preview": "BEGIN TRANSACTION; DROP TABLE IF EXISTS t3; WITH RECURSIVE t1 (c3, c2, _rowid_) AS NOT MATERIALIZED (SELECT ALL * ORDER BY -CURRENT_TIME DESC NULLS FIRST LIMIT RAISE(IGNORE)), t1 AS (SELECT ALL * EXCE"
+    },
+    {
+      "hash": "ba2224af3b9d3ee9",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": 0,
+      "count": 1,
+      "sample_file": "5_000000777",
+      "top_frames": [
+        "<no-stack-1de2b6a5c66de822>"
+      ],
+      "sql_preview": "INSERT INTO t2 (rowid, _rowid_) VALUES (json_array(NOT EXISTS (SELECT DISTINCT ~-CURRENT_TIMESTAMP NOT IN (SELECT t1.*) & CASE WHEN FALSE = CURRENT_DATE / +NULL / count(DISTINCT TRUE) - CASE FALSE COL"
+    },
+    {
+      "hash": "ad0754187ca87677",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": 0,
+      "count": 1,
+      "sample_file": "5_000000928",
+      "top_frames": [
+        "<no-stack-e247a8e4bb70cf45>"
+      ],
+      "sql_preview": "DELETE FROM t2; UPDATE t3 SET _rowid_ = 'Nt_ --_-GJg3R7Pu_' IS NULL | total_changes() -> c3, rowid = total_changes() OVER (PARTITION BY NULL <> CURRENT_TIME ISNULL IS NOT DISTINCT FROM CASE TRUE WHEN "
+    },
+    {
+      "hash": "83045152cb72a078",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": 0,
+      "count": 1,
+      "sample_file": "5_000004419",
+      "top_frames": [
+        "<no-stack-f90a4038f9c3faf5>"
+      ],
+      "sql_preview": "VACUUM; CREATE TABLE t2 (c2 TEXT GENERATED ALWAYS AS (CURRENT_TIME >= CURRENT_TIME >> CASE WHEN TRUE THEN NULL END & CURRENT_TIMESTAMP + FALSE < CASE WHEN TRUE THEN FALSE WHEN CURRENT_TIME THEN TRUE E"
+    },
+    {
+      "hash": "b029107406a99254",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": 0,
+      "count": 1,
+      "sample_file": "5_000004938",
+      "top_frames": [
+        "<no-stack-a92c44c9d9c6aeb1>"
+      ],
+      "sql_preview": "VACUUM INTO ':memory:'; ANALYZE t1;"
+    },
+    {
+      "hash": "9d512fad703104ce",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": 0,
+      "count": 1,
+      "sample_file": "5_000007984",
+      "top_frames": [
+        "<no-stack-00bcfb1439dffaca>"
+      ],
+      "sql_preview": "CREATE INDEX idx1 ON t2 (_rowid_) WHERE -RAISE(IGNORE) <= CURRENT_TIME & CURRENT_TIME IN (WITH RECURSIVE t2 AS (WITH RECURSIVE t1 AS MATERIALIZED (SELECT DISTINCT * LIMIT CURRENT_TIMESTAMP) VALUES (TR"
+    },
+    {
+      "hash": "0037ea98097aa861",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": 0,
+      "count": 1,
+      "sample_file": "5_000010531",
+      "top_frames": [
+        "<no-stack-a014fa53c05b93a4>"
+      ],
+      "sql_preview": "DROP TABLE IF EXISTS t3; ATTACH ':memory:' AS db2; PRAGMA integrity_check; ALTER TABLE t1 RENAME COLUMN rowid TO c2;"
+    },
+    {
+      "hash": "2d4fe57a15c9c7b0",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": 0,
+      "count": 1,
+      "sample_file": "5_000027394",
+      "top_frames": [
+        "<no-stack-bfad42ff34ab8d6c>"
+      ],
+      "sql_preview": "BEGIN IMMEDIATE TRANSACTION; DROP TABLE t2;"
+    },
+    {
+      "hash": "7e2fa5bcec19aed1",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": 0,
+      "count": 1,
+      "sample_file": "5_000028664",
+      "top_frames": [
+        "<no-stack-e599089969a59efa>"
+      ],
+      "sql_preview": "ALTER TABLE t2 RENAME COLUMN c1 TO c1; INSERT INTO t3 WITH t3 AS (SELECT DISTINCT * LIMIT CURRENT_TIME OFFSET NOT CURRENT_TIME) SELECT * FROM t3 INDEXED BY rowid ORDER BY (CURRENT_TIME, CURRENT_TIMEST"
+    },
+    {
+      "hash": "7f746ead72113ac7",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": 0,
+      "count": 1,
+      "sample_file": "5_000028818",
+      "top_frames": [
+        "<no-stack-59a6e32e40038664>"
+      ],
+      "sql_preview": "INSERT OR FAIL INTO t3 VALUES (NOT CASE WHEN CURRENT_DATE THEN NOT EXISTS (SELECT DISTINCT CURRENT_DATE ORDER BY FALSE NULLS LAST, changes() ASC NULLS LAST) END ISNULL LIKE last_insert_rowid() FILTER "
+    },
+    {
+      "hash": "d32bfc2511f7c91b",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": 0,
+      "count": 1,
+      "sample_file": "5_000076720",
+      "top_frames": [
+        "<no-stack-5351456e98a0de90>"
+      ],
+      "sql_preview": "BEGIN IMMEDIATE TRANSACTION; BEGIN IMMEDIATE;"
+    },
+    {
+      "hash": "144c963dbb9ac079",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": 0,
+      "count": 1,
+      "sample_file": "5_000076864",
+      "top_frames": [
+        "<no-stack-36a2e604e36582f5>"
+      ],
+      "sql_preview": "CREATE TRIGGER trg1 AFTER INSERT ON t1 WHEN CASE WHEN RAISE(IGNORE) IS NOT FALSE << FALSE <= +CURRENT_TIMESTAMP LIKE CURRENT_DATE THEN ~FALSE ISNULL OR (RAISE(IGNORE)) WHEN CASE WHEN FALSE THEN RAISE("
+    },
+    {
+      "hash": "8b67dceca2d6933d",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": 0,
+      "count": 1,
+      "sample_file": "5_000077288",
+      "top_frames": [
+        "<no-stack-cafffa2ae12a40d6>"
+      ],
+      "sql_preview": "DROP TABLE IF EXISTS t3; ATTACH ':memory:' AS db2; CREATE VIEW IF NOT EXISTS v1 AS SELECT ALL t1.* FROM t2 UNION ALL SELECT DISTINCT * ORDER BY NULL ASC NULLS FIRST LIMIT NOT CURRENT_TIMESTAMP, CURREN"
+    },
+    {
+      "hash": "1d6b4f98def424f7",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": 0,
+      "count": 1,
+      "sample_file": "5_000087424",
+      "top_frames": [
+        "<no-stack-bcb04906967819d5>"
+      ],
+      "sql_preview": "CREATE TABLE t1 (rowid INT REFERENCES t3 (c3) DEFERRABLE INITIALLY DEFERRED, FOREIGN KEY (rowid) REFERENCES t2 (c1) ON DELETE SET NULL); ATTACH ':memory:' AS db2;"
+    },
+    {
+      "hash": "0d86e93d22b084a8",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": 0,
+      "count": 1,
+      "sample_file": "5_000150776",
+      "top_frames": [
+        "<no-stack-214f6339146ae9f3>"
+      ],
+      "sql_preview": "ATTACH DATABASE ':memory:' AS db2; BEGIN EXCLUSIVE; CREATE INDEX IF NOT EXISTS idx1 ON t3 (c2);"
+    },
+    {
+      "hash": "865bf99a86a45f31",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": 0,
+      "count": 1,
+      "sample_file": "5_000174961",
+      "top_frames": [
+        "<no-stack-5bf0d24fcf89fd2b>"
+      ],
+      "sql_preview": "CREATE TABLE t3 (c1 INT); END;"
+    },
+    {
+      "hash": "dc534a14d1e127c6",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": 0,
+      "count": 1,
+      "sample_file": "5_000284186",
+      "top_frames": [
+        "<no-stack-2d9e1f764b45604d>"
+      ],
+      "sql_preview": "PRAGMA optimize; ALTER TABLE t3 RENAME COLUMN _rowid_ TO _rowid_;"
+    }
+  ]
+}

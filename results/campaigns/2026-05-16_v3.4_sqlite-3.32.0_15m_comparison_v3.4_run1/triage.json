@@ -1,0 +1,265 @@
+{
+  "total_crashes": 21,
+  "unique_crashes": 21,
+  "summary": {
+    "asan": 0,
+    "ubsan": 0,
+    "debug_assert": 20,
+    "signal": 1,
+    "timeout": 0
+  },
+  "crashes": [
+    {
+      "hash": "b3ffbf437ee9bc0d",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": 0,
+      "count": 1,
+      "sample_file": "5_000000178",
+      "top_frames": [
+        "<no-stack-7dcc2a46bef4a5f4>"
+      ],
+      "sql_preview": "SELECT printf('%llu', 9223372036854775807, '-k6 94_V_-2g-__-2'); CREATE TABLE IF NOT EXISTS p(c2 VARCHAR(255) PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(c3 BLOB NOT NULL DEFAULT CURRENT_DATE, c3 INTEG"
+    },
+    {
+      "hash": "5192d5060c1fff73",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": 0,
+      "count": 1,
+      "sample_file": "5_000000244",
+      "top_frames": [
+        "<no-stack-6fb66a1085a3dc26>"
+      ],
+      "sql_preview": "SELECT substr('BIX- --M -_', 1);"
+    },
+    {
+      "hash": "ffa0bc3e3aeca9c0",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": 0,
+      "count": 1,
+      "sample_file": "5_000000314",
+      "top_frames": [
+        "<no-stack-e7fcfd250f52b91b>"
+      ],
+      "sql_preview": "SELECT round(-1.0, 4294967295);"
+    },
+    {
+      "hash": "1368b470f77eb16e",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000001850",
+      "top_frames": [
+        "<no-stack-419c92cb6305f3d6>"
+      ],
+      "sql_preview": "CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a JOIN seed_a b ON 3 = seed_a.c NATURAL JOIN seed_a WHERE seed_a.c IN((SELECT(SELECT coalesce(lead(2) OVER(), SUM(c))) FROM seed_a d WHERE seed"
+    },
+    {
+      "hash": "2b8b07654c317a73",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000001864",
+      "top_frames": [
+        "<no-stack-e40127914988ed9b>"
+      ],
+      "sql_preview": "CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(a, c3); INSERT OR IGNORE INTO p VALUES ((FALSE COLLATE NOCASE) >> b ->> avg(rank() OVER (PARTITION BY CURRENT_TIMESTAMP) >> ~RAISE(IGNORE) AND FALS"
+    },
+    {
+      "hash": "e643d7ee63d5a6e6",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000002000",
+      "top_frames": [
+        "<no-stack-23b83f6ed9f116a6>"
+      ],
+      "sql_preview": "CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(a, c3); INSERT OR IGNORE INTO p VALUES ((jsonb_array(-RAISE(IGNORE) + TRUE OR FALSE, CURRENT_DATE ISNULL NOTNULL, TRUE NOT BETWEEN FALSE AND CURREN"
+    },
+    {
+      "hash": "9da3932255e51982",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": 0,
+      "count": 1,
+      "sample_file": "5_000007721",
+      "top_frames": [
+        "<no-stack-71b57e30a310fdf7>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, c1 AS(c1) UNIQUE); EXPLAIN QUERY PLAN VALUES (CURRENT_TIMESTAMP); CREATE TABLE seed_b(b INTEGER); INSERT INTO seed_b VALUES (1),(2),(3); SELECT(SELECT b FROM seed_"
+    },
+    {
+      "hash": "58b440b3b550088b",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": 0,
+      "count": 1,
+      "sample_file": "5_000016068",
+      "top_frames": [
+        "<no-stack-38466b75fca8b46f>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a FLOAT, c1 AS(c1) UNIQUE); EXPLAIN QUERY PLAN VALUES (CURRENT_TIMESTAMP); SELECT printf('%.*s', 4294967296);"
+    },
+    {
+      "hash": "7e65058c23aca77c",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": 0,
+      "count": 1,
+      "sample_file": "5_000016227",
+      "top_frames": [
+        "<no-stack-452d64cad976e779>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(a REAL, c1 AS(c1) UNIQUE); EXPLAIN QUERY PLAN SELECT cume_dist() OVER (PARTITION BY NULL) << TRUE ISNULL - CASE WHEN CURRENT_TIME THEN NULL IS NULL END AS q_t9m1y8_f_r_tc_"
+    },
+    {
+      "hash": "c8d1358624ca8b0e",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000041336",
+      "top_frames": [
+        "<no-stack-787d8643d05fa320>"
+      ],
+      "sql_preview": "SELECT substr('0aN-t-V-2 P', 0, 4294967296); CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a JOIN seed_a b ON 3 = seed_a.c NATURAL JOIN seed_a WHERE seed_a.c IN((SELECT(SELECT coalesce(lead"
+    },
+    {
+      "hash": "370878cc9e80c7b9",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000041343",
+      "top_frames": [
+        "<no-stack-d0b9a6cfd2c701ca>"
+      ],
+      "sql_preview": "SELECT round(1e308, 2147483648); CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a JOIN seed_a b ON 3 = seed_a.c NATURAL JOIN seed_a WHERE seed_a.c IN((SELECT(SELECT coalesce(lead(2) OVER(), "
+    },
+    {
+      "hash": "1606991e2c6cd577",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": 0,
+      "count": 1,
+      "sample_file": "5_000041392",
+      "top_frames": [
+        "<no-stack-255f789c3f77d452>"
+      ],
+      "sql_preview": "SELECT hex(zeroblob(0)); SELECT hex(zeroblob(-9223372036854775808));"
+    },
+    {
+      "hash": "544dbbbf9b462a4c",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000041442",
+      "top_frames": [
+        "<no-stack-af395599b6f18ca2>"
+      ],
+      "sql_preview": "SELECT substr('0aN-t-V-2 P', 0, -9223372036854775808); SELECT substr('0aN-t-V-2 P', 0, -9223372036854775808); SELECT substr('0aN-t-V-2 P', 0, -9223372036854775808); SELECT substr('0aN-t-V-2 P', 0, -92"
+    },
+    {
+      "hash": "b05fc387c396eff8",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000062738",
+      "top_frames": [
+        "<no-stack-81e6a02513adb561>"
+      ],
+      "sql_preview": "SELECT printf('%s', 2147483647, ''); CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a JOIN seed_a b ON 3 = seed_a.c NATURAL JOIN seed_a WHERE seed_a.c IN((SELECT(SELECT coalesce(lead(2) OVER"
+    },
+    {
+      "hash": "224f2a22773291f3",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000062754",
+      "top_frames": [
+        "<no-stack-219dab0d561f54fb>"
+      ],
+      "sql_preview": "SELECT substr('0aN-t-V-2 P', 0, 4294967295); CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a JOIN seed_a b ON 3 = seed_a.c NATURAL JOIN seed_a WHERE seed_a.c IN((SELECT(SELECT coalesce(lead"
+    },
+    {
+      "hash": "d9d698527fd1f219",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000063990",
+      "top_frames": [
+        "<no-stack-aeb51e2352384fb4>"
+      ],
+      "sql_preview": "SELECT printf('%s', 9223372036854775807, ''); CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a JOIN seed_a b ON 3 = seed_a.c NATURAL JOIN seed_a WHERE seed_a.c IN((SELECT(SELECT coalesce(lea"
+    },
+    {
+      "hash": "c98b28be667eb1c4",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": 0,
+      "count": 1,
+      "sample_file": "5_000064030",
+      "top_frames": [
+        "<no-stack-c815cf167880476e>"
+      ],
+      "sql_preview": "SELECT printf('%s', 2147483647, ''); CREATE TABLE IF NOT EXISTS p(a INT NOT NULL); CREATE VIEW IF NOT EXISTS v1 AS SELECT DISTINCT NOT FALSE <= TRUE ISNULL >> CURRENT_TIMESTAMP IS NOT lead(RAISE(IGNOR"
+    },
+    {
+      "hash": "48d0ff6c4e34acde",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000064376",
+      "top_frames": [
+        "<no-stack-a4512c2c8ae92a35>"
+      ],
+      "sql_preview": "SELECT substr('0aN-t-V-2 P', 0, 4294967295); SELECT substr('0aN-t-V-2 P', 0, 4294967295); SELECT substr('0aN-t-V-2 P', 0, 4294967295); SELECT substr('0aN-t-V-2 P', 0, 4294967295); SELECT substr('0aN-t"
+    },
+    {
+      "hash": "7838423e6be512ee",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000074575",
+      "top_frames": [
+        "<no-stack-8920fef0b502d28f>"
+      ],
+      "sql_preview": "SELECT substr('k 3i5_-N0_E', -1); CREATE TABLE seed_a(c UNIQUE); SELECT seed_a.c FROM seed_a JOIN seed_a b ON 3 = seed_a.c NATURAL JOIN seed_a WHERE seed_a.c IN((SELECT(SELECT coalesce(lead(2) OVER(),"
+    },
+    {
+      "hash": "cb48e89ef78b7416",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": 0,
+      "count": 1,
+      "sample_file": "5_000080078",
+      "top_frames": [
+        "<no-stack-84adf1a28b91bd7a>"
+      ],
+      "sql_preview": "SELECT printf('%.*g', 2147483648, -1e308); SELECT round(1e308, 2147483648); CREATE TABLE seed_b(b INTEGER); INSERT INTO seed_b VALUES (1),(2),(3); SELECT(SELECT b FROM seed_b GROUP BY b HAVING(b IN((S"
+    },
+    {
+      "hash": "71eea10860152c8f",
+      "type": "signal",
+      "subtype": "signal-6",
+      "exit_code": -6,
+      "count": 1,
+      "sample_file": "6_000001615",
+      "top_frames": [
+        "<no-stack-4e0c438ed84a77bf>"
+      ],
+      "sql_preview": "CREATE TABLE seed_t1(c1 INTEGER); INSERT INTO seed_t1 VALUES(12),(123),(1234); CREATE TABLE seed_t2(c2 INTEGER); INSERT INTO seed_t2 VALUES(44),(55),(123); CREATE TABLE seed_t3(c3 INTEGER, c4 INTEGER)"
+    }
+  ]
+}

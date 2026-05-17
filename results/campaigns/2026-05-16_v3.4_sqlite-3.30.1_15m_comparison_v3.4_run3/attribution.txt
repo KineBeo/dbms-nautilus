@@ -1,0 +1,48 @@
+# Per-Rule Attribution Report
+
+Total log entries: 6428
+
+## Strategy Summary
+Strategy      NEW_COV  Crashes
+------------------------------
+Det                 0        3
+Gen               144       82
+Havoc             130      761
+HavocRec           34      172
+Min               188     1975
+MinRec             58      958
+Splice            577     1346
+
+## Per-Rule Attribution (Sql-Stmt level)
+Rule   Name                              W   COV  Crash  1st COV  1st Crash
+---------------------------------------------------------------------------
+R3     Schema-Setup                    3.0   422   1627        6        314
+R5     Schema-Setup                    2.0   421   1550       55        705
+R12    Sql-Stmt                        0.1     1    734      490        485
+R10    Sql-Stmt                        0.1     1    703      540        535
+R6     Boundary-Func-Call              2.0   102    530       30        592
+R4     Schema-Setup                    2.5   178    110       12        734
+R11    Sql-Stmt                        0.1     5     43     1897       1936
+R8     Format-Spec                     0.1     1      0       93          -
+
+## Top Rules by Coverage (with strategy breakdown)
+  R3 Schema-Setup: 422 COV — Splice=244, Min=80, Havoc=41, Gen=36, MinRec=14, HavocRec=7
+  R5 Schema-Setup: 421 COV — Splice=243, Havoc=61, Min=51, MinRec=25, Gen=23, HavocRec=18
+  R4 Schema-Setup: 178 COV — Splice=67, Min=33, Gen=31, Havoc=20, MinRec=19, HavocRec=8
+  R6 Boundary-Func-Call: 102 COV — Gen=51, Splice=23, Min=19, Havoc=8, HavocRec=1
+  R11 Sql-Stmt: 5 COV — Min=5
+  R8 Format-Spec: 1 COV — Gen=1
+  R12 Sql-Stmt: 1 COV — Gen=1
+  R10 Sql-Stmt: 1 COV — Gen=1
+
+## Top Rules by Crashes
+  R3 Schema-Setup (w=3.0): 1627 crashes
+  R5 Schema-Setup (w=2.0): 1550 crashes
+  R12 Sql-Stmt (w=0.1): 734 crashes
+  R10 Sql-Stmt (w=0.1): 703 crashes
+  R6 Boundary-Func-Call (w=2.0): 530 crashes
+  R4 Schema-Setup (w=2.5): 110 crashes
+  R11 Sql-Stmt (w=0.1): 43 crashes
+
+## Dead Rules (no COV, no crashes)
+  R7 Sql-Stmt (w=0.1) — NEVER OBSERVED

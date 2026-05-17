@@ -1,0 +1,50 @@
+# Per-Rule Attribution Report
+
+Total log entries: 3513
+
+## Strategy Summary
+Strategy      NEW_COV  Crashes
+------------------------------
+Gen               184       72
+Havoc              99      398
+HavocRec           34       70
+Min               245      912
+MinRec             64      216
+Splice            455      684
+
+## Per-Rule Attribution (Sql-Stmt level)
+Rule   Name                              W   COV  Crash  1st COV  1st Crash
+---------------------------------------------------------------------------
+R5     Schema-Setup                    2.0   269    497        6        571
+R12    Sql-Stmt                        0.1     1    755      227        222
+R3     Schema-Setup                    3.0   430    299       18        263
+R4     Schema-Setup                    2.5   220    294       12        829
+R6     Boundary-Func-Call              2.0   104    349       42       1158
+R10    Sql-Stmt                        0.1    35     58      993       3767
+R7     Sql-Stmt                        0.1     8     54     1844       3551
+R11    Sql-Stmt                        0.1    12     46      357       3525
+R9     Table-Name                      0.1     2      0      331          -
+
+## Top Rules by Coverage (with strategy breakdown)
+  R3 Schema-Setup: 430 COV — Splice=189, Min=105, Havoc=46, Gen=45, MinRec=29, HavocRec=16
+  R5 Schema-Setup: 269 COV — Splice=140, Min=46, Gen=34, Havoc=28, MinRec=11, HavocRec=10
+  R4 Schema-Setup: 220 COV — Splice=94, Min=43, Gen=40, MinRec=22, Havoc=15, HavocRec=6
+  R6 Boundary-Func-Call: 104 COV — Gen=60, Splice=23, Min=12, Havoc=8, MinRec=1
+  R10 Sql-Stmt: 35 COV — Min=28, Splice=3, Havoc=2, Gen=1, HavocRec=1
+  R11 Sql-Stmt: 12 COV — Min=5, Splice=5, Gen=1, HavocRec=1
+  R7 Sql-Stmt: 8 COV — Min=6, MinRec=1, Splice=1
+  R9 Table-Name: 2 COV — Gen=2
+  R12 Sql-Stmt: 1 COV — Gen=1
+
+## Top Rules by Crashes
+  R12 Sql-Stmt (w=0.1): 755 crashes
+  R5 Schema-Setup (w=2.0): 497 crashes
+  R6 Boundary-Func-Call (w=2.0): 349 crashes
+  R3 Schema-Setup (w=3.0): 299 crashes
+  R4 Schema-Setup (w=2.5): 294 crashes
+  R10 Sql-Stmt (w=0.1): 58 crashes
+  R7 Sql-Stmt (w=0.1): 54 crashes
+  R11 Sql-Stmt (w=0.1): 46 crashes
+
+## Dead Rules (no COV, no crashes)
+  (none — all Sql-Stmt rules observed)

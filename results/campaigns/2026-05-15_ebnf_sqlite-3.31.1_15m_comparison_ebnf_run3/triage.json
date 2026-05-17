@@ -1,0 +1,949 @@
+{
+  "total_crashes": 78,
+  "unique_crashes": 78,
+  "summary": {
+    "asan": 0,
+    "ubsan": 0,
+    "debug_assert": 78,
+    "signal": 0,
+    "timeout": 0
+  },
+  "crashes": [
+    {
+      "hash": "d987716a2db92de4",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000000006",
+      "top_frames": [
+        "<no-stack-e2efa0a0e071cc45>"
+      ],
+      "sql_preview": "CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(_rowid_); REINDEX t3; ANALYZE t1; DELETE FROM t1 WHERE group_concat(-NULL IN (TRUE) MATCH (WITH t1 AS (VALUES (CURRENT_TIMESTAMP) LIMIT FALSE) VALU"
+    },
+    {
+      "hash": "661a8b4647ceddd5",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000000923",
+      "top_frames": [
+        "<no-stack-7cf6934e86ae8833>"
+      ],
+      "sql_preview": "CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c3, c2); ROLLBACK; DELETE FROM t2 WHERE unicode(RAISE(IGNORE) >= NULL) FILTER (WHERE FALSE) != trim(FALSE) FILTER (WHERE CURRENT_TIMESTAMP) OVER (P"
+    },
+    {
+      "hash": "ba562bac9f93fdeb",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000000944",
+      "top_frames": [
+        "<no-stack-10893198afe1f259>"
+      ],
+      "sql_preview": "CREATE VIRTUAL TABLE IF NOT EXISTS fts_t2 USING fts3(_rowid_, c3); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c2); COMMIT TRANSACTION; COMMIT;"
+    },
+    {
+      "hash": "7794aab400e0fab2",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000001141",
+      "top_frames": [
+        "<no-stack-25e8a83e7c77288d>"
+      ],
+      "sql_preview": "VACUUM INTO ':memory:'; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c1);"
+    },
+    {
+      "hash": "6a4eb4297ae97a29",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000002173",
+      "top_frames": [
+        "<no-stack-434720edfb620afb>"
+      ],
+      "sql_preview": "CREATE TABLE t2 (_rowid_ DATE NOT NULL REFERENCES t3 (rowid) ON UPDATE RESTRICT); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c3);"
+    },
+    {
+      "hash": "ab95bdad56f68d0f",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000002210",
+      "top_frames": [
+        "<no-stack-020d84839357734c>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS t3 (rowid DATE PRIMARY KEY ASC); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c3);"
+    },
+    {
+      "hash": "13f7d1a24b837247",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000002401",
+      "top_frames": [
+        "<no-stack-e275aba1a631493c>"
+      ],
+      "sql_preview": "ATTACH ':memory:' AS db2; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c2); COMMIT TRANSACTION; COMMIT;"
+    },
+    {
+      "hash": "224bcb6ea0e2d34e",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000002407",
+      "top_frames": [
+        "<no-stack-339f4778b67b150b>"
+      ],
+      "sql_preview": "CREATE VIRTUAL TABLE IF NOT EXISTS rtree1 USING rtree(id, x1, x2, y1, y2); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c2); COMMIT TRANSACTION; COMMIT;"
+    },
+    {
+      "hash": "b29ce76480ee6356",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000002413",
+      "top_frames": [
+        "<no-stack-ee7c63dfa981d46d>"
+      ],
+      "sql_preview": "CREATE VIRTUAL TABLE IF NOT EXISTS fts_t2 USING fts3(rowid); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c2); COMMIT TRANSACTION; COMMIT;"
+    },
+    {
+      "hash": "421ef7ee24a96119",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000005121",
+      "top_frames": [
+        "<no-stack-968511f3d729a275>"
+      ],
+      "sql_preview": "PRAGMA foreign_keys=1; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c3);"
+    },
+    {
+      "hash": "52ccd3ff616565e0",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000005219",
+      "top_frames": [
+        "<no-stack-045be1b0ccdff9e5>"
+      ],
+      "sql_preview": "BEGIN TRANSACTION; PRAGMA journal_mode=PERSIST; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(_rowid_); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(_rowid_); UPDATE t2 SET c1 = CASE WH"
+    },
+    {
+      "hash": "c886ed608c1f3520",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000005276",
+      "top_frames": [
+        "<no-stack-5480d1ff791f771a>"
+      ],
+      "sql_preview": "BEGIN IMMEDIATE; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c1);"
+    },
+    {
+      "hash": "63c4c7c3a57b2427",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000008217",
+      "top_frames": [
+        "<no-stack-a62e7795a43167d0>"
+      ],
+      "sql_preview": "CREATE TEMP TABLE IF NOT EXISTS t3 (rowid BLOB DEFAULT FALSE); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(_rowid_);"
+    },
+    {
+      "hash": "931d9911d5fbf013",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000013167",
+      "top_frames": [
+        "<no-stack-e09c3eab64121eee>"
+      ],
+      "sql_preview": "PRAGMA analysis_limit=+3; BEGIN IMMEDIATE; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c2, c1, c1);"
+    },
+    {
+      "hash": "0c421611e9450530",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000016729",
+      "top_frames": [
+        "<no-stack-af0b0a3f456228d1>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS t3 (c3 BLOB, rowid BLOB PRIMARY KEY DESC) WITHOUT ROWID; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c3);"
+    },
+    {
+      "hash": "61b54447d0079d9a",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000019006",
+      "top_frames": [
+        "<no-stack-482449c4f38f9857>"
+      ],
+      "sql_preview": "CREATE TABLE t3 (c1 NUMERIC GENERATED ALWAYS AS (RAISE(IGNORE)) VIRTUAL, c3 VARCHAR(255) PRIMARY KEY ASC, CHECK (CURRENT_TIMESTAMP)); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(_rowid_);"
+    },
+    {
+      "hash": "dde7cb347cedaa5c",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000019511",
+      "top_frames": [
+        "<no-stack-f3492006358134e0>"
+      ],
+      "sql_preview": "CREATE TEMP TABLE IF NOT EXISTS t2 (rowid DATE PRIMARY KEY ASC); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c3);"
+    },
+    {
+      "hash": "37368c1a6801b430",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000020888",
+      "top_frames": [
+        "<no-stack-01c388b08e89f090>"
+      ],
+      "sql_preview": "ANALYZE; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c1, c1); BEGIN IMMEDIATE; SELECT CASE WHEN CURRENT_DATE THEN (CURRENT_DATE) ELSE CURRENT_DATE END, * FROM t1 GROUP BY TRUE WINDOW w1 AS ()"
+    },
+    {
+      "hash": "42c1be25bb9bafd7",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000023900",
+      "top_frames": [
+        "<no-stack-d61d7cc0804873d8>"
+      ],
+      "sql_preview": "CREATE VIRTUAL TABLE IF NOT EXISTS fts_t2 USING fts3(rowid); CREATE VIRTUAL TABLE IF NOT EXISTS rtree1 USING rtree(id, x1, x2, y1, y2); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c3);"
+    },
+    {
+      "hash": "af487bbb35dcd185",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000027575",
+      "top_frames": [
+        "<no-stack-14b0519203c487b4>"
+      ],
+      "sql_preview": "PRAGMA journal_mode=TRUNCATE; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c3); VACUUM; COMMIT TRANSACTION;"
+    },
+    {
+      "hash": "8d2ce9cb27a71cfc",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000028083",
+      "top_frames": [
+        "<no-stack-54d2c67bb975b336>"
+      ],
+      "sql_preview": "CREATE TEMP TABLE IF NOT EXISTS t3 (c3 INTEGER NOT NULL REFERENCES t2 (c2) ON DELETE NO ACTION); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c3);"
+    },
+    {
+      "hash": "0a4e489a08590fa5",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000028299",
+      "top_frames": [
+        "<no-stack-1dae3b01178013f9>"
+      ],
+      "sql_preview": "CREATE TEMP TABLE IF NOT EXISTS t3 (c2 FLOAT NOT NULL); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c3);"
+    },
+    {
+      "hash": "b0638c7fde453e91",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000031279",
+      "top_frames": [
+        "<no-stack-06f3a95281a36a0b>"
+      ],
+      "sql_preview": "PRAGMA cache_size=+78; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c1);"
+    },
+    {
+      "hash": "bf23b5b8f2ade114",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000032814",
+      "top_frames": [
+        "<no-stack-10a74fa3b9ae2570>"
+      ],
+      "sql_preview": "PRAGMA wal_checkpoint(FULL); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c2);"
+    },
+    {
+      "hash": "2cdf136107f4d971",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000034062",
+      "top_frames": [
+        "<no-stack-650ca8fed55db087>"
+      ],
+      "sql_preview": "BEGIN EXCLUSIVE TRANSACTION; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c3); ANALYZE;"
+    },
+    {
+      "hash": "7d48d659edfcddcb",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000040446",
+      "top_frames": [
+        "<no-stack-83fdeeb1e51b2615>"
+      ],
+      "sql_preview": "CREATE TABLE t2 (c3 INTEGER PRIMARY KEY DESC); CREATE TRIGGER trg1 AFTER INSERT ON t2 BEGIN SELECT * FROM t2; END; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(_rowid_); CREATE VIEW v1 AS VALU"
+    },
+    {
+      "hash": "da96e37d45ecc9dc",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000057693",
+      "top_frames": [
+        "<no-stack-4a30354b03363e0d>"
+      ],
+      "sql_preview": "CREATE TABLE t2 (c2 VARCHAR(255) COLLATE NOCASE, _rowid_ FLOAT PRIMARY KEY ASC, CHECK (NULL), UNIQUE (c2)); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c3, c1, c3, c1, _rowid_);"
+    },
+    {
+      "hash": "bd2991d22fe2873e",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000058125",
+      "top_frames": [
+        "<no-stack-ed74d46cfb122ba9>"
+      ],
+      "sql_preview": "CREATE TABLE t2 (c2 BOOLEAN PRIMARY KEY, CHECK (NULL), UNIQUE (c2) ON CONFLICT REPLACE); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(_rowid_);"
+    },
+    {
+      "hash": "690571816208818d",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000058560",
+      "top_frames": [
+        "<no-stack-84bbc7076ff558c5>"
+      ],
+      "sql_preview": "CREATE VIEW v1 AS SELECT ALL *; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c1);"
+    },
+    {
+      "hash": "f01c3a7f2873f0c8",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000058895",
+      "top_frames": [
+        "<no-stack-fd9a13d0c14235de>"
+      ],
+      "sql_preview": "BEGIN TRANSACTION; END; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c3); DETACH db2; ALTER TABLE t3 DROP COLUMN rowid; BEGIN DEFERRED TRANSACTION; ROLLBACK TRANSACTION;"
+    },
+    {
+      "hash": "1797cd2bbf22ae30",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000064723",
+      "top_frames": [
+        "<no-stack-bf282fffe0d04283>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS t3 (c1 DATE PRIMARY KEY ASC) WITHOUT ROWID; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(_rowid_, c3, c2); VACUUM INTO ':memory:';"
+    },
+    {
+      "hash": "6cfdbf9374e07416",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000065819",
+      "top_frames": [
+        "<no-stack-5d14161af2ec6fba>"
+      ],
+      "sql_preview": "ATTACH ':memory:' AS db2; DETACH db2; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c3);"
+    },
+    {
+      "hash": "18546460ba77b1f1",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000076279",
+      "top_frames": [
+        "<no-stack-780c15cf9e4db5bf>"
+      ],
+      "sql_preview": "PRAGMA journal_mode=MEMORY; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c2); BEGIN DEFERRED TRANSACTION; DROP TABLE IF EXISTS t2;"
+    },
+    {
+      "hash": "fa2ea694933ef7d1",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000076957",
+      "top_frames": [
+        "<no-stack-a6e1c1fe1f81c568>"
+      ],
+      "sql_preview": "CREATE TEMP TABLE IF NOT EXISTS t3 (c2 INTEGER NOT NULL); VACUUM INTO ':memory:'; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c2, _rowid_); ANALYZE t2; ATTACH DATABASE ':memory:' AS db2; SELE"
+    },
+    {
+      "hash": "3a34602725090179",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000077232",
+      "top_frames": [
+        "<no-stack-9a57d2c3c1f68e5d>"
+      ],
+      "sql_preview": "ATTACH ':memory:' AS db2; BEGIN TRANSACTION; DETACH db2; ROLLBACK; BEGIN IMMEDIATE TRANSACTION; COMMIT; ATTACH ':memory:' AS db2; BEGIN TRANSACTION; CREATE TABLE IF NOT EXISTS t1 (c2 BOOLEAN); CREATE "
+    },
+    {
+      "hash": "30322e30beb5faba",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000077714",
+      "top_frames": [
+        "<no-stack-7e4f443c8b45df90>"
+      ],
+      "sql_preview": "ANALYZE; ATTACH ':memory:' AS db2; BEGIN TRANSACTION; ROLLBACK; BEGIN TRANSACTION; ANALYZE; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c1, c3); BEGIN IMMEDIATE TRANSACTION;"
+    },
+    {
+      "hash": "783fdebf5a0de66f",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000077867",
+      "top_frames": [
+        "<no-stack-75daca496cfffb5f>"
+      ],
+      "sql_preview": "ATTACH ':memory:' AS db2; BEGIN TRANSACTION; DETACH db2; ROLLBACK; CREATE TEMP TABLE IF NOT EXISTS t3 (c3 FLOAT COLLATE NOCASE); ATTACH DATABASE ':memory:' AS db2; DETACH db2; ATTACH DATABASE ':memory"
+    },
+    {
+      "hash": "306db5572b0fdf13",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000077932",
+      "top_frames": [
+        "<no-stack-eefa15893feccd8a>"
+      ],
+      "sql_preview": "ATTACH ':memory:' AS db2; BEGIN TRANSACTION; DETACH db2; ROLLBACK; CREATE TEMP TABLE IF NOT EXISTS t3 (c3 FLOAT COLLATE NOCASE); ATTACH DATABASE ':memory:' AS db2; DETACH db2; ATTACH DATABASE ':memory"
+    },
+    {
+      "hash": "c78b7f8c5ae696ca",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000078314",
+      "top_frames": [
+        "<no-stack-d633668a1c09253e>"
+      ],
+      "sql_preview": "ATTACH ':memory:' AS db2; BEGIN TRANSACTION; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t2 USING fts3(rowid); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(_rowid_);"
+    },
+    {
+      "hash": "f3d629072dbf0610",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000079134",
+      "top_frames": [
+        "<no-stack-be1a145ace9afbb5>"
+      ],
+      "sql_preview": "CREATE VIEW v1 AS SELECT DISTINCT *; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c3); ROLLBACK TRANSACTION;"
+    },
+    {
+      "hash": "9309b13e39ec3c27",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000082618",
+      "top_frames": [
+        "<no-stack-1de563af26fbcd63>"
+      ],
+      "sql_preview": "CREATE TABLE t3 (_rowid_ INTEGER DEFAULT (TRUE), rowid INT NOT NULL DEFAULT FALSE); CREATE TRIGGER trg1 AFTER DELETE ON t3 BEGIN SELECT 42756819654674233863666.5101420994332514186369018307095772386897"
+    },
+    {
+      "hash": "986d5c8c406b646e",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000082688",
+      "top_frames": [
+        "<no-stack-7f12d333a5af7238>"
+      ],
+      "sql_preview": "CREATE TABLE t3 (_rowid_ INTEGER DEFAULT (TRUE), c3 NUMERIC NOT NULL); CREATE TRIGGER trg1 AFTER DELETE ON t3 BEGIN DELETE FROM t3; END; DROP TABLE IF EXISTS t3; CREATE VIRTUAL TABLE IF NOT EXISTS fts"
+    },
+    {
+      "hash": "724636c7cb96bd10",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000082695",
+      "top_frames": [
+        "<no-stack-313ec90a9a4b2926>"
+      ],
+      "sql_preview": "CREATE TABLE t3 (_rowid_ INTEGER DEFAULT (TRUE), c3 NUMERIC NOT NULL); CREATE TRIGGER trg1 AFTER DELETE ON t3 BEGIN DELETE FROM t3; END; REINDEX; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c"
+    },
+    {
+      "hash": "e377c43104d517f3",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000082701",
+      "top_frames": [
+        "<no-stack-da7f7ada0ec61901>"
+      ],
+      "sql_preview": "CREATE TABLE t3 (_rowid_ INTEGER DEFAULT (TRUE), c3 NUMERIC NOT NULL); CREATE TRIGGER trg1 AFTER DELETE ON t3 BEGIN DELETE FROM t3; END; DROP TRIGGER trg1; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 US"
+    },
+    {
+      "hash": "3a664492f9142d22",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000082749",
+      "top_frames": [
+        "<no-stack-897d6d264ee5ce55>"
+      ],
+      "sql_preview": "CREATE TABLE t3 (_rowid_ BLOB UNIQUE); CREATE TRIGGER trg1 AFTER DELETE ON t3 BEGIN DELETE FROM t3; END; DROP TABLE IF EXISTS t3; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c3, c3);"
+    },
+    {
+      "hash": "548a3f21f82062fe",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000082759",
+      "top_frames": [
+        "<no-stack-046ec4391aeef131>"
+      ],
+      "sql_preview": "CREATE TABLE t3 (_rowid_ BLOB UNIQUE); CREATE TRIGGER trg1 AFTER DELETE ON t3 BEGIN DELETE FROM t3; END; REINDEX; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c3, c3);"
+    },
+    {
+      "hash": "529342f8a0530700",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000082903",
+      "top_frames": [
+        "<no-stack-8e4c7b8ca044224a>"
+      ],
+      "sql_preview": "CREATE TABLE t1 AS VALUES (CURRENT_TIMESTAMP); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c3);"
+    },
+    {
+      "hash": "8a99b78fbf6aea89",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000086625",
+      "top_frames": [
+        "<no-stack-600245cbd555d134>"
+      ],
+      "sql_preview": "CREATE TABLE t1 (_rowid_ REAL PRIMARY KEY DESC) WITHOUT ROWID; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c2, c2); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t2 USING fts3(c1, c2);"
+    },
+    {
+      "hash": "80ad36cfd0a0d262",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000086684",
+      "top_frames": [
+        "<no-stack-b708ab30afde4d84>"
+      ],
+      "sql_preview": "CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(_rowid_, _rowid_, _rowid_, _rowid_, _rowid_, _rowid_, _rowid_, _rowid_, _rowid_, _rowid_, _rowid_, _rowid_, _rowid_, _rowid_, _rowid_); BEGIN;"
+    },
+    {
+      "hash": "a12dc9ea30f58ebe",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000087233",
+      "top_frames": [
+        "<no-stack-b6f47154d9bf48d4>"
+      ],
+      "sql_preview": "VACUUM; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(_rowid_, c3); REINDEX t3; ATTACH ':memory:' AS db2;"
+    },
+    {
+      "hash": "631548d7d8725dc5",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000087292",
+      "top_frames": [
+        "<no-stack-ca110668c4571245>"
+      ],
+      "sql_preview": "DROP TABLE IF EXISTS t3; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c3); DROP TABLE t1;"
+    },
+    {
+      "hash": "0fcc99370d613335",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000090357",
+      "top_frames": [
+        "<no-stack-495cb273c7ce4ca9>"
+      ],
+      "sql_preview": "CREATE TABLE t3 (rowid INT NOT NULL DEFAULT X'4acb5BcD3a'); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(_rowid_);"
+    },
+    {
+      "hash": "a7b7561a2bbf4b8f",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000095420",
+      "top_frames": [
+        "<no-stack-626fde85c1ffb104>"
+      ],
+      "sql_preview": "ATTACH ':memory:' AS db2; BEGIN TRANSACTION; DETACH db2; CREATE VIRTUAL TABLE IF NOT EXISTS rtree1 USING rtree(id, x1, x2, y1, y2); CREATE TABLE IF NOT EXISTS t1 (rowid BLOB PRIMARY KEY DESC); REINDEX"
+    },
+    {
+      "hash": "884da37646a376ae",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000096142",
+      "top_frames": [
+        "<no-stack-e54fcd6d0f4979c0>"
+      ],
+      "sql_preview": "ATTACH ':memory:' AS db2; BEGIN TRANSACTION; DETACH db2; CREATE TEMP TABLE IF NOT EXISTS t3 (c3 FLOAT COLLATE NOCASE); ATTACH DATABASE ':memory:' AS db2; DETACH db2; CREATE TEMP TABLE IF NOT EXISTS t3"
+    },
+    {
+      "hash": "f06e21e1f17421b2",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000096184",
+      "top_frames": [
+        "<no-stack-3cd3b97a08eeab41>"
+      ],
+      "sql_preview": "ATTACH ':memory:' AS db2; BEGIN TRANSACTION; DETACH db2; CREATE TEMP TABLE IF NOT EXISTS t3 (c3 FLOAT COLLATE NOCASE); ATTACH DATABASE ':memory:' AS db2; DETACH db2; DROP INDEX IF EXISTS idx1; CREATE "
+    },
+    {
+      "hash": "1ff291e96f0daa11",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000096191",
+      "top_frames": [
+        "<no-stack-fedce4c2deb71427>"
+      ],
+      "sql_preview": "ATTACH ':memory:' AS db2; BEGIN TRANSACTION; DETACH db2; CREATE TEMP TABLE IF NOT EXISTS t3 (c3 FLOAT COLLATE NOCASE); ATTACH DATABASE ':memory:' AS db2; DETACH db2; CREATE TEMP TABLE IF NOT EXISTS t3"
+    },
+    {
+      "hash": "867d92946733a1e5",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000096779",
+      "top_frames": [
+        "<no-stack-289a8e68140f99f8>"
+      ],
+      "sql_preview": "ATTACH ':memory:' AS db2; BEGIN TRANSACTION; DETACH db2; ROLLBACK; BEGIN IMMEDIATE TRANSACTION; COMMIT; PRAGMA foreign_keys=ON; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c3, _rowid_, c3);"
+    },
+    {
+      "hash": "e4a8c1057ba66762",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000096854",
+      "top_frames": [
+        "<no-stack-73d3c8a0ec04028b>"
+      ],
+      "sql_preview": "ATTACH ':memory:' AS db2; BEGIN TRANSACTION; DETACH db2; ROLLBACK; BEGIN IMMEDIATE TRANSACTION; COMMIT; BEGIN TRANSACTION; CREATE VIRTUAL TABLE IF NOT EXISTS rtree1 USING rtree(id, x1, x2, y1, y2); CR"
+    },
+    {
+      "hash": "bdfb92a2ff11af25",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000117123",
+      "top_frames": [
+        "<no-stack-f760beb2aa9adbcd>"
+      ],
+      "sql_preview": "CREATE TABLE t3 (c3 BLOB REFERENCES t3 (c2) ON DELETE SET DEFAULT, _rowid_ TEXT PRIMARY KEY ASC, CHECK (TRUE)); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c3);"
+    },
+    {
+      "hash": "8d9047461769fecf",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000117204",
+      "top_frames": [
+        "<no-stack-1cd142cd7cc9a242>"
+      ],
+      "sql_preview": "CREATE TABLE t3 (_rowid_ VARCHAR(255) NOT NULL, CHECK (RAISE(IGNORE) IS NULL)); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(_rowid_);"
+    },
+    {
+      "hash": "bcd6614c0caebe55",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000120256",
+      "top_frames": [
+        "<no-stack-be723ebd66be0d5f>"
+      ],
+      "sql_preview": "CREATE TABLE t3 (c3 VARCHAR(255) PRIMARY KEY ASC, CHECK (CURRENT_TIMESTAMP)); DROP TABLE IF EXISTS t3; ATTACH DATABASE ':memory:' AS db2; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c1, c1, _"
+    },
+    {
+      "hash": "b5d20170d1f2b2d1",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000120372",
+      "top_frames": [
+        "<no-stack-66f9e5217710579e>"
+      ],
+      "sql_preview": "CREATE TABLE t3 (c3 VARCHAR(255) PRIMARY KEY ASC, UNIQUE (c3) ON CONFLICT ROLLBACK); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c3); VALUES (CASE WHEN CURRENT_TIME THEN NULL WHEN FALSE ISNUL"
+    },
+    {
+      "hash": "7ae29ea05659a544",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000122632",
+      "top_frames": [
+        "<no-stack-08e94d14f25b8052>"
+      ],
+      "sql_preview": "DROP VIEW IF EXISTS v1; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c3, c3, c3);"
+    },
+    {
+      "hash": "114447b629be3053",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000124176",
+      "top_frames": [
+        "<no-stack-c6c6ff2077cf3edd>"
+      ],
+      "sql_preview": "CREATE VIEW v1 (c1, c1) AS SELECT t3.* FROM t2 WHERE FALSE GROUP BY TRUE, TRUE HAVING CURRENT_DATE INTERSECT SELECT * FROM t1 NOT INDEXED; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(_rowid_,"
+    },
+    {
+      "hash": "b8a7351639a9d8c9",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000125634",
+      "top_frames": [
+        "<no-stack-fb6d75a7e75f0376>"
+      ],
+      "sql_preview": "CREATE TABLE t2 (c2 BOOLEAN PRIMARY KEY, FOREIGN KEY (c2) REFERENCES t3 (_rowid_) ON DELETE RESTRICT, CHECK (CURRENT_TIME)); CREATE TABLE t3 (c3 BOOLEAN UNIQUE); ATTACH ':memory:' AS db2; CREATE VIRTU"
+    },
+    {
+      "hash": "21468f7fae79772c",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000129082",
+      "top_frames": [
+        "<no-stack-9898e72ef2e7a283>"
+      ],
+      "sql_preview": "CREATE TABLE t3 (_rowid_ TEXT PRIMARY KEY ASC, UNIQUE (_rowid_, _rowid_)); DROP TABLE t3; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c1, c1);"
+    },
+    {
+      "hash": "f678a10636490d3e",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000146017",
+      "top_frames": [
+        "<no-stack-836ab27019c134bd>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS t3 (c3 VARCHAR(255) NOT NULL DEFAULT 9807943853979885.69183e+48385679); PRAGMA journal_mode=TRUNCATE; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c1, c3, c2); CREAT"
+    },
+    {
+      "hash": "370c20fa6adcbf79",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000149871",
+      "top_frames": [
+        "<no-stack-f25b1f0cfde565c4>"
+      ],
+      "sql_preview": "PRAGMA journal_mode=WAL; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(_rowid_);"
+    },
+    {
+      "hash": "6c0190f9d5eb0086",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000149952",
+      "top_frames": [
+        "<no-stack-3410d2d6a5e75b5d>"
+      ],
+      "sql_preview": "PRAGMA integrity_check; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(_rowid_);"
+    },
+    {
+      "hash": "75d4bb24836f4b9d",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000149978",
+      "top_frames": [
+        "<no-stack-0bf34063c4ad7741>"
+      ],
+      "sql_preview": "PRAGMA cache_size=-0; CREATE VIRTUAL TABLE IF NOT EXISTS rtree1 USING rtree(id, x1, x2, y1, y2); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(_rowid_);"
+    },
+    {
+      "hash": "7ff0a829d71f9f18",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000156051",
+      "top_frames": [
+        "<no-stack-ee792e3bc33c0f74>"
+      ],
+      "sql_preview": "BEGIN IMMEDIATE; ROLLBACK TRANSACTION; ATTACH ':memory:' AS db2; BEGIN IMMEDIATE TRANSACTION; ROLLBACK; CREATE TEMP TABLE IF NOT EXISTS t3 (_rowid_ REAL); CREATE TEMP TABLE IF NOT EXISTS t3 (c3 INTEGE"
+    },
+    {
+      "hash": "3f10afb21f424b9e",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000156221",
+      "top_frames": [
+        "<no-stack-149fc94e43f7a9dd>"
+      ],
+      "sql_preview": "CREATE TEMP TABLE IF NOT EXISTS t3 (_rowid_ INT PRIMARY KEY ASC); BEGIN IMMEDIATE; DROP TABLE t3; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c1, _rowid_);"
+    },
+    {
+      "hash": "12e9e4445c3675aa",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000158457",
+      "top_frames": [
+        "<no-stack-21771f27fbe668cc>"
+      ],
+      "sql_preview": "CREATE VIRTUAL TABLE IF NOT EXISTS rtree1 USING rtree(id, x1, x2, y1, y2); VACUUM; VACUUM; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c1); UPDATE OR ROLLBACK t1 SET c3 = EXISTS (SELECT *, * "
+    },
+    {
+      "hash": "94600857d198a0a4",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000159787",
+      "top_frames": [
+        "<no-stack-d663632d5dcc69ef>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS t1 (c3 BLOB PRIMARY KEY DESC, rowid FLOAT UNIQUE) WITHOUT ROWID; CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c1, _rowid_);"
+    },
+    {
+      "hash": "d276d5ef4c65ed49",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000161150",
+      "top_frames": [
+        "<no-stack-6c46b97786bad596>"
+      ],
+      "sql_preview": "VALUES (NOT CURRENT_TIME); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c3);"
+    },
+    {
+      "hash": "8a46aaa48fdad2f3",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000161239",
+      "top_frames": [
+        "<no-stack-dcb7a3100f7e7b0c>"
+      ],
+      "sql_preview": "VALUES (TRUE); CREATE VIRTUAL TABLE IF NOT EXISTS fts_t1 USING fts5(c3);"
+    },
+    {
+      "hash": "38c3e28d6634d986",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000161854",
+      "top_frames": [
+        "<no-stack-ebbb96844d890b16>"
+      ],
+      "sql_preview": "SELECT DISTINCT count(*) FILTER (WHERE FALSE) OVER () AS ihc__3t8_k_w_3_6_gveg_u_g7o__496_s9_d4_p_5h491_0_3h__6_2zdzd___e_5e1j__4u_2q_68h0_0d_h97rxwv8b_p53_p_4_8____665_c9b3x95_pv5q36_61wo_8h_j71_2qk2"
+    },
+    {
+      "hash": "59a7843f628ca663",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000161938",
+      "top_frames": [
+        "<no-stack-d146f032eaeff425>"
+      ],
+      "sql_preview": "SELECT DISTINCT FALSE AS ihc__3t8_k_w_3_6_gveg_u_g7o__496_s9_d4_p_5h491_0_3h__6_2zdzd___e_5e1j__4u_2q_68h0_0d_h97rxwv8b_p53_p_4_8____665_c9b3x95_pv5q36_61wo_8h_j71_2qk23_i0m__11da__6_b_23_9__ig_g79j__"
+    }
+  ]
+}
