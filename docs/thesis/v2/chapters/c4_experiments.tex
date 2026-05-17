@@ -195,20 +195,20 @@ Table~\ref{tab:all-bugs} presents all 10 bug classes discovered by DBMS-Nautilus
 BC001 & Null ptr in \texttt{sqlite3Fts5GetTokenizer} & HIGH & 4 ver. & --- & 4 \\
 BC002 & Misaligned in \texttt{WindowUnlinkFromSelect} & HIGH & 3.30.1 & 13871 & 1 \\
 BC003 & Int overflow in \texttt{sqlite3\_str\_vappendf} & MED & 3 ver. & 13434 & 6 \\
-BC004 & Float cast overflow in \texttt{alsoAnInt} & LOW & 4 ver. & --- & 42 \\
+BC004 & Float cast overflow in \texttt{alsoAnInt} & LOW & 4 ver. & --- & 56 \\
 BC005 & Signal 6 in \texttt{WindowListDelete} & MED & 3.30.1 & --- & 4 \\
-BC006 & Null ptr in \texttt{sqlite3AtoF} & HIGH & 3.30.1 & --- & 1 \\
-BC007 & Null ptr in \texttt{sqlite3Atoi64} & HIGH & 3.30.1 & --- & 1 \\
-BC008 & Float cast overflow in \texttt{VdbeMemNumerify} & LOW & 2 ver. & --- & 8 \\
-BC009 & Signal 6 (no stack trace) & MED & 2 ver. & --- & 21 \\
+BC006 & Null ptr in \texttt{sqlite3ExprCodeTarget} & HIGH & 3 ver. & --- & 3 \\
+BC007 & Null ptr in \texttt{sqlite3AtoF} & HIGH & 3.30.1 & --- & 1 \\
+BC008 & Null ptr in \texttt{sqlite3Atoi64} & HIGH & 3.30.1 & --- & 1 \\
+BC009 & Float cast overflow in \texttt{VdbeMemNumerify} & LOW & 2 ver. & --- & 8 \\
 BC010 & Null ptr in \texttt{sqlite3Select} & HIGH & 3.31.1 & 9327 & 1 \\
 \midrule
-\multicolumn{5}{l}{\textbf{Total}} & \textbf{89} \\
+\multicolumn{5}{l}{\textbf{Total}} & \textbf{85} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The 89 unique stack hashes across 10 bug classes demonstrate that the grammar, designed primarily to target known CVEs, also exercises code paths containing previously undocumented defects. The seven non-CVE bug classes span four distinct sanitizer categories: null pointer dereferences (BC001, BC006, BC007), float cast overflows (BC004, BC008), signals/aborts (BC005, BC009), representing a diverse cross-section of memory safety and undefined behavior violations.
+The 85 unique stack hashes across 10 bug classes demonstrate that the grammar, designed primarily to target known CVEs, also exercises code paths containing previously undocumented defects. The seven non-CVE bug classes span four distinct sanitizer categories: null pointer dereferences (BC001, BC006, BC007, BC008), float cast overflows (BC004, BC009), and signals/aborts (BC005), representing a diverse cross-section of memory safety and undefined behavior violations.
 
 \subsection{Case Studies}
 
@@ -216,11 +216,14 @@ The 89 unique stack hashes across 10 bug classes demonstrate that the grammar, d
 This bug affects all four tested versions (3.30.1, 3.31.1, 3.32.0, 3.32.2), with 4 unique stack hashes suggesting slightly different triggering paths through the FTS5 module. The crash occurs during FTS5 virtual table initialization when the tokenizer lookup fails to validate a null pointer before dereferencing it. The persistence of this bug across at least two years of SQLite releases (from 3.30.1 released in 2019 to 3.32.2 released in 2020) indicates a systematic defect in the FTS5 module's error handling, not a version-specific regression. The grammar's FTS schema template (Schema-Setup alternative S5) is the primary driver for this discovery, as it generates \texttt{CREATE VIRTUAL TABLE ... USING fts5(...)} statements with various column and tokenizer configurations.
 
 \paragraph{BC004 --- Float cast overflow (\texttt{alsoAnInt}).}
-With 42 unique stack hashes, BC004 is the richest bug class by far, affecting all four tested versions. The crash is a float-to-integer cast overflow in the \texttt{alsoAnInt()} function, which is part of SQLite's type affinity system that determines whether a floating-point value can be losslessly represented as an integer. When boundary float values (such as values near \texttt{INT64\_MAX} or \texttt{-INF}) appear in SQL expressions, the cast overflows, triggering UBSan's float-cast-overflow diagnostic.
+With 56 unique stack hashes, BC004 is the richest bug class by far, affecting all four tested versions. The crash is a float-to-integer cast overflow in the \texttt{alsoAnInt()} function, which is part of SQLite's type affinity system that determines whether a floating-point value can be losslessly represented as an integer. When boundary float values (such as values near \texttt{INT64\_MAX} or \texttt{-INF}) appear in SQL expressions, the cast overflows, triggering UBSan's float-cast-overflow diagnostic.
 
 The large number of unique hashes indicates that many distinct SQL patterns can trigger this bug --- any expression that produces a boundary floating-point value and feeds it through a type coercion path will reach the vulnerable function. This suggests a pervasive numeric edge case in SQLite's type affinity system rather than a narrow bug in a single code path. The grammar's \texttt{Boundary-Int} and \texttt{Boundary-Float} terminals, which include values such as \texttt{2147483647}, \texttt{9223372036854775807}, and \texttt{1e308}, are the primary triggers.
 
-\paragraph{BC006 and BC007 --- Null pointer pair (\texttt{sqlite3AtoF} and \texttt{sqlite3Atoi64}).}
+\paragraph{BC006 --- Null pointer dereference (\texttt{sqlite3ExprCodeTarget}).}
+This bug class is a null pointer dereference in SQLite's expression code generator, occurring when the query compiler attempts to generate VDBE bytecode for a malformed expression tree. Found across 3 versions (3.30.1, 3.31.1, 3.32.0) with 3 unique stack hashes, it indicates a systematic failure to validate expression node pointers before code generation. The persistence across multiple versions suggests a structural deficiency in the expression compiler's null-safety checks rather than a version-specific regression.
+
+\paragraph{BC007 and BC008 --- Null pointer pair (\texttt{sqlite3AtoF} and \texttt{sqlite3Atoi64}).}
 These two bug classes are null pointer dereferences in SQLite's numeric conversion functions: \texttt{sqlite3AtoF} (string-to-float conversion) and \texttt{sqlite3Atoi64} (string-to-64-bit-integer conversion). Both were found only on SQLite 3.30.1, each with a single unique hash. The co-occurrence of null pointer dereferences in two closely related numeric parsing functions suggests a shared root cause in SQLite's string-to-number conversion path, where certain malformed or boundary input values are not properly validated for null before the conversion routine attempts to read the input buffer.
 
 The version-specificity of these bugs (found only on 3.30.1) suggests that the null-check deficiency was addressed in later SQLite releases, possibly as part of a broader hardening effort in the numeric parsing subsystem.
@@ -228,11 +231,9 @@ The version-specificity of these bugs (found only on 3.30.1) suggests that the n
 \paragraph{BC005 --- Window function cleanup abort (\texttt{sqlite3WindowListDelete}).}
 This bug produces a \texttt{SIGABRT} (signal~6) during execution of \texttt{sqlite3WindowListDelete} --- the routine responsible for deallocating the linked list of window function objects at the end of query execution. Found on SQLite 3.30.1 with 4 unique stack hashes, this indicates a double-free or use-after-free in the window function lifecycle management. Notably, BC005 is distinct from BC002 (CVE-2020-13871): BC002 crashes during window \emph{unlinking} (\texttt{sqlite3WindowUnlinkFromSelect}), while BC005 crashes during window list \emph{deletion} (\texttt{sqlite3WindowListDelete}). These represent two separate defects in the same subsystem --- the window function memory management pipeline --- discovered through the same grammar primitives (window function rules added in v3.2).
 
-\paragraph{BC008 --- Float cast overflow (\texttt{sqlite3VdbeMemNumerify}).}
-This bug is related to but distinct from BC004. While BC004 occurs in the \texttt{alsoAnInt()} type affinity function, BC008 occurs deeper in the virtual machine during \texttt{sqlite3VdbeMemNumerify}, which converts a memory cell's value to a numeric type during VDBE instruction execution. Found on 2 versions (3.30.1 and 3.32.0) with 8 unique hashes, it represents a separate manifestation of the float-to-integer overflow problem at a different layer of the SQLite execution stack.
+\paragraph{BC009 --- Float cast overflow (\texttt{sqlite3VdbeMemNumerify}).}
+This bug is related to but distinct from BC004. While BC004 occurs in the \texttt{alsoAnInt()} type affinity function, BC009 occurs deeper in the virtual machine during \texttt{sqlite3VdbeMemNumerify}, which converts a memory cell's value to a numeric type during VDBE instruction execution. Found on 2 versions (3.30.1 and 3.32.0) with 8 unique hashes, it represents a separate manifestation of the float-to-integer overflow problem at a different layer of the SQLite execution stack.
 
-\paragraph{BC009 --- Signal 6 with no stack trace.}
-This bug class contains 21 unique hashes across 2 versions (3.30.1 and 3.31.1). The crashes produce \texttt{SIGABRT} but the ASan runtime does not capture a stack trace, likely because the abort occurs during a signal handler or after the stack has been corrupted. The high hash diversity with no stack trace available makes root cause identification difficult. These crashes may represent multiple distinct bugs that are grouped together only because the triage pipeline cannot distinguish them without stack information.
 
 \subsection{Verification on Modern SQLite}
 
@@ -315,7 +316,7 @@ The 1\% seed weight was chosen to balance reliability against generation bias. A
 
 \subsection{Cross-Pollination Evidence}
 
-Seven of the ten discovered bug classes (BC001, BC004--BC009) have no corresponding CVE in the target list. These bugs were found through structural primitives designed for specific CVEs but which also exercise adjacent code paths. For example, the \texttt{Boundary-Func-Call} non-terminal, designed to trigger CVE-2020-13434's integer overflow, also produces boundary float values that trigger BC004 (float cast overflow in \texttt{alsoAnInt}) and BC008 (float cast overflow in \texttt{sqlite3VdbeMemNumerify}). Similarly, the window function rules added for CVE-2020-13871 also trigger BC005 (window function cleanup abort in \texttt{sqlite3WindowListDelete}).
+Seven of the ten discovered bug classes (BC001, BC004--BC009) have no corresponding CVE in the target list. These bugs were found through structural primitives designed for specific CVEs but which also exercise adjacent code paths. For example, the \texttt{Boundary-Func-Call} non-terminal, designed to trigger CVE-2020-13434's integer overflow, also produces boundary float values that trigger BC004 (float cast overflow in \texttt{alsoAnInt}) and BC009 (float cast overflow in \texttt{sqlite3VdbeMemNumerify}). Similarly, the window function rules added for CVE-2020-13871 also trigger BC005 (window function cleanup abort in \texttt{sqlite3WindowListDelete}).
 
 This cross-pollination effect is a direct consequence of the structural-primitive design methodology: by encoding \emph{patterns} rather than \emph{inputs}, each non-terminal serves multiple vulnerability classes simultaneously.
 
