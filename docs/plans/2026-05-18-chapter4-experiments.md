@@ -17,6 +17,8 @@
 - 1 baseline (EBNF), no ablation table
 - No grammar version numbers in thesis .tex files (use descriptive names)
 - RQ2 latest-SQLite 0-day section is a placeholder (grammar enhancement in separate session)
+- **Dual-harness triage:** AFL harness compiled WITH -DSQLITE_DEBUG. In triage, crashes are separated into (A) ASan/UBSan real crashes and (B) debug assert findings. This catches CVE-15358 (heap buffer read detected only by debug assert) alongside CVE-13435 (UBSan null ptr). CVE-2019-19646 remains excluded (infinite loop, no crash signal).
+- **CVE detection target: 5/6** — exclude only CVE-2019-19646 (oracle limitation: infinite loop)
 
 ---
 
