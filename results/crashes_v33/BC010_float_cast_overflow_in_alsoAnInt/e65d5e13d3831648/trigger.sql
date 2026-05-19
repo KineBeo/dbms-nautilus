@@ -1,0 +1,2 @@
+WITH RECURSIVE a(x) AS (SELECT 1 UNION ALL SELECT x+1 FROM a WHERE x < 5), b(y) AS (SELECT CAST(TRUE AS INTEGER) NOT BETWEEN hex(hex(hex(hex(hex(hex(hex(hex(random())))))))) AND FALSE FROM a) SELECT * FROM b;
+CREATE VIRTUAL TABLE IF NOT EXISTS rtree1 USING rtree(id, x1, x2, y1, y2);

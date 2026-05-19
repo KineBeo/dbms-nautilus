@@ -1,0 +1,2 @@
+CREATE TABLE seed_a(c UNIQUE);
+SELECT seed_a.c FROM seed_a JOIN seed_a b ON 3 = seed_a.c NATURAL JOIN seed_a WHERE seed_a.c IN((SELECT(SELECT coalesce(lead(2) OVER(), SUM(c))) FROM seed_a d WHERE seed_a.c));

@@ -1,0 +1,20 @@
+{
+  "hash": "1ca1c0159b42ae50",
+  "crash_type": "ubsan",
+  "subtype": "signed-integer-overflow",
+  "exit_code": -6,
+  "version": "3.30.1",
+  "error_message": "../cve_builds/sqlite-3.30.1/sqlite3.c:27935:24: runtime error: signed integer overflow: 2147483647 + 341 cannot be represented in type 'int'",
+  "sql_preview": "SELECT printf('%.*f', 2147483647, -1e308); CREATE TABLE IF NOT EXISTS p(c3 TEXT DEFAULT '-21_'); INSERT OR REPLACE INTO q VALUES (CURRENT_TIMESTAMP <= TRUE AND CURRENT_TIMESTAMP >= +CURRENT_TIME NOT N",
+  "campaigns": [
+    "sqlite-3.30.1_v35_run2",
+    "sqlite-3.30.1_v35_run3",
+    "sqlite-3.30.1_v35_run4",
+    "sqlite-3.30.1_v35_run5"
+  ],
+  "total_count": 5,
+  "sample_file": "5_000000202",
+  "bug_class": "BC003",
+  "cve": "CVE-2020-13434",
+  "severity": "MEDIUM"
+}

@@ -1,0 +1,3 @@
+SELECT printf('%.*f', 2147483647, 1e308);
+CREATE TABLE IF NOT EXISTS p(a INTEGER);
+PRAGMA integrity_check;

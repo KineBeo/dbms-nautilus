@@ -1,0 +1,229 @@
+{
+  "generated_at": "2026-05-19",
+  "grammar": "v3.3",
+  "experiment": "RQ2",
+  "total_bug_classes": 11,
+  "campaigns_scanned": 20,
+  "classes": [
+    {
+      "class_id": "BC001",
+      "name": "null_pointer_in_sqlite3Fts5GetTokenizer",
+      "subtype": "null-pointer",
+      "key_function": "sqlite3Fts5GetTokenizer",
+      "severity": "HIGH",
+      "cve": null,
+      "versions": [
+        "3.30.1",
+        "3.31.1",
+        "3.32.0",
+        "3.32.2"
+      ],
+      "total_crashes": 832,
+      "unique_hashes": 4,
+      "hashes": [
+        "18c7efd9c88d6c67",
+        "8e36b1ab15ffac2b",
+        "a57b932b08c49ed6",
+        "b45ae061172ad4b5"
+      ]
+    },
+    {
+      "class_id": "BC002",
+      "name": "misaligned_access_in_sqlite3WindowUnlinkFromSelect",
+      "subtype": "misaligned-access",
+      "key_function": "sqlite3WindowUnlinkFromSelect",
+      "severity": "HIGH",
+      "cve": "CVE-2020-13871",
+      "versions": [
+        "3.30.1"
+      ],
+      "total_crashes": 71,
+      "unique_hashes": 1,
+      "hashes": [
+        "48cb7c287ece21f3"
+      ]
+    },
+    {
+      "class_id": "BC003",
+      "name": "signed_integer_overflow_in_sqlite3_str_vappendf",
+      "subtype": "signed-integer-overflow",
+      "key_function": "sqlite3_str_vappendf",
+      "severity": "MEDIUM",
+      "cve": "CVE-2020-13434",
+      "versions": [
+        "3.30.1",
+        "3.31.1",
+        "3.32.0"
+      ],
+      "total_crashes": 157,
+      "unique_hashes": 6,
+      "hashes": [
+        "1ca1c0159b42ae50",
+        "44c6c886cff47bba",
+        "7264a343681aca95",
+        "767f16fdfbae8ba1",
+        "937a301147a0c985",
+        "b43f365a68048314"
+      ]
+    },
+    {
+      "class_id": "BC004",
+      "name": "float_cast_overflow_in_alsoAnInt",
+      "subtype": "float-cast-overflow",
+      "key_function": "alsoAnInt",
+      "severity": "LOW",
+      "cve": null,
+      "versions": [
+        "3.31.1",
+        "3.32.0",
+        "3.32.2"
+      ],
+      "total_crashes": 21,
+      "unique_hashes": 10,
+      "hashes": [
+        "082d290a01ade500",
+        "1ae6577c1410311e",
+        "1e8f9bffc125d471",
+        "675dce2802256a43",
+        "7e847453d5f9a926",
+        "86384c71790e7443",
+        "9d7c1388cbe903ca",
+        "a156622b9f5c75e9",
+        "e65d5e13d3831648",
+        "f11ffd6c7a32fcf3"
+      ]
+    },
+    {
+      "class_id": "BC006",
+      "name": "null_pointer_in_sqlite3ExprCodeTarget",
+      "subtype": "null-pointer",
+      "key_function": "sqlite3ExprCodeTarget",
+      "severity": "HIGH",
+      "cve": null,
+      "versions": [
+        "3.30.1",
+        "3.31.1",
+        "3.32.0"
+      ],
+      "total_crashes": 7222,
+      "unique_hashes": 3,
+      "hashes": [
+        "42302883be9cc977",
+        "9411c5875a64a648",
+        "c3220eea4184cae8"
+      ]
+    },
+    {
+      "class_id": "BC008",
+      "name": "null_pointer_in_sqlite3Atoi64",
+      "subtype": "null-pointer",
+      "key_function": "sqlite3Atoi64",
+      "severity": "HIGH",
+      "cve": null,
+      "versions": [
+        "3.30.1"
+      ],
+      "total_crashes": 4,
+      "unique_hashes": 2,
+      "hashes": [
+        "6e423265255b1822",
+        "7fcae878221cb405"
+      ]
+    },
+    {
+      "class_id": "BC009",
+      "name": "float_cast_overflow_in_sqlite3VdbeMemNumerify",
+      "subtype": "float-cast-overflow",
+      "key_function": "sqlite3VdbeMemNumerify",
+      "severity": "LOW",
+      "cve": null,
+      "versions": [
+        "3.32.2"
+      ],
+      "total_crashes": 6,
+      "unique_hashes": 2,
+      "hashes": [
+        "378bf38a628a91c2",
+        "c6968dbc81249da2"
+      ]
+    },
+    {
+      "class_id": "BC010",
+      "name": "null_pointer_in_sqlite3Select",
+      "subtype": "null-pointer",
+      "key_function": "sqlite3Select",
+      "severity": "HIGH",
+      "cve": "CVE-2020-9327",
+      "versions": [
+        "3.31.1",
+        "3.32.0"
+      ],
+      "total_crashes": 5,
+      "unique_hashes": 2,
+      "hashes": [
+        "203fe090abe775e0",
+        "2b1da72f9048599c"
+      ]
+    },
+    {
+      "class_id": "BC011",
+      "name": "misaligned_access_in_resetAccumulator",
+      "subtype": "misaligned-access",
+      "key_function": "resetAccumulator",
+      "severity": "HIGH",
+      "cve": null,
+      "versions": [
+        "3.30.1"
+      ],
+      "total_crashes": 13,
+      "unique_hashes": 1,
+      "hashes": [
+        "186cc5604faecbe4"
+      ]
+    },
+    {
+      "class_id": "BC012",
+      "name": "null_pointer_in_isAuxiliaryVtabOperator",
+      "subtype": "null-pointer",
+      "key_function": "isAuxiliaryVtabOperator",
+      "severity": "HIGH",
+      "cve": null,
+      "versions": [
+        "3.31.1"
+      ],
+      "total_crashes": 20,
+      "unique_hashes": 1,
+      "hashes": [
+        "78bd3886e40881c5"
+      ]
+    },
+    {
+      "class_id": "BC013",
+      "name": "misaligned_access_in_sqlite3ExprCodeTarget",
+      "subtype": "misaligned-access",
+      "key_function": "sqlite3ExprCodeTarget",
+      "severity": "HIGH",
+      "cve": null,
+      "versions": [
+        "3.31.1"
+      ],
+      "total_crashes": 13,
+      "unique_hashes": 13,
+      "hashes": [
+        "1bee57694ce6b107",
+        "2eeb0652db5806e4",
+        "6213cfc8effe111e",
+        "7335fd423e7df525",
+        "9b23087d7bf066d3",
+        "a1436802e003bf8d",
+        "a4631f0826afe6b3",
+        "c9339a11e91b8dd5",
+        "cafac669ab79177e",
+        "d0939087b0129f7d",
+        "dddede1eba6fce0f",
+        "e4f1cdbc084cdca4",
+        "ea61d0701ef318e4"
+      ]
+    }
+  ]
+}

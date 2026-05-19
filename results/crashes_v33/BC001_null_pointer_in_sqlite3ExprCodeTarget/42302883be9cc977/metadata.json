@@ -1,0 +1,21 @@
+{
+  "hash": "42302883be9cc977",
+  "crash_type": "ubsan",
+  "subtype": "null-pointer",
+  "exit_code": -6,
+  "version": "3.30.1",
+  "error_message": "../cve_builds/sqlite-3.30.1/sqlite3.c:101292:16: runtime error: applying zero offset to null pointer",
+  "sql_preview": "CREATE TABLE IF NOT EXISTS p(a UNIQUE); SELECT p.a FROM p JOIN p q ON 3 = p.a NATURAL JOIN p WHERE p.a IN((SELECT(SELECT coalesce(lead(2) OVER(), SUM(a))) FROM p d WHERE p.a));",
+  "campaigns": [
+    "sqlite-3.30.1_v33_run1",
+    "sqlite-3.30.1_v33_run2",
+    "sqlite-3.30.1_v33_run3",
+    "sqlite-3.30.1_v33_run4",
+    "sqlite-3.30.1_v33_run5"
+  ],
+  "total_count": 2630,
+  "sample_file": "5_000001876",
+  "bug_class": "BC001",
+  "cve": null,
+  "severity": "HIGH"
+}

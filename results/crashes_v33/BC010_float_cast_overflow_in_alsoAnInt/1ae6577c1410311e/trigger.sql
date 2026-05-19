@@ -1,0 +1,3 @@
+CREATE TABLE IF NOT EXISTS p(a INTEGER);
+INSERT INTO p VALUES(-97802),(17),(0);
+SELECT sum(hex(hex(hex(hex(hex(hex(hex(count(*))))))))) OVER (PARTITION BY (SELECT 797 INTERSECT SELECT a FROM p) ) FROM p;

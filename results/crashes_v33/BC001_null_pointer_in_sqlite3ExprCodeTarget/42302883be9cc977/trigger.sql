@@ -1,0 +1,2 @@
+CREATE TABLE IF NOT EXISTS p(a UNIQUE);
+SELECT p.a FROM p JOIN p q ON 3 = p.a NATURAL JOIN p WHERE p.a IN((SELECT(SELECT coalesce(lead(2) OVER(), SUM(a))) FROM p d WHERE p.a));
