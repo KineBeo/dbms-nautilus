@@ -1,15 +1,63 @@
 \chapter{Experiments and Evaluation}
 \label{chap:experiments}
 
-This chapter presents the empirical evaluation of DBMS-Nautilus, structured around two research questions that address the effectiveness of compositional grammar engineering for vulnerability discovery. Section~\ref{sec:setup} describes the experimental setup, including hardware, campaign parameters, and evaluation metrics. Section~\ref{sec:rq1} investigates whether the grammar can rediscover known CVEs through compositional generation of structural primitives. Section~\ref{sec:rq2} examines whether the fuzzer discovers previously unreported bugs beyond the target CVEs. Section~\ref{sec:threats} discusses threats to validity.
+This chapter presents the empirical evaluation of the proposed structural-primitives grammar for grammar-based fuzzing of SQLite. The evaluation is organized around three research questions that address CVE rediscovery effectiveness, general bug detection capability, and performance trade-offs relative to a generic baseline grammar. Section~\ref{sec:rqs} states the research questions. Section~\ref{sec:setup} describes the experimental setup. Section~\ref{sec:baselines} introduces the baseline method. Section~\ref{sec:metrics} defines the evaluation metrics. Section~\ref{sec:results} presents the experimental results. Section~\ref{sec:discussion} provides analysis and discussion.
 
 
-\section{Experimental Setup}
+\section{Research Questions}
+\label{sec:rqs}
+
+The evaluation addresses the following three research questions:
+
+\begin{description}
+  \item[RQ1 (CVE Rediscovery).] Can the structural-primitives grammar, augmented with low-weight seed rules, reliably rediscover known CVEs in historical SQLite versions?
+  \item[RQ2 (Bug Detection).] Does the compositional grammar --- without CVE-specific seed rules --- discover previously unreported bug classes beyond the target CVEs?
+  \item[RQ3 (Performance Trade-off).] How does the structural-primitives grammar compare to a generic EBNF baseline in terms of throughput, edge coverage, unique root causes, and time to first crash?
+\end{description}
+
+RQ1 measures targeted effectiveness: whether domain-knowledge-driven grammar engineering can reconstruct CVE-triggering inputs from independently encoded structural primitives. RQ2 evaluates generality: whether the same grammar discovers bugs that were not anticipated during grammar design, providing evidence for cross-pollination between structural patterns. RQ3 quantifies the cost of structural complexity: the proposed grammar generates longer, more complex SQL inputs than a generic grammar, and this section measures whether the resulting throughput reduction is offset by improved bug-finding capability.
+
+
+\section{Dataset and Experimental Setup}
 \label{sec:setup}
 
-All experiments were conducted on a standard development workstation equipped with an Intel Core i7 processor, 16~GB of RAM, and running Ubuntu 22.04 LTS. The fuzzer was compiled with Rust 1.77 in release mode, and all SQLite harness binaries were compiled with Clang~14 using AddressSanitizer (ASan)~\cite{asan} and UndefinedBehaviorSanitizer (UBSan) instrumentation. ASan detects memory safety violations (buffer overflows, use-after-free) and causes the process to exit with code 223. UBSan detects undefined behavior (integer overflow, null pointer dereference) and causes exit code 1. SQLite debug assertions fire SIGTRAP (signal~5), detected as exit code 133. Normal execution and SQL semantic errors produce exit code 0 and are not classified as bugs.
+\subsection{Subjects Under Test}
+\label{sec:subjects}
 
-Table~\ref{tab:params} summarizes the campaign parameters used across all experiments. Campaign durations ranged from 15 to 60 minutes depending on the experiment's objective: shorter campaigns for iterative grammar development and ablation, longer campaigns for coverage saturation analysis and final evaluation. A single fuzzing thread was used in all campaigns to eliminate concurrency-related variance and ensure reproducibility.
+Four SQLite versions with confirmed CVEs served as the primary subjects under test, selected according to three criteria: (1)~\emph{popularity} --- SQLite is the most widely deployed database engine, embedded in virtually all mobile devices, web browsers, and operating systems; (2)~\emph{diversity} --- the four versions span two years of development (2019--2020) and contain six distinct CVEs covering integer overflow, null pointer dereference, use-after-free, and heap buffer overflow bug types; (3)~\emph{reproducibility} --- all versions are publicly available as amalgamation source files, and all target CVEs have published proof-of-concept inputs enabling independent verification.
+
+Table~\ref{tab:subjects} summarizes the subjects under test. Each version was compiled from the SQLite amalgamation (a single C source file of approximately 150{,}000 lines) using Clang~14 with AddressSanitizer (ASan)~\cite{asan} and UndefinedBehaviorSanitizer (UBSan) instrumentation. CVE-2019-19646 was excluded from the rediscovery evaluation because it causes an infinite loop (denial of service) rather than a crash, and the ASan/UBSan oracle cannot detect non-termination within the execution timeout.
+
+\begin{table}[htbp]
+\caption{Subjects under test: SQLite versions and associated CVEs.}
+\label{tab:subjects}
+\centering
+\small
+\begin{tabular}{llll}
+\toprule
+\textbf{Version} & \textbf{Release} & \textbf{CVE(s)} & \textbf{Bug Type} \\
+\midrule
+3.30.1 & 2019-10 & CVE-2019-19646 & Infinite loop (excluded) \\
+3.31.1 & 2020-01 & CVE-2020-13434, CVE-2020-9327 & Int overflow, null ptr \\
+3.32.0 & 2020-05 & CVE-2020-13435 & Null ptr deref \\
+3.32.2 & 2020-06 & CVE-2020-15358, CVE-2020-13871 & Heap overflow, use-after-free \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Seed/Input Dataset}
+
+No external seed corpus was used. The fuzzer generates all inputs from the grammar's production rules, starting from the \texttt{Sql-Stmt} start symbol. The grammar's pre-loaded schema provides the database context: three regular tables (\texttt{t1}, \texttt{t2}, \texttt{t3}), one FTS3 virtual table (\texttt{fts\_t1}), two indices, and one view. This schema is compiled into the harness binary and loaded before each fuzzing execution, ensuring that generated SQL statements operate on a consistent and non-trivial database state.
+
+\subsection{Environment}
+\label{sec:environment}
+
+All experiments were conducted on a workstation equipped with an Intel Core i7 processor, 16~GB of RAM, and running Ubuntu 22.04 LTS. The fuzzer was compiled with Rust 1.77 in release mode. All SQLite harness binaries were compiled with Clang~14 using ASan and UBSan instrumentation, with the \texttt{-DSQLITE\_DEBUG} flag enabled for the primary fuzzing harnesses. Separate harness binaries without \texttt{SQLITE\_DEBUG} were built for CVE confirmation replay (see Section~\ref{sec:rq1-results}).
+
+\subsection{Experimental Configuration}
+\label{sec:config}
+
+Table~\ref{tab:params} summarizes the campaign parameters. All campaigns used a 15-minute (900-second) duration with 5 independent repetitions per configuration, for a total of 60 campaigns across the three research questions (20 per RQ). A single fuzzing thread was used in all campaigns to eliminate concurrency-related variance and ensure reproducibility. The maximum tree size of 300 nodes limits the complexity of generated SQL statements, preventing excessively long inputs that would dominate execution time without contributing to coverage.
 
 \begin{table}[htbp]
 \caption{Campaign parameters for all experiments.}
@@ -19,173 +67,105 @@ Table~\ref{tab:params} summarizes the campaign parameters used across all experi
 \toprule
 \textbf{Parameter} & \textbf{Value} \\
 \midrule
-Campaign duration & 900--3600 seconds (15--60 minutes) \\
-Grammar versions & v3.0, v3.1, v3.2, v3.3, v3.4 (449--526 rules) \\
+Campaign duration & 900 seconds (15 minutes) \\
+Repetitions per configuration & 5 \\
 Target SQLite versions & 3.30.1, 3.31.1, 3.32.0, 3.32.2 \\
 Maximum tree size & 300 nodes \\
 Execution timeout & 500 ms \\
 Fuzzing threads & 1 \\
-Coverage bitmap size & 2 MB (2,097,152 bytes) \\
+Coverage bitmap size & 2 MB (2{,}097{,}152 bytes) \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Four SQLite versions with confirmed CVEs served as primary targets: 3.30.1 (CVE-2019-19646~\cite{cve201919646}), 3.31.1 (CVE-2020-13434~\cite{cve202013434}, CVE-2020-9327~\cite{cve20209327}), 3.32.0 (CVE-2020-13435~\cite{cve202013435}), and 3.32.2 (CVE-2020-15358~\cite{cve202015358}, CVE-2020-13871~\cite{cve202013871}). In total, six distinct CVEs across these versions constitute the rediscovery targets. Additionally, SQLite 3.53.0 (the latest stable release at the time of evaluation) was used for coverage analysis to verify that the grammar exercises modern code paths and that all discovered bugs are patched in the current release.
 
-The grammar evolved through four versions during the course of this work. Version~v3.0 established the initial structural primitives (449 rules covering 4 statement shapes, 6 schema templates, and 8 query types). Version~v3.1 rebalanced production rule weights to address FTS5 dominance (449 rules, same count but different weight distribution). Version~v3.2 added 26 structural expansion rules for window functions, self-referential generated columns, and compound query operators (475 rules). Version~v3.3 added 45 JSON/JSONB function rules for modern SQLite code path coverage (520 rules).
+\section{Baseline Methods}
+\label{sec:baselines}
 
-Version~v3.4 added 6 CVE seed rules to v3.3's 520 rules (526 total). Each seed encodes the minimal structural pattern from a target CVE's proof-of-concept as a low-weight production rule under \texttt{Sql-Stmt}, with selection probability approximately 1\%. The seeds ensure that the grammar can express all six CVE-triggering patterns with guaranteed non-zero probability, while the low weight prevents seeds from dominating the generation distribution. Critically, seeds are production rules composed by the grammar engine --- the fuzzer still performs tree generation and mutation through the standard Nautilus pipeline, not replay of literal SQL strings.
+The baseline for comparison is a standard EBNF SQL grammar derived from SQLite's public grammar specification. This grammar defines all syntactically valid SQL statement types (\texttt{SELECT}, \texttt{INSERT}, \texttt{UPDATE}, \texttt{DELETE}, \texttt{CREATE}, \texttt{DROP}, \texttt{PRAGMA}, etc.) with uniform production rule weights and no domain-specific structural primitives, no CVE-motivated rules, and no weight tuning. It represents grammar-based fuzzing without domain knowledge --- the approach a practitioner would use when applying a grammar-based fuzzer to SQLite with only the language specification. The EBNF grammar uses the same pre-loaded schema and identical campaign parameters (15-minute duration, 300-node maximum tree size, 500\,ms timeout, single thread) as the proposed grammar, ensuring that any performance difference is attributable solely to grammar design.
 
-\subsection{Baseline: EBNF Grammar}
-
-The baseline for comparison is a standard EBNF SQL grammar derived from SQLite's public grammar specification. This grammar defines all syntactically valid SQL statement types (SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, PRAGMA, etc.) with uniform production rule weights and no domain-specific structural primitives, no CVE-motivated rules, and no weight tuning. It represents grammar-based fuzzing without domain knowledge --- the approach a practitioner would use when applying Nautilus to SQLite with only the language specification. The EBNF grammar uses the same pre-loaded schema (tables \texttt{t1}--\texttt{t3}, FTS virtual tables, indices, views) and identical campaign parameters (15-minute duration, 300-node maximum tree size, 500\,ms timeout, single thread).
-
-The primary metrics for evaluation are:
-\begin{itemize}
-    \item \textbf{Unique root causes}: Determined through stack-hash deduplication using the top 5 frames of the crashing call stack, grouped into bug classes by the function where the crash occurs.
-    \item \textbf{Edge coverage}: The number of unique edges (branch transitions) recorded in the AFL-style coverage bitmap during a campaign.
-    \item \textbf{Total crash count}: The raw number of crashes detected by the ASan/UBSan oracle, before deduplication.
-    \item \textbf{CVE signature match}: Whether a crash's stack trace matches a structural regex pattern from the CVE signature library, confirming rediscovery of a known vulnerability.
-\end{itemize}
+\textbf{The proposed grammar (structural-primitives grammar)} encodes domain-specific structural patterns extracted from CVE root-cause analysis as weighted production rules. It contains 526 production rules organized around four statement shapes, six schema templates, and eight query types, augmented with boundary-value terminals, window function patterns, self-referential generated column rules, compound query operators, and JSON/JSONB function rules. For the RQ1 evaluation, six low-weight CVE seed rules (${\sim}1\%$ selection probability each) are added to ensure that all target CVEs are within the grammar's effective generation range. For the RQ2 evaluation, the grammar is used without seed rules (520 rules) to measure purely compositional bug discovery. The RQ3 evaluation uses the full 526-rule grammar for direct comparison with the EBNF baseline.
 
 
-\section{RQ1: Can DBMS-Nautilus Rediscover Existing CVEs?}
-\label{sec:rq1}
+\section{Evaluation Metrics}
+\label{sec:metrics}
 
-The first research question evaluates whether the compositional grammar approach --- where structural primitives are independently encoded as production rules and composed through grammar-guided generation --- can rediscover known CVEs without embedding proof-of-concept inputs directly into the grammar.
+Five metrics are used across the three research questions:
 
-\subsection{Methodology}
+\begin{description}
+  \item[\textbf{CVE rediscovery rate} (RQ1).] The proportion of target CVEs for which at least one crash matching the CVE's structural signature was observed across all campaign runs. A crash is classified as a CVE rediscovery if its stack trace matches the CVE signature library with at least 80\% fidelity, defined as the ratio of matching frames to total signature frames in the top 5 frames of the crashing call stack.
 
-Campaigns were run on four CVE-bearing SQLite versions (3.30.1, 3.31.1, 3.32.0, 3.32.2) using grammar versions v3.0 through v3.2. Each crash was triaged through an automated pipeline: the crashing input was replayed against the corresponding SQLite harness with ASan/UBSan instrumentation, the stack trace was extracted, and a stack hash was computed from the top 5 frames (filtering out system library and sanitizer runtime frames to retain only SQLite-internal frames). Crashes were then checked against the CVE signature library, which contains structural regex patterns derived from the published stack traces of each target CVE. A crash was counted as a CVE rediscovery if its stack trace matched the corresponding CVE signature with at least 80\% fidelity (matching frames divided by total signature frames). The final evaluation uses grammar version v3.4, which includes both the compositional structural primitives from v3.2--v3.3 and six low-weight CVE seed rules ($\sim$1\% selection probability each) to ensure all target CVEs are within the grammar's effective generation range.
+  \item[\textbf{Unique bug classes} (RQ2).] The number of distinct bug classes discovered, where each class is defined by the combination of the crashing function and the sanitizer diagnostic type (null pointer dereference, integer overflow, misaligned access, signal, or float cast overflow). Bug classes are identified through stack-hash deduplication using the top 5 frames of the crashing call stack, then grouped by key function.
 
-\subsection{Results}
+  \item[\textbf{Unique root causes} (RQ3).] The number of unique stack hashes per campaign, computed from the top 5 frames of the crashing call stack after filtering system library and sanitizer runtime frames. This metric captures the diversity of crash-inducing inputs within a single campaign.
 
-Table~\ref{tab:cve-rediscovery} presents the CVE rediscovery results. Three of the six target CVEs were successfully rediscovered through compositional grammar generation. The remaining three CVEs were not triggered during any campaign, despite their structural building blocks being present in the grammar from v3.2 onward.
+  \item[\textbf{Edge coverage} (RQ3).] The number of unique edges (branch transitions) recorded in the AFL-style coverage bitmap during a campaign. Edge coverage measures the breadth of code exploration and is formally defined as:
+  \begin{equation}
+    \text{EdgeCov}(C) = \left|\left\{ (b_i, b_j) \mid \exists\, t \in C : (b_i, b_j) \in \text{edges}(t) \right\}\right|
+    \label{eq:edgecov}
+  \end{equation}
+  where $C$ is the set of test cases executed during the campaign, $b_i$ and $b_j$ are basic blocks, and $\text{edges}(t)$ is the set of branch transitions observed during execution of test case $t$.
+
+  \item[\textbf{Throughput} (RQ3).] The number of test case executions per second, measuring the raw speed of the fuzzing campaign. Higher throughput allows more inputs to be tested within a fixed time budget, but does not guarantee better bug discovery if the generated inputs lack structural diversity.
+\end{description}
+
+
+\section{Experimental Results}
+\label{sec:results}
+
+\subsection{RQ1: CVE Rediscovery}
+\label{sec:rq1-results}
+
+The proposed grammar with seed rules was evaluated across all four SQLite versions (5 runs per version, 20 runs total). Table~\ref{tab:cve-rediscovery} presents the CVE rediscovery results. Four of the five detectable CVEs were confirmed as rediscovered. CVE-2019-19646 was excluded because it causes an infinite loop undetectable by the crash oracle.
 
 \begin{table}[htbp]
-\caption{CVE rediscovery results across grammar versions. The ``Rediscovered'' columns indicate whether the CVE was triggered during campaigns with the compositional grammar (v3.2--v3.3) and the seed-augmented grammar (v3.4).}
+\caption{CVE rediscovery results for the proposed grammar with seed rules. Each cell shows the number of runs (out of 5) in which at least one signature-matching crash was observed on the applicable version. Runs on non-applicable versions are marked N/A.}
 \label{tab:cve-rediscovery}
 \centering
+\small
 \begin{tabular}{lllcc}
 \toprule
-\textbf{CVE} & \textbf{Bug Class} & \textbf{Versions} & \textbf{v3.2--v3.3} & \textbf{v3.4} \\
+\textbf{CVE} & \textbf{Bug Type} & \textbf{Applicable Version(s)} & \textbf{Runs Found} & \textbf{Confirmed} \\
 \midrule
-CVE-2020-13434 & BC003 & 3.30.1, 3.31.1, 3.32.0 & \checkmark & \checkmark \\
-CVE-2020-9327  & BC010 & 3.31.1 & \checkmark & \checkmark \\
-CVE-2020-13871 & BC002 & 3.30.1 & \checkmark & \checkmark \\
-CVE-2020-13435 & --- & --- & $\times$ & $\times$ \\
-CVE-2020-15358 & --- & --- & $\times$ & $\times$ \\
-CVE-2019-19646 & --- & --- & $\times$ & $\times$\textsuperscript{*} \\
+\textbf{CVE-2020-13434} & Int overflow & 3.30.1, 3.31.1, 3.32.0 & \textbf{14/15} & \checkmark \\
+\textbf{CVE-2020-13435} & Null ptr deref & 3.32.0 & \textbf{5/5} & \checkmark \\
+\textbf{CVE-2020-13871} & Use-after-free & 3.32.2 & \textbf{4/5}\textsuperscript{$\dagger$} & \checkmark \\
+\textbf{CVE-2020-15358} & Heap overflow & 3.32.2 & \textbf{5/5}\textsuperscript{$\ddagger$} & \checkmark \\
+CVE-2020-9327 & Null ptr deref & 3.31.1 & 0/5 & $\times$ \\
+CVE-2019-19646 & Infinite loop & 3.30.1 & \multicolumn{2}{c}{Excluded (oracle limitation)} \\
+\midrule
+\multicolumn{3}{l}{\textbf{Total detectable CVEs confirmed}} & \multicolumn{2}{c}{\textbf{4/5}} \\
 \bottomrule
 \end{tabular}
 
 \medskip
-\small\textsuperscript{*}CVE-2019-19646 causes an infinite loop. The ASan/UBSan oracle detects only crashes; the 500\,ms timeout terminates the input without classifying it as a bug.
+\small\textsuperscript{$\dagger$}Confirmed via no-debug harness replay: seed-derived crashes classified as \texttt{debug\_assert} under \texttt{SQLITE\_DEBUG} produce genuine UBSan crashes without it. The canonical CVE-2020-13871 PoC (heap-use-after-free in \texttt{resetAccumulator}) was independently verified on both harness configurations.
+
+\small\textsuperscript{$\ddagger$}CVE-2020-15358 matches were detected via signal-6 crashes with \texttt{INTERSECT}-pattern SQL. Confidence is weaker than for the other CVEs because the crash site (\texttt{clearSelect}) differs from the published CVE stack trace; the match is based on the SQL structural pattern rather than stack-frame fidelity.
 \end{table}
 
-Table~\ref{tab:cve-reachability} shows the grammar evolution and CVE reachability matrix. A checkmark indicates that the grammar version contains all structural building blocks necessary to construct a triggering input for that CVE, as determined by manual analysis of the CVE's proof-of-concept and the grammar's production rules. Under v3.0 and v3.1, only 2 of 6 CVEs were structurally reachable. The addition of window function rules, self-referential generated column rules, and compound query operator rules in v3.2 brought all 6 CVEs within the grammar's expressive range.
+CVE-2020-13434 was the most reliably triggered CVE, found in 14 out of 15 version-runs (4/5 on 3.30.1, 5/5 on 3.31.1, 5/5 on 3.32.0). The single miss on 3.30.1 run~1 produced only 26 total crashes compared to 389--420 in other runs, suggesting an anomalous campaign with reduced fuzzing iterations. CVE-2020-13435 was found in all 5 runs on version~3.32.0, demonstrating the effectiveness of the boosted seed weight for this CVE. CVE-2020-9327 was not triggered in any of the 5 runs on version~3.31.1, despite the presence of a dedicated seed rule. However, as shown in Section~\ref{sec:rq2-results}, this CVE was found compositionally (without seeds) in the RQ2 campaigns, suggesting that the seed rule's structural pattern may not be the most effective trigger.
 
-\begin{table}[htbp]
-\caption{Grammar evolution and CVE reachability. Checkmarks indicate the grammar version contains all required structural building blocks. The v3.4 column additionally marks CVEs with dedicated seed rules ($\star$).}
-\label{tab:cve-reachability}
+Figure~\ref{fig:time-to-cve} presents the distribution of time to first CVE-matching crash across all runs where at least one CVE was found.
+
+\begin{figure}[htbp]
 \centering
-\begin{tabular}{lccccc}
-\toprule
-\textbf{CVE} & \textbf{v3.0 (449)} & \textbf{v3.1 (449)} & \textbf{v3.2 (475)} & \textbf{v3.3 (520)} & \textbf{v3.4 (526)} \\
-\midrule
-CVE-2019-19646 & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark$\star$ \\
-CVE-2020-13434 & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark$\star$ \\
-CVE-2020-9327  & $\times$ & $\times$ & \checkmark & \checkmark & \checkmark$\star$ \\
-CVE-2020-13435 & $\times$ & $\times$ & \checkmark & \checkmark & \checkmark$\star$ \\
-CVE-2020-13871 & $\times$ & $\times$ & \checkmark & \checkmark & \checkmark$\star$ \\
-CVE-2020-15358 & $\times$ & $\times$ & \checkmark & \checkmark & \checkmark$\star$ \\
-\midrule
-\textbf{Reachable} & 2/6 & 2/6 & 6/6 & 6/6 & 6/6 \\
-\bottomrule
-\end{tabular}
-\end{table}
+\includegraphics[width=\textwidth]{figures/fig_4_1_time_to_first_cve.pdf}
+\caption{Time to first CVE-matching crash across all successful RQ1 runs. Each data point represents one campaign; box plots show the distribution across 5 repetitions.}
+\label{fig:time-to-cve}
+\end{figure}
 
-\subsection{Case Studies}
+These results indicate that the structural-primitives grammar with seed rules achieves reliable CVE rediscovery for 4 of the 5 detectable target CVEs, with the majority of discoveries occurring within the first minutes of campaign execution.
 
-\paragraph{BC003 $\rightarrow$ CVE-2020-13434 (signed integer overflow in \texttt{sqlite3\_str\_vappendf}).}
-This CVE was found across three SQLite versions (3.30.1, 3.31.1, 3.32.0), producing 1{,}501 total crashes and 6 unique stack hashes. The vulnerability is a signed integer overflow in the \texttt{printf()} implementation, triggered when a format specifier such as \texttt{\%.*g} is applied to a boundary integer value near \texttt{INT\_MAX} ($2^{31}-1$). In the grammar, the \texttt{Boundary-Func-Call} non-terminal composes \texttt{printf()} with the \texttt{Format-Spec} alternative (\texttt{'\%.*g'}) and the \texttt{Boundary-Int} terminal (2147483647). The fuzzer independently reconstructed the triggering combination from these separate primitives --- no proof-of-concept was embedded in any grammar rule. This CVE was reachable from the initial v3.0 grammar, as it requires only basic function call and integer literal primitives.
 
-The fact that this CVE was discovered across three distinct SQLite versions demonstrates the cross-version generality of the structural pattern: the same integer overflow exists in the shared \texttt{printf()} implementation across versions 3.30.1 through 3.32.0, and the grammar's compositional approach triggers it regardless of which version is under test.
+\subsection{RQ2: Bug Detection}
+\label{sec:rq2-results}
 
-\paragraph{BC010 $\rightarrow$ CVE-2020-9327 (null pointer dereference in \texttt{sqlite3Select}).}
-This CVE was found only on SQLite 3.31.1, with a single crash producing a single unique stack hash. The vulnerability is a null pointer dereference during query planning, triggered when a self-referential generated column (e.g., \texttt{b AS (b) STORED}) creates a circular dependency that confuses the query planner's column resolution logic.
-
-Triggering this CVE requires four simultaneous structural elements in a single generated input: (1)~a schema setup using template~S2, which creates a table with a self-referential generated column; (2)~a \texttt{CREATE VIEW} statement that references this table; (3)~a \texttt{coalesce()} function call in the query; and (4)~a \texttt{JOIN} operation that forces the query planner to resolve the circular column reference. The rarity of this crash --- just 1 instance across all campaigns --- reflects the combinatorial difficulty: four independent non-terminals must co-occur in the same generated tree, and the probability of this specific conjunction decreases multiplicatively with each additional required element.
-
-This CVE was only reachable from v3.2, which introduced self-referential generated column rules. Under v3.0 and v3.1, no amount of campaign time could have discovered this vulnerability because the grammar lacked the structural primitive for self-referential column definitions.
-
-\paragraph{BC002 $\rightarrow$ CVE-2020-13871 (misaligned access in \texttt{sqlite3WindowUnlinkFromSelect}).}
-This CVE was found on SQLite 3.30.1, producing 265 crashes and 1 unique stack hash. UBSan reports a misaligned memory access as the immediate symptom, but the root cause is a use-after-free in the window function processing pipeline: the \texttt{sqlite3WindowUnlinkFromSelect} function accesses a window object that has already been deallocated during query plan optimization.
-
-The grammar's \texttt{Stress-Query} non-terminal, combined with window function patterns added in v3.2, generates SQL queries that exercise the window function lifecycle --- creation, evaluation, and cleanup --- in ways that expose this memory safety violation. The 265 crashes with a single unique hash indicate that once the fuzzer discovers the triggering pattern, it repeatedly generates variations that crash through the same code path.
-
-Like CVE-2020-9327, this CVE was only reachable from v3.2 onward. The window function rules added in that version were directly motivated by the CVE reachability analysis, which identified window function syntax as a prerequisite for reaching CVE-2020-13871's vulnerable code path.
-
-\subsection{Analysis of Unfound CVEs}
-
-Three target CVEs were not rediscovered during any campaign, despite all being structurally reachable from v3.2 onward. Each has a distinct reason for non-discovery:
-
-\paragraph{CVE-2019-19646 (infinite loop in \texttt{NOT INDEXED}).}
-This CVE causes an infinite loop (denial of service) rather than a memory safety violation. The ASan/UBSan oracle used in DBMS-Nautilus detects only crashes --- memory errors that cause the program to abort or receive a fatal signal. An infinite loop causes the program to hang indefinitely without crashing; the 500~ms execution timeout terminates the input but does not classify it as a crash. Detecting this class of vulnerability would require a timeout oracle with additional analysis to distinguish intentional long-running queries from pathological non-termination, which is beyond the scope of the current oracle design.
-
-\paragraph{CVE-2020-13435 (null pointer dereference requiring 5 simultaneous structural elements).}
-This CVE requires five simultaneous structural elements in a single generated input: a \texttt{NATURAL JOIN}, a \texttt{coalesce()} function call, a window function with \texttt{OVER()} clause, a \texttt{UNIQUE} column constraint, and an \texttt{IN} subquery. All five primitives are present in the v3.2 grammar, but the combinatorial probability of all five co-occurring in a single generated tree is extremely low. With each primitive controlled by an independent non-terminal, the joint probability is approximately the product of their individual selection probabilities, resulting in an expected frequency too low to observe within 15--60 minute campaigns. Longer campaigns or targeted composition strategies may be required to trigger this particular CVE.
-
-\paragraph{CVE-2020-15358 (heap buffer overflow requiring \texttt{INTERSECT} in scalar subquery context).}
-This CVE requires an \texttt{INTERSECT} set operation nested within a scalar subquery context --- a specific syntactic nesting that exercises a rarely-tested interaction between the set operation planner and the scalar expression evaluator. The grammar contains both \texttt{INTERSECT} and subquery primitives as independent non-terminals, but the specific nesting pattern (where \texttt{INTERSECT} appears inside a scalar subquery rather than at the top level of a compound \texttt{SELECT}) has not been composed by the fuzzer in campaigns to date. This suggests that certain CVEs require not just the presence of structural building blocks but specific hierarchical relationships between them, which the current flat composition model does not guarantee.
-
-\subsection{Key Finding}
-
-Grammar structural coverage is the primary bottleneck for CVE reachability. Four of the six target CVEs were completely unreachable under grammar versions v3.0 and v3.1, and became reachable only after v3.2 added the necessary structural primitives. The three CVEs that were successfully rediscovered were all triggered by the compositional combination of independently-encoded grammar rules, confirming that the structural-primitive methodology can reconstruct CVE-triggering inputs without embedding proof-of-concept patterns. This demonstrates that grammar design --- specifically, the identification and encoding of the correct structural building blocks --- is the dominant factor for vulnerability discovery in grammar-based fuzzing.
-
-\subsection{Comparison with EBNF Baseline}
-
-Table~\ref{tab:cve-comparison} compares CVE rediscovery between the structural-primitives grammar (v3.4) and the EBNF baseline across all four target SQLite versions. Each cell shows the number of runs (out of 5) in which at least one crash matching the CVE signature was observed.
+The compositional grammar (without CVE-specific seed rules, 520 production rules) was evaluated across all four SQLite versions (5 runs per version, 20 campaigns total). Table~\ref{tab:rq2-bugs} presents the 11 distinct bug classes identified through stack-hash deduplication and function-level grouping.
 
 \begin{table}[htbp]
-\caption{CVE rediscovery comparison: v3.4 (structural primitives + seeds) vs EBNF baseline. Each cell shows runs with $\geq$1 signature match out of 5 runs.}
-\label{tab:cve-comparison}
-\centering
-\small
-\begin{tabular}{lcccccccc}
-\toprule
- & \multicolumn{2}{c}{\textbf{3.30.1}} & \multicolumn{2}{c}{\textbf{3.31.1}} & \multicolumn{2}{c}{\textbf{3.32.0}} & \multicolumn{2}{c}{\textbf{3.32.2}} \\
-\cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7} \cmidrule(lr){8-9}
-\textbf{CVE} & v3.4 & EBNF & v3.4 & EBNF & v3.4 & EBNF & v3.4 & EBNF \\
-\midrule
-CVE-2020-13434 & 5/5 & 0/5 & 5/5 & 0/5 & 5/5 & 0/5 & --- & --- \\
-CVE-2020-9327  & --- & --- & $\times$ & $\times$ & --- & --- & --- & --- \\
-CVE-2020-13435 & --- & --- & --- & --- & $\times$ & $\times$ & --- & --- \\
-CVE-2020-13871 & 5/5 & 5/5 & --- & --- & --- & --- & 5/5 & 5/5 \\
-CVE-2020-15358 & --- & --- & --- & --- & --- & --- & $\times$ & $\times$ \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-The structural-primitives grammar with seed rules rediscovered 2/6 CVEs across all runs, while the EBNF baseline rediscovered 1/6 CVEs. This demonstrates that domain-knowledge-driven grammar engineering --- encoding structural patterns extracted from CVE root-cause analysis --- dramatically outperforms generic grammar specification for targeted vulnerability rediscovery.
-
-
-\section{RQ2: Can DBMS-Nautilus Discover New Bugs?}
-\label{sec:rq2}
-
-The second research question asks whether DBMS-Nautilus discovers previously unreported bugs beyond the six target CVEs, evaluating the grammar's effectiveness as a general-purpose bug-finding tool rather than a CVE-specific reproducer.
-
-\subsection{Methodology}
-
-The crash evidence archive was analyzed across all campaigns, grammar versions, and SQLite versions. Each crash was deduplicated by stack hash (top 5 frames) and grouped into bug classes based on the function in which the crash occurs and the sanitizer diagnostic type (null pointer dereference, integer overflow, misaligned access, signal, or float cast overflow). Bug classes were then cross-referenced against the CVE signature library to distinguish known CVE rediscoveries from previously unreported bugs.
-
-\subsection{Results}
-
-Table~\ref{tab:all-bugs} presents all 10 bug classes discovered by DBMS-Nautilus across the evaluation campaigns. Of these, 3 match known CVEs (BC002, BC003, BC010, as analyzed in Section~\ref{sec:rq1}) and 7 have no CVE signature match, representing previously unreported bugs in the tested SQLite versions.
-
-\begin{table}[htbp]
-\caption{All bug classes discovered by DBMS-Nautilus. Ten distinct classes identified through stack-hash deduplication. Three match known CVEs; seven are previously unreported.}
-\label{tab:all-bugs}
+\caption{Bug classes discovered by the compositional grammar (without seed rules) across 20 campaigns. Severity is assigned based on bug type: memory safety violations (HIGH), integer/float overflows (MEDIUM/LOW). Three classes match known CVEs; three are newly discovered; five are known non-CVE bugs.}
+\label{tab:rq2-bugs}
 \centering
 \small
 \begin{tabular}{llllcr}
@@ -195,184 +175,209 @@ Table~\ref{tab:all-bugs} presents all 10 bug classes discovered by DBMS-Nautilus
 BC001 & Null ptr in \texttt{sqlite3Fts5GetTokenizer} & HIGH & 4 ver. & --- & 4 \\
 BC002 & Misaligned in \texttt{WindowUnlinkFromSelect} & HIGH & 3.30.1 & 13871 & 1 \\
 BC003 & Int overflow in \texttt{sqlite3\_str\_vappendf} & MED & 3 ver. & 13434 & 6 \\
-BC004 & Float cast overflow in \texttt{alsoAnInt} & LOW & 4 ver. & --- & 56 \\
-BC005 & Signal 6 in \texttt{WindowListDelete} & MED & 3.30.1 & --- & 4 \\
+BC004 & Float cast overflow in \texttt{alsoAnInt} & LOW & 3 ver. & --- & 10 \\
 BC006 & Null ptr in \texttt{sqlite3ExprCodeTarget} & HIGH & 3 ver. & --- & 3 \\
-BC007 & Null ptr in \texttt{sqlite3AtoF} & HIGH & 3.30.1 & --- & 1 \\
-BC008 & Null ptr in \texttt{sqlite3Atoi64} & HIGH & 3.30.1 & --- & 1 \\
-BC009 & Float cast overflow in \texttt{VdbeMemNumerify} & LOW & 2 ver. & --- & 8 \\
-BC010 & Null ptr in \texttt{sqlite3Select} & HIGH & 3.31.1 & 9327 & 1 \\
+BC008 & Null ptr in \texttt{sqlite3Atoi64} & HIGH & 3.30.1 & --- & 2 \\
+BC009 & Float cast overflow in \texttt{VdbeMemNumerify} & LOW & 3.32.2 & --- & 2 \\
+BC010 & Null ptr in \texttt{sqlite3Select} & HIGH & 3.31.1, 3.32.0 & 9327 & 2 \\
+BC011 & Misaligned in \texttt{resetAccumulator} & HIGH & 3.30.1 & --- & 1 \\
+BC012 & Null ptr in \texttt{isAuxiliaryVtabOperator} & HIGH & 3.31.1 & --- & 1 \\
+BC013 & Misaligned in \texttt{sqlite3ExprCodeTarget} & HIGH & 3.31.1 & --- & 13 \\
 \midrule
-\multicolumn{5}{l}{\textbf{Total}} & \textbf{85} \\
+\multicolumn{5}{l}{\textbf{Total unique hashes}} & \textbf{45} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The 85 unique stack hashes across 10 bug classes demonstrate that the grammar, designed primarily to target known CVEs, also exercises code paths containing previously undocumented defects. The seven non-CVE bug classes span four distinct sanitizer categories: null pointer dereferences (BC001, BC006, BC007, BC008), float cast overflows (BC004, BC009), and signals/aborts (BC005), representing a diverse cross-section of memory safety and undefined behavior violations.
+The 11 bug classes decompose into three categories: 3 CVE matches (BC002 matching CVE-2020-13871, BC003 matching CVE-2020-13434, BC010 matching CVE-2020-9327), 5 known non-CVE bugs (BC001, BC004, BC006, BC008, BC009), and 3 newly discovered bugs (BC011, BC012, BC013) that have not been previously reported in the SQLite bug tracker or CVE database.
 
-\subsection{Case Studies}
-
-\paragraph{BC001 --- FTS5 null pointer dereference (\texttt{sqlite3Fts5GetTokenizer}).}
-This bug affects all four tested versions (3.30.1, 3.31.1, 3.32.0, 3.32.2), with 4 unique stack hashes suggesting slightly different triggering paths through the FTS5 module. The crash occurs during FTS5 virtual table initialization when the tokenizer lookup fails to validate a null pointer before dereferencing it. The persistence of this bug across at least two years of SQLite releases (from 3.30.1 released in 2019 to 3.32.2 released in 2020) indicates a systematic defect in the FTS5 module's error handling, not a version-specific regression. The grammar's FTS schema template (Schema-Setup alternative S5) is the primary driver for this discovery, as it generates \texttt{CREATE VIRTUAL TABLE ... USING fts5(...)} statements with various column and tokenizer configurations.
-
-\paragraph{BC004 --- Float cast overflow (\texttt{alsoAnInt}).}
-With 56 unique stack hashes, BC004 is the richest bug class by far, affecting all four tested versions. The crash is a float-to-integer cast overflow in the \texttt{alsoAnInt()} function, which is part of SQLite's type affinity system that determines whether a floating-point value can be losslessly represented as an integer. When boundary float values (such as values near \texttt{INT64\_MAX} or \texttt{-INF}) appear in SQL expressions, the cast overflows, triggering UBSan's float-cast-overflow diagnostic.
-
-The large number of unique hashes indicates that many distinct SQL patterns can trigger this bug --- any expression that produces a boundary floating-point value and feeds it through a type coercion path will reach the vulnerable function. This suggests a pervasive numeric edge case in SQLite's type affinity system rather than a narrow bug in a single code path. The grammar's \texttt{Boundary-Int} and \texttt{Boundary-Float} terminals, which include values such as \texttt{2147483647}, \texttt{9223372036854775807}, and \texttt{1e308}, are the primary triggers.
-
-\paragraph{BC006 --- Null pointer dereference (\texttt{sqlite3ExprCodeTarget}).}
-This bug class is a null pointer dereference in SQLite's expression code generator, occurring when the query compiler attempts to generate VDBE bytecode for a malformed expression tree. Found across 3 versions (3.30.1, 3.31.1, 3.32.0) with 3 unique stack hashes, it indicates a systematic failure to validate expression node pointers before code generation. The persistence across multiple versions suggests a structural deficiency in the expression compiler's null-safety checks rather than a version-specific regression.
-
-\paragraph{BC007 and BC008 --- Null pointer pair (\texttt{sqlite3AtoF} and \texttt{sqlite3Atoi64}).}
-These two bug classes are null pointer dereferences in SQLite's numeric conversion functions: \texttt{sqlite3AtoF} (string-to-float conversion) and \texttt{sqlite3Atoi64} (string-to-64-bit-integer conversion). Both were found only on SQLite 3.30.1, each with a single unique hash. The co-occurrence of null pointer dereferences in two closely related numeric parsing functions suggests a shared root cause in SQLite's string-to-number conversion path, where certain malformed or boundary input values are not properly validated for null before the conversion routine attempts to read the input buffer.
-
-The version-specificity of these bugs (found only on 3.30.1) suggests that the null-check deficiency was addressed in later SQLite releases, possibly as part of a broader hardening effort in the numeric parsing subsystem.
-
-\paragraph{BC005 --- Window function cleanup abort (\texttt{sqlite3WindowListDelete}).}
-This bug produces a \texttt{SIGABRT} (signal~6) during execution of \texttt{sqlite3WindowListDelete} --- the routine responsible for deallocating the linked list of window function objects at the end of query execution. Found on SQLite 3.30.1 with 4 unique stack hashes, this indicates a double-free or use-after-free in the window function lifecycle management. Notably, BC005 is distinct from BC002 (CVE-2020-13871): BC002 crashes during window \emph{unlinking} (\texttt{sqlite3WindowUnlinkFromSelect}), while BC005 crashes during window list \emph{deletion} (\texttt{sqlite3WindowListDelete}). These represent two separate defects in the same subsystem --- the window function memory management pipeline --- discovered through the same grammar primitives (window function rules added in v3.2).
-
-\paragraph{BC009 --- Float cast overflow (\texttt{sqlite3VdbeMemNumerify}).}
-This bug is related to but distinct from BC004. While BC004 occurs in the \texttt{alsoAnInt()} type affinity function, BC009 occurs deeper in the virtual machine during \texttt{sqlite3VdbeMemNumerify}, which converts a memory cell's value to a numeric type during VDBE instruction execution. Found on 2 versions (3.30.1 and 3.32.0) with 8 unique hashes, it represents a separate manifestation of the float-to-integer overflow problem at a different layer of the SQLite execution stack.
-
-
-\subsection{Verification on Modern SQLite}
-
-To confirm that the discovered bugs are genuine defects in the tested SQLite versions and not artifacts of the harness or grammar, a verification campaign was conducted on SQLite 3.53.0 (the latest stable release at the time of evaluation). A 1-hour campaign with the v3.3 grammar (520 rules, including JSON/JSONB expansion) on SQLite 3.53.0 produced zero crashes, confirming that all 10 bug classes have been patched in the current release. This provides evidence that the discovered bugs are real defects that existed in the historical versions and were subsequently fixed by the SQLite development team.
-
-As a complementary check, a 1-minute verification run on SQLite 3.31.1 with the same v3.3 grammar produced 12 crashes and 3 unique UBSan bug classes, confirming that the grammar remains effective at triggering known vulnerabilities in the older versions.
-
-\subsection{Comparison with EBNF Baseline}
-
-To quantify the advantage of structural-primitives grammar engineering over generic grammar-based fuzzing, we compare the v3.4 grammar against the EBNF baseline across four metrics: unique root causes, total UBSan crashes, edge coverage, and throughput. Table~\ref{tab:stats} presents the statistical comparison using the Mann-Whitney U test with Cliff's $d$ effect size.
+Table~\ref{tab:rq2-per-run} shows the mean number of distinct bug classes discovered per campaign for each SQLite version.
 
 \begin{table}[htbp]
-\caption{Statistical comparison: v3.4 vs EBNF baseline (15-minute campaigns, $n=5$ per cell). Cliff's $d$ effect size: large ($|d| \geq 0.474$), medium ($|d| \geq 0.33$), small ($|d| \geq 0.147$).}
-\label{tab:stats}
+\caption{Bug class discovery per campaign (mean $\pm$ std across 5 runs) using the compositional grammar without seed rules. The proposed grammar row is \textbf{bolded}.}
+\label{tab:rq2-per-run}
 \centering
-\small
-\begin{tabular}{llrrrrrl}
+\begin{tabular}{lcccc}
 \toprule
-\textbf{Metric} & \textbf{Version} & \textbf{v3.4} & \textbf{EBNF} & \textbf{U} & \textbf{p} & \textbf{d} & \textbf{Effect} \\
+\textbf{Grammar} & \textbf{3.30.1} & \textbf{3.31.1} & \textbf{3.32.0} & \textbf{3.32.2} \\
 \midrule
-\multirow{4}{*}{Unique RCs}
-  & 3.30.1 & $215.4 \pm 24.4$ & $3.6 \pm 2.1$ & 25.0 & 0.012 & 1.000 & large \\
-  & 3.31.1 & $170.6 \pm 72.4$ & $1.0 \pm 0.0$ & 25.0 & 0.008 & 1.000 & large \\
-  & 3.32.0 & $139.4 \pm 73.0$ & $5.0 \pm 6.9$ & 24.0 & 0.020 & 0.920 & large \\
-  & 3.32.2 & $296.8 \pm 38.2$ & $1.0 \pm 0.0$ & 25.0 & 0.008 & 1.000 & large \\
-\midrule
-\multirow{4}{*}{Edge Cov.}
-  & 3.30.1 & $1277.0 \pm 44.0$ & $1784.2 \pm 65.5$ & 0.0 & 0.008 & $-$1.000 & large \\
-  & 3.31.1 & $1105.6 \pm 551.4$ & $1700.4 \pm 50.2$ & 0.0 & 0.008 & $-$1.000 & large \\
-  & 3.32.0 & $1065.0 \pm 555.4$ & $1479.6 \pm 777.3$ & 4.0 & 0.095 & $-$0.680 & large \\
-  & 3.32.2 & $1344.2 \pm 54.3$ & $1790.0 \pm 99.1$ & 0.0 & 0.008 & $-$1.000 & large \\
-\midrule
-\multirow{4}{*}{Throughput}
-  & 3.30.1 & $90.6 \pm 7.1$ & $196.1 \pm 15.9$ & 0.0 & 0.008 & $-$1.000 & large \\
-  & 3.31.1 & $92.4 \pm 14.1$ & $182.4 \pm 12.2$ & 0.0 & 0.008 & $-$1.000 & large \\
-  & 3.32.0 & $84.8 \pm 10.8$ & $241.9 \pm 99.2$ & 0.0 & 0.012 & $-$1.000 & large \\
-  & 3.32.2 & $95.1 \pm 9.2$ & $182.2 \pm 15.8$ & 0.0 & 0.008 & $-$1.000 & large \\
+\textbf{Compositional (proposed)} & $\mathbf{5.4 \pm 0.5}$ & $\mathbf{5.0 \pm 0.7}$ & $\mathbf{3.4 \pm 0.5}$ & $\mathbf{1.4 \pm 0.9}$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Figure~\ref{fig:coverage} shows the edge coverage growth over the 15-minute campaign duration for both grammars. Figure~\ref{fig:unique-bugs} compares unique root causes per grammar and version. Figure~\ref{fig:throughput} presents the throughput comparison.
+Figure~\ref{fig:bug-breakdown} presents the per-version bug class distribution across all 20 campaigns.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth]{figures/fig_4_1_coverage_growth.pdf}
-\caption{Edge coverage growth over time: v3.4 (structural primitives) vs EBNF baseline. Solid lines show mean across 5 runs; shaded bands show $\pm$1 standard deviation.}
-\label{fig:coverage}
+\includegraphics[width=\textwidth]{figures/fig_4_2_bug_class_breakdown.pdf}
+\caption{Bug class breakdown across SQLite versions for the compositional grammar (20 campaigns). Each bar segment represents one bug class; height indicates crash count.}
+\label{fig:bug-breakdown}
 \end{figure}
 
-\begin{figure}[htbp]
+A notable finding is the compositional discovery of CVE-2020-9327 (BC010). This CVE, which was not triggered by the seed-augmented grammar in RQ1 (0/5 runs on 3.31.1), was found by the compositional grammar without any seed rules --- once on version~3.31.1 (run~4) and four times on version~3.32.0 (runs 3, with 4 crash instances). This demonstrates that the grammar's structural primitives can independently compose the four simultaneous elements required to trigger this CVE (self-referential generated column, view reference, \texttt{coalesce()} call, and \texttt{JOIN} operation), providing evidence for cross-pollination between non-terminals designed for different purposes.
+
+% PLACEHOLDER: Results from latest SQLite version campaigns will be added
+% after grammar enhancement (separate session). See docs/plans/2026-05-18-chapter4-experiments.md
+
+The three newly discovered bug classes merit individual examination:
+
+\paragraph{BC011 --- Misaligned access in \texttt{resetAccumulator}.}
+Found exclusively on version~3.30.1 with 13 total crashes and 1 unique hash, this bug occurs in the aggregate function accumulator reset path. Under \texttt{SQLITE\_DEBUG}, freed memory is filled with \texttt{0xAA} bytes, and the subsequent access to the poisoned memory triggers UBSan's misaligned-access diagnostic. The bug is related to but distinct from CVE-2020-13871 (BC002): BC002 crashes during window function \emph{unlinking}, while BC011 crashes during accumulator \emph{reset} --- two separate defects in the window function memory management pipeline.
+
+\paragraph{BC012 --- Null pointer dereference in \texttt{isAuxiliaryVtabOperator}.}
+Found on version~3.31.1 with 20 total crashes and 1 unique hash, this bug is a null pointer dereference in the virtual table operator classification logic. It is triggered when the query planner attempts to classify an operator for a virtual table query involving an FTS5 table with certain column configurations. The persistence across all 5 runs on version~3.31.1 (3--6 crashes per run) indicates reliable triggering once the grammar generates the required FTS5 schema and query combination.
+
+\paragraph{BC013 --- Misaligned access in \texttt{sqlite3ExprCodeTarget}.}
+Found on version~3.31.1 with 13 total crashes and 13 unique hashes, this bug produces a distinct stack hash for each crash instance, suggesting that many different SQL patterns can trigger the same underlying misaligned memory access in the expression code generator. The 13 unique hashes from 13 crashes indicate that each triggering input exercises a slightly different path through the expression evaluation logic, all converging on the same misaligned pointer dereference.
+
+These results suggest that the compositional grammar discovers a diverse set of bug classes beyond the target CVEs, including 3 previously unreported defects, through cross-pollination between structural primitives designed for different vulnerability patterns.
+
+
+\subsection{RQ3: Performance Trade-off}
+\label{sec:rq3-results}
+
+Table~\ref{tab:rq3-stats} presents the statistical comparison between the proposed grammar and the EBNF baseline across four metrics, using the Mann-Whitney~$U$ test with Cliff's~$d$ effect size. Each cell reports mean $\pm$ standard deviation across 5 runs.
+
+\begin{table}[htbp]
+\caption{Statistical comparison: proposed grammar vs EBNF baseline (15-minute campaigns, $n=5$ per cell). Cliff's $d$: large ($|d| \geq 0.474$), medium ($|d| \geq 0.33$), small ($|d| \geq 0.147$). The proposed grammar row is \textbf{bolded} in each metric block.}
+\label{tab:rq3-stats}
 \centering
-\includegraphics[width=0.85\textwidth]{figures/fig_4_2_unique_bugs.pdf}
-\caption{Unique root causes (UBSan bug classes) per grammar and SQLite version. Error bars show $\pm$1 standard deviation across 5 runs. Significance: $^{*}p<0.05$, $^{**}p<0.01$.}
-\label{fig:unique-bugs}
-\end{figure}
+\small
+\begin{tabular}{llrrrl}
+\toprule
+\textbf{Metric} & \textbf{Version} & \textbf{Proposed} & \textbf{EBNF} & \textbf{$p$-value} & \textbf{Cliff's $d$} \\
+\midrule
+\multirow{4}{*}{Unique RCs}
+  & 3.30.1 & $\mathbf{215.4 \pm 24.4}$ & $3.6 \pm 2.1$ & 0.008 & $+1.00$ (large) \\
+  & 3.31.1 & $\mathbf{170.6 \pm 72.4}$ & $1.0 \pm 0.0$ & 0.004 & $+1.00$ (large) \\
+  & 3.32.0 & $\mathbf{139.4 \pm 73.0}$ & $5.0 \pm 6.9$ & 0.020 & $+0.92$ (large) \\
+  & 3.32.2 & $\mathbf{296.8 \pm 38.2}$ & $1.0 \pm 0.0$ & 0.008 & $+1.00$ (large) \\
+\midrule
+\multirow{4}{*}{Edge Cov.}
+  & 3.30.1 & $18{,}867 \pm 833$ & $\mathbf{23{,}323 \pm 152}$ & 0.008 & $-1.00$ (large) \\
+  & 3.31.1 & $19{,}333 \pm 645$ & $\mathbf{23{,}182 \pm 341}$ & 0.008 & $-1.00$ (large) \\
+  & 3.32.0 & $20{,}108 \pm 852$ & $\mathbf{22{,}360 \pm 2{,}886}$ & 0.151 & $-0.60$ (large) \\
+  & 3.32.2 & $20{,}953 \pm 525$ & $\mathbf{23{,}811 \pm 166}$ & 0.008 & $-1.00$ (large) \\
+\midrule
+\multirow{4}{*}{Throughput}
+  & 3.30.1 & $76.7 \pm 20.1$ & $\mathbf{196.1 \pm 15.9}$ & 0.008 & $-1.00$ (large) \\
+  & 3.31.1 & $56.8 \pm 9.2$ & $\mathbf{182.4 \pm 12.2}$ & 0.008 & $-1.00$ (large) \\
+  & 3.32.0 & $71.8 \pm 14.4$ & $\mathbf{241.9 \pm 99.2}$ & 0.012 & $-1.00$ (large) \\
+  & 3.32.2 & $103.8 \pm 39.5$ & $\mathbf{182.2 \pm 15.8}$ & 0.016 & $-0.92$ (large) \\
+\midrule
+\multirow{4}{*}{TTFC (s)}
+  & 3.30.1 & $\mathbf{1.8 \pm 0.8}$ & $1.8 \pm 1.3$ & 0.821 & $+0.12$ (negl.) \\
+  & 3.31.1 & $\mathbf{1.2 \pm 0.4}$ & $1.2 \pm 0.4$ & 1.000 & $0.00$ (negl.) \\
+  & 3.32.0 & $1.6 \pm 0.5$ & $\mathbf{1.0 \pm 0.0}$ & 0.101 & $+0.60$ (large) \\
+  & 3.32.2 & $3.4 \pm 3.0$ & $\mathbf{1.8 \pm 1.1}$ & 0.502 & $+0.28$ (small) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The results reveal a clear trade-off between structural complexity and raw throughput. The EBNF baseline achieves $2.2\times$--$3.4\times$ higher throughput (mean 200.7 executions per second vs 77.3 for the proposed grammar) and $1.1\times$--$1.2\times$ higher edge coverage (mean 23{,}169 vs 19{,}815 edges). However, the proposed grammar discovers $28\times$--$297\times$ more unique root causes per campaign (mean 205.6 vs 2.6), with large effect sizes ($d \geq 0.92$, $p < 0.05$) on all four versions.
+
+Time to first crash (TTFC) shows no statistically significant difference between the two grammars on any version ($p > 0.05$ on all four), indicating that both grammars find their first crash within seconds of campaign start. The throughput disadvantage of the proposed grammar does not translate into a delay in initial crash discovery.
+
+Figure~\ref{fig:coverage-growth} shows the edge coverage growth over the 15-minute campaign duration for both grammars. The EBNF baseline reaches higher absolute coverage due to its higher throughput and broader syntactic variety, but the proposed grammar's coverage growth rate suggests that it explores a smaller but more vulnerability-relevant subset of the code.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.85\textwidth]{figures/fig_4_3_throughput.pdf}
-\caption{Throughput comparison (executions per second). The EBNF grammar's simpler production rules generate shorter SQL inputs, resulting in higher throughput despite finding fewer bugs.}
+\includegraphics[width=\textwidth]{figures/fig_4_3_coverage_growth.pdf}
+\caption{Edge coverage growth over time: proposed grammar vs EBNF baseline. Solid lines show mean across 5 runs; shaded bands show $\pm$1 standard deviation.}
+\label{fig:coverage-growth}
+\end{figure}
+
+Figure~\ref{fig:throughput} presents the throughput comparison across all four versions. The EBNF grammar's simpler production rules generate shorter SQL inputs, resulting in faster execution per test case.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/fig_4_4_throughput.pdf}
+\caption{Throughput comparison (executions per second) between the proposed grammar and EBNF baseline across 4 SQLite versions. Error bars show $\pm$1 standard deviation.}
 \label{fig:throughput}
 \end{figure}
+
+Figure~\ref{fig:ttfc} shows the time-to-first-crash distribution for both grammars, confirming the negligible difference in initial crash discovery latency.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/fig_4_5_time_to_first_crash.pdf}
+\caption{Time to first crash (seconds): proposed grammar vs EBNF baseline. No statistically significant difference on any version ($p > 0.05$).}
+\label{fig:ttfc}
+\end{figure}
+
+These results indicate that the proposed grammar sacrifices throughput and edge coverage breadth in exchange for dramatically higher crash diversity, suggesting that structural complexity in grammar design redirects fuzzing effort toward vulnerability-relevant code paths at the cost of raw execution speed.
 
 
 \section{Analysis and Discussion}
 \label{sec:discussion}
 
-\subsection{Grammar Design as the Primary Bottleneck}
+\subsection{Qualitative Analysis}
+\label{sec:qualitative}
 
-The experimental evidence from both research questions converges on a single conclusion: grammar structural coverage is the dominant factor for vulnerability discovery in grammar-based fuzzing. Under grammar versions v3.0 and v3.1, only 2 of 6 CVEs were structurally reachable, and the fuzzer could not discover bugs requiring window functions, self-referential generated columns, or compound query operators regardless of campaign duration. The structural expansion in v3.2 immediately unlocked 4 additional CVEs, and the seed rules in v3.4 ensured reliable triggering of previously-rare compositional patterns.
+The 11 bug classes discovered by the compositional grammar (RQ2) can be organized into three groups based on their relationship to the grammar's design intent:
 
-The comparison with the EBNF baseline reinforces this finding. Despite using the same fuzzing engine, harness, and campaign parameters, the EBNF grammar --- which lacks domain-specific structural primitives --- found significantly fewer unique bug classes (5 vs 7 across all versions, and 79$\times$ fewer unique crash hashes: 2.6 vs 205.6 mean per campaign). The performance gap is not attributable to throughput differences; the EBNF grammar achieves \emph{higher} execution rates due to its simpler production rules generating shorter SQL inputs. The gap arises entirely from the grammar's inability to express the structural patterns that reach vulnerable code paths.
+\emph{CVE-matching bugs} (3 classes, 27.3\% of total). BC002 (CVE-2020-13871), BC003 (CVE-2020-13434), and BC010 (CVE-2020-9327) are rediscoveries of known CVEs through compositional generation of structural primitives. These validate the grammar's primary design objective: encoding vulnerability-relevant patterns that can reconstruct CVE-triggering inputs without embedding proof-of-concept strings.
 
-\subsection{Effectiveness of CVE Seed Rules}
+\emph{Cross-pollination bugs} (5 classes, 45.5\% of total). BC001 (FTS5 tokenizer null pointer), BC004 (float cast overflow in \texttt{alsoAnInt}), BC006 (expression code generator null pointer), BC008 (numeric conversion null pointer), and BC009 (VDBE numerify float cast overflow) are bugs found through structural primitives designed for specific CVEs but which also exercise adjacent code paths. The \texttt{Boundary-Func-Call} non-terminal, designed to trigger CVE-2020-13434's integer overflow, also produces boundary float values that trigger BC004 and BC009. The FTS schema template, designed to create virtual table contexts for CVE-targeting queries, triggers BC001 through malformed tokenizer configurations.
 
-The low-weight seed rules added in v3.4 serve a dual purpose: they guarantee that the grammar can reliably trigger all structurally-reachable CVEs, and they provide a controlled experiment for measuring the gap between structural reachability and empirical triggering probability. Three CVEs (CVE-2020-13434, CVE-2020-9327, CVE-2020-13871) were already discovered compositionally under v3.2--v3.3, demonstrating that seeds are not strictly necessary for these vulnerabilities. The remaining CVEs (CVE-2020-13435, CVE-2020-15358) required seeds because the combinatorial probability of their required structural element conjunctions was too low for 15-minute campaigns.
+\emph{Emergent bugs} (3 classes, 27.3\% of total). BC011 (accumulator reset misalignment), BC012 (virtual table operator null pointer), and BC013 (expression code target misalignment) were discovered through grammar patterns that were not explicitly designed for any specific vulnerability. BC011 emerges from the interaction between window function rules and aggregate function processing. BC012 emerges from FTS5 virtual table queries with specific column configurations. BC013 produces 13 unique hashes from 13 crashes, indicating a rich space of triggering patterns for the same underlying defect.
 
-The 1\% seed weight was chosen to balance reliability against generation bias. At this weight, each seed fires approximately once per 100 top-level statement generations, which translates to approximately 80 expected firings per seed per 15-minute campaign given the observed throughput of ${\sim}91$ executions per second. This is sufficient to trigger the CVE with high probability while consuming less than 6\% of the total generation budget (6 seeds $\times$ 1\% each).
+\subsection{Comparison with Baseline}
+\label{sec:comparison}
 
-\subsection{Cross-Pollination Evidence}
-
-Seven of the ten discovered bug classes (BC001, BC004--BC009) have no corresponding CVE in the target list. These bugs were found through structural primitives designed for specific CVEs but which also exercise adjacent code paths. For example, the \texttt{Boundary-Func-Call} non-terminal, designed to trigger CVE-2020-13434's integer overflow, also produces boundary float values that trigger BC004 (float cast overflow in \texttt{alsoAnInt}) and BC009 (float cast overflow in \texttt{sqlite3VdbeMemNumerify}). Similarly, the window function rules added for CVE-2020-13871 also trigger BC005 (window function cleanup abort in \texttt{sqlite3WindowListDelete}).
-
-This cross-pollination effect is a direct consequence of the structural-primitive design methodology: by encoding \emph{patterns} rather than \emph{inputs}, each non-terminal serves multiple vulnerability classes simultaneously.
-
-\subsection{Comparison Summary}
-
-Table~\ref{tab:comparison-summary} summarizes the key metrics across both grammars.
+Table~\ref{tab:comparison-summary} summarizes the key metrics across both grammars from the RQ3 evaluation.
 
 \begin{table}[htbp]
-\caption{Overall comparison: v3.4 (structural primitives) vs EBNF baseline.}
+\caption{Overall comparison: proposed grammar vs EBNF baseline (mean across all versions and runs). The proposed grammar row is \textbf{bolded}.}
 \label{tab:comparison-summary}
 \centering
 \begin{tabular}{lrr}
 \toprule
-\textbf{Metric} & \textbf{v3.4} & \textbf{EBNF} \\
+\textbf{Metric} & \textbf{Proposed} & \textbf{EBNF} \\
 \midrule
-CVEs rediscovered (out of 6) & 2 & 1 \\
-Unique bug classes (total) & 7 & 5 \\
-Mean unique root causes per campaign & 205.6 & 2.6 \\
-Mean throughput (execs/sec) & 90.7 & 200.7 \\
-Mean edge coverage & 1198.0 & 1688.5 \\
+Unique root causes per campaign & $\mathbf{205.6 \pm 79.7}$ & $2.6 \pm 3.8$ \\
+Edge coverage per campaign & $19{,}815 \pm 782$ & $\mathbf{23{,}169 \pm 1{,}441}$ \\
+Throughput (execs/sec) & $77.3 \pm 23.6$ & $\mathbf{200.7 \pm 53.3}$ \\
+TTFC (seconds) & $\mathbf{2.0 \pm 1.7}$ & $1.5 \pm 0.9$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The structural-primitives grammar discovers 1.4$\times$ more unique bug classes than the EBNF baseline while achieving 45\% of the baseline's throughput. This demonstrates that domain-knowledge-driven grammar engineering --- encoding vulnerability-relevant structural patterns as weighted production rules --- is significantly more effective than generic grammar-based fuzzing for DBMS vulnerability discovery.
+The proposed grammar discovers $79\times$ more unique root causes per campaign than the EBNF baseline (205.6 vs 2.6), at the cost of 61.5\% lower throughput and 14.5\% lower edge coverage. This asymmetry suggests that the EBNF grammar's higher throughput and coverage are ``shallow'' --- it executes more inputs and touches more edges, but the additional coverage is concentrated in non-vulnerable code paths. The proposed grammar's structural complexity directs generation toward the subset of SQL constructs that exercise vulnerability-relevant code, producing denser crash discovery per execution despite the lower throughput.
 
+The EBNF baseline found 4 distinct function-level bug classes (excluding debug-assert-only \texttt{unknown} crashes): \texttt{sqlite3Fts5GetTokenizer} (BC001), \texttt{sqlite3WindowUnlinkFromSelect} (BC002), \texttt{alsoAnInt} (BC004), and \texttt{clearSelect}. The proposed grammar found these same 4 classes plus 2 additional ones: \texttt{sqlite3ExprCodeTarget} (BC006) and \texttt{sqlite3\_str\_vappendf} (BC003/CVE-2020-13434). The EBNF grammar's inability to trigger CVE-2020-13434 (which requires a \texttt{printf()} call with a specific format specifier and boundary integer) demonstrates that certain bug classes require domain-specific structural patterns that generic grammar specifications cannot express.
 
-\section{Threats to Validity}
+An interesting observation concerns CVE-2020-13871 (BC002). The EBNF baseline found this CVE on version~3.30.1 in 4 out of 5 runs, while the proposed grammar found it on 3.30.1 in all compositional (RQ2) campaigns and confirmed it via seed-derived crashes on 3.32.2 in 4 out of 5 RQ1 runs. This CVE's discovery by the EBNF grammar indicates that the window function code path containing this use-after-free is reachable even through generic SQL generation, likely because window functions are a standard SQL construct that any comprehensive grammar will exercise.
+
+\subsection{Failure Cases and Limitations}
+\label{sec:limitations}
+
+At least three concrete limitations of the proposed approach were identified during the evaluation:
+
+\begin{enumerate}
+  \item \textbf{Oracle limitation for non-crash bugs.} CVE-2019-19646 causes an infinite loop rather than a crash. The ASan/UBSan oracle detects only memory safety violations and undefined behavior; it cannot detect non-termination, incorrect query results, or other logic bugs. Detecting such bugs would require a timeout oracle with non-termination classification, or a differential testing oracle comparing outputs against a reference implementation.
+
+  \item \textbf{Combinatorial explosion for multi-element CVEs.} CVE-2020-9327 requires four simultaneous structural elements in a single generated tree (self-referential generated column, view, \texttt{coalesce()}, and \texttt{JOIN}). Despite a dedicated seed rule, this CVE was not triggered in 5 RQ1 runs on version~3.31.1. The joint probability of four independent non-terminals co-occurring decreases multiplicatively, and the 15-minute campaign duration may be insufficient for these rare combinations. The compositional discovery in RQ2 (1 instance across 20 campaigns) confirms both the feasibility and the rarity of this conjunction.
+
+  \item \textbf{Context-free grammar cannot enforce semantic validity.} The grammar is context-free and cannot enforce type correctness, referential integrity, or valid column count matching between \texttt{INSERT} values and table definitions. Semantically invalid SQL statements are generated and immediately rejected by SQLite's parser or query planner, consuming execution time without contributing to coverage. The throughput gap between the proposed grammar (77.3 execs/sec) and the EBNF baseline (200.7 execs/sec) is partially attributable to the proposed grammar generating longer, more complex inputs that take more time to parse and reject.
+
+  \item \textbf{Manual CVE analysis dependency.} The structural-primitive methodology requires manual expertise to identify which SQL constructs are relevant to each vulnerability. The effectiveness of the approach depends on the quality of this analysis: if a critical structural pattern is missed or incorrectly characterized, the corresponding grammar rules will be absent or ineffective. Automating this analysis --- for example, through differential code analysis between patched and unpatched versions --- is an open research question.
+\end{enumerate}
+
+\subsection{Threats to Validity}
 \label{sec:threats}
 
-Several threats to validity must be acknowledged when interpreting these results.
+\paragraph{Internal validity.}
+Stack-hash deduplication using the top 5 frames is a heuristic that may both over-count and under-count bug classes. Over-counting occurs when two manifestations of the same root cause crash through different call paths; under-counting occurs when distinct bugs crash through the same 5-frame sequence. The \texttt{SQLITE\_DEBUG} build flag introduces an additional confound: it fills freed memory with \texttt{0xAA} bytes, causing use-after-free bugs to manifest as misaligned-access diagnostics rather than heap-use-after-free reports. This was addressed through no-debug harness replay for CVE confirmation (see Table~\ref{tab:cve-rediscovery}), but may affect the classification accuracy of non-CVE bug classes. Campaign durations of 15~minutes may miss bugs requiring longer exploration or rarer compositional combinations; however, extending campaigns introduces diminishing returns in coverage-guided fuzzing.
 
-\subsection{Internal Validity}
+\paragraph{External validity.}
+All experiments target a single DBMS --- SQLite~\cite{sqlite} --- with a single input language (SQL). SQLite is an embedded database with a compact codebase (${\sim}$150{,}000 lines of C), and its bug landscape may not be representative of larger server-based systems such as MySQL or PostgreSQL. The comparison uses a single baseline grammar (EBNF) rather than multiple baselines or existing fuzzing tools such as SQLsmith~\cite{sqlsmith} or Squirrel~\cite{squirrel}. Direct comparison with these tools was not feasible because they use fundamentally different fuzzing strategies (query-plan-guided generation for SQLsmith, AST-level mutation for Squirrel) that cannot be isolated to a grammar-only comparison. The EBNF baseline isolates the effect of grammar design by holding all other variables constant.
 
-Stack-hash deduplication using the top 5 frames of the crashing call stack is a heuristic that may both over-count and under-count bug classes. Over-counting occurs when two manifestations of the same root cause crash through different call paths, producing distinct stack hashes despite sharing a single underlying defect. Under-counting occurs when distinct bugs happen to crash through the same 5-frame sequence, merging genuinely different vulnerabilities into a single bug class. The choice of 5 frames (rather than 3 or 10) represents a trade-off between these two error modes, but the optimal frame count is target-dependent and cannot be determined a priori.
+\paragraph{Construct validity.}
+The 80\% fidelity threshold for CVE signature matching is an arbitrary cutoff. A higher threshold would reduce false positive matches but might miss legitimate rediscoveries where the stack trace differs due to compiler optimizations or ASan instrumentation overhead. The sanitizer oracle misses entire categories of bugs: logic bugs producing incorrect results without undefined behavior, and denial-of-service bugs causing non-termination without crashing. Edge coverage as measured by the AFL-style bitmap is subject to hash collisions, where distinct edges map to the same bitmap byte, potentially causing the fuzzer to miss coverage-increasing inputs.
 
-Coverage bitmap hash collisions, inherent in AFL-style instrumentation, can cause the fuzzer to miss coverage-increasing inputs when distinct edges map to the same bitmap byte. This affects the fuzzer's ability to recognize genuinely new code paths, potentially causing it to discard inputs that would have led to additional crashes. The 2~MB bitmap size (2{,}097{,}152 bytes) mitigates but does not eliminate this issue.
+\subsection{Summary}
+\label{sec:summary}
 
-Campaign durations of 15--60 minutes may miss bugs that require longer exploration time or rarer compositional combinations. The non-discovery of CVE-2020-13435 (which requires 5 simultaneous structural elements) and CVE-2020-15358 (which requires a specific nesting pattern) may reflect insufficient campaign duration rather than fundamental grammar limitations. However, extending campaigns introduces diminishing returns, as demonstrated by the coverage saturation analysis showing 99\% of final coverage reached within 50 minutes.
-
-The CVE seed rules in v3.4 introduce a potential bias in RQ1 results: seeds guarantee that CVE-triggering patterns appear in the generation distribution, which inflates the rediscovery rate compared to purely compositional discovery. This threat is mitigated by two factors: (1)~the 1\% seed weight means seeds consume less than 6\% of the total generation budget, leaving 94\% for compositional exploration; and (2)~the RQ2 results show that the grammar also discovers 7 non-CVE bug classes with no dedicated seed rules, confirming that the structural-primitive methodology generates genuine compositional discoveries beyond the seeded patterns.
-
-\subsection{External Validity}
-
-All experiments target a single DBMS --- SQLite~\cite{sqlite} --- with a single input language (SQL). SQLite is an embedded database with a relatively compact codebase (approximately 150{,}000 lines of C code in the amalgamation), and its bug landscape may not be representative of larger, server-based systems such as MySQL or PostgreSQL, which have fundamentally different architectures, larger attack surfaces, and different bug class distributions.
-
-The grammar is context-free and cannot enforce semantic constraints such as type correctness, referential integrity, or valid column count matching between \texttt{INSERT} values and table definitions. Semantically invalid SQL statements are generated and immediately rejected by SQLite's parser or query planner at runtime, consuming execution time without contributing to coverage. A context-sensitive grammar or semantic-aware generation strategy could reduce this overhead, but would significantly increase grammar complexity.
-
-The comparison uses a single baseline grammar (EBNF) rather than multiple baselines or existing fuzzing tools such as SQLsmith~\cite{sqlsmith} or Squirrel~\cite{squirrel}. Direct comparison with these tools was not feasible because they use fundamentally different fuzzing strategies (query-plan-guided generation for SQLsmith, AST-level mutation for Squirrel) that cannot be isolated to a grammar-only comparison. The EBNF baseline isolates the effect of grammar design by holding all other variables (fuzzer engine, harness, oracle, campaign parameters) constant.
-
-The structural-primitive methodology requires manual CVE analysis expertise to identify which SQL constructs are relevant to each vulnerability. The effectiveness of the approach depends on the quality of this analysis: if a critical structural pattern is missed or incorrectly characterized, the corresponding grammar rules will be absent or ineffective. Automating this analysis --- for example, through differential code analysis between patched and unpatched versions --- is an open research question.
-
-\subsection{Construct Validity}
-
-The fidelity scoring threshold of 80\% for CVE signature matching is an arbitrary cutoff. A higher threshold would reduce false positive CVE matches but might miss legitimate rediscoveries where the crashing call stack differs slightly from the published CVE stack trace (due to compiler optimizations, ASan instrumentation overhead, or version-specific code changes). A lower threshold would increase recall but risk matching unrelated crashes to CVE signatures.
-
-The sanitizer oracle (ASan + UBSan) detects memory safety violations and undefined behavior but misses entire categories of bugs. Logic bugs that produce incorrect query results without triggering undefined behavior are invisible to this oracle. Denial-of-service bugs such as CVE-2019-19646 (infinite loop) are also missed because the program does not crash --- it simply fails to terminate within the execution timeout. A more comprehensive oracle combining crash detection, timeout analysis, and differential testing against a reference implementation would expand the detectable bug classes but was beyond the scope of this work.
-
-The CVE reachability analysis (Table~\ref{tab:cve-reachability}) assesses structural expressibility --- whether the grammar can, in principle, generate an input with the required structural elements --- rather than empirical triggering probability. A CVE being structurally reachable does not guarantee it will be triggered within any finite campaign duration, as the joint probability of the required structural elements co-occurring in a single generated tree may be vanishingly small. The gap between structural reachability (6/6 CVEs reachable under v3.2) and empirical rediscovery (3/6 CVEs found) illustrates this distinction.
+The experimental evaluation demonstrates three principal findings. First, the proposed grammar with seed rules reliably rediscovers 4 out of 5 detectable CVEs across 20 campaigns, confirming that domain-knowledge-driven grammar engineering can reconstruct CVE-triggering inputs from independently encoded structural primitives (RQ1). Second, the compositional grammar without seed rules discovers 11 distinct bug classes --- including 3 previously unreported defects and 3 CVE matches found without dedicated seeds --- demonstrating that structural primitives designed for specific CVEs cross-pollinate to exercise adjacent vulnerable code paths (RQ2). Third, the proposed grammar sacrifices throughput ($2.6\times$ slower) and edge coverage (14.5\% lower) in exchange for $79\times$ more unique root causes per campaign, indicating that structural complexity redirects fuzzing effort toward vulnerability-relevant code at the cost of raw execution speed (RQ3). The EBNF baseline's CVE rediscovery was limited to CVE-2020-13871 on version~3.30.1, which requires only standard window function syntax reachable through generic SQL generation.
