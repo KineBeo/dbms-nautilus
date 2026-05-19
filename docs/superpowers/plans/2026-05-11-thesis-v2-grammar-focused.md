@@ -105,7 +105,7 @@ The master document must include these chapters in order:
 \setlength{\parskip}{0.4em}
 \setlength{\parindent}{0pt}
 
-\title{Grammar-Based Greybox Fuzzing for Automated Vulnerability Discovery in SQLite}
+\title{Grammar-based Greybox Fuzzing for DBMS Vulnerability Detection}
 \author{Nguyen Viet Kien}
 
 \newcommand{\argmax}{\arg\!\max}
@@ -347,7 +347,7 @@ Finally, I would like to express my heartfelt thanks to all my classmates in K67
 \end{center}
 \addcontentsline{toc}{chapter}{Statement of Integrity}
 
-I hereby declare that the graduation thesis entitled ``Grammar-Based Greybox Fuzzing for Automated Vulnerability Discovery in SQLite'' presented in this report is entirely my own work. The content does not involve any form of plagiarism or the use of others' results without proper citation. The proposed method in this thesis is the result of my own research, conducted under the supervision of Dr. Nguyen Duc Anh. I take full responsibility for any violations of the regulations of the University of Engineering and Technology, Vietnam National University, Hanoi.
+I hereby declare that the graduation thesis entitled ``Grammar-based Greybox Fuzzing for DBMS Vulnerability Detection'' presented in this report is entirely my own work. The content does not involve any form of plagiarism or the use of others' results without proper citation. The proposed method in this thesis is the result of my own research, conducted under the supervision of Dr. Nguyen Duc Anh. I take full responsibility for any violations of the regulations of the University of Engineering and Technology, Vietnam National University, Hanoi.
 
 \begin{flushright}
 Ha Noi, June 2026
