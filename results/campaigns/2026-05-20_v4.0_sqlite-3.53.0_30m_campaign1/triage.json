@@ -1,0 +1,529 @@
+{
+  "total_crashes": 43,
+  "unique_crashes": 43,
+  "summary": {
+    "asan": 0,
+    "ubsan": 0,
+    "debug_assert": 43,
+    "signal": 0,
+    "timeout": 0
+  },
+  "crashes": [
+    {
+      "hash": "f8eed1a184e776b4",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000000445",
+      "top_frames": [
+        "<no-stack-947e295f0113d14d>"
+      ],
+      "sql_preview": "SELECT fpdecode(1e308, 2147483648, 65536); CREATE TABLE IF NOT EXISTS p(a REAL, b AS(b) UNIQUE); INSERT INTO t1 VALUES (CASE changes() FILTER (WHERE (FALSE)) WHEN NOT CASE NOT NULL WHEN CURRENT_DATE T"
+    },
+    {
+      "hash": "96b82037e24d9683",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000018991",
+      "top_frames": [
+        "<no-stack-5123f8e4aa8f317d>"
+      ],
+      "sql_preview": "SELECT fpdecode(-1e308, 2147483648, -9223372036854775808); SELECT trunc(-9e999);"
+    },
+    {
+      "hash": "00a9897468396ae5",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000023396",
+      "top_frames": [
+        "<no-stack-e18eaf4bf9ae86af>"
+      ],
+      "sql_preview": "SELECT fpdecode(1e308, -2147483648, 65536); SELECT trunc(1.0);"
+    },
+    {
+      "hash": "14fd39ca51710cb0",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000023412",
+      "top_frames": [
+        "<no-stack-4dad0872759a732d>"
+      ],
+      "sql_preview": "SELECT fpdecode(1e308, 2147483648, 2147483647); SELECT trunc(1.0);"
+    },
+    {
+      "hash": "cfc30d8ee7e752ab",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000023426",
+      "top_frames": [
+        "<no-stack-d8871e4b8d2868a3>"
+      ],
+      "sql_preview": "SELECT fpdecode(1.0, 2147483648, 65536); SELECT trunc(1.0);"
+    },
+    {
+      "hash": "56f6748ad7901407",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000023446",
+      "top_frames": [
+        "<no-stack-25e894ba91b980dc>"
+      ],
+      "sql_preview": "SELECT fpdecode(1e308, 2147483648, 9223372036854775807); SELECT trunc(1.0);"
+    },
+    {
+      "hash": "63d1d1c4b3f2519f",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000023508",
+      "top_frames": [
+        "<no-stack-ee8df2ab2a67e0fb>"
+      ],
+      "sql_preview": "SELECT fpdecode(1e308, 2147483648, 0); SELECT trunc(1.0);"
+    },
+    {
+      "hash": "e23cf0671b2fa6c0",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000023543",
+      "top_frames": [
+        "<no-stack-4d933707727a1761>"
+      ],
+      "sql_preview": "SELECT fpdecode(1e308, 2147483648, -1); SELECT trunc(1.0);"
+    },
+    {
+      "hash": "79eddb8c53e64718",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000025468",
+      "top_frames": [
+        "<no-stack-cd2f2ab172d5e1e6>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 NUMERIC GENERATED ALWAYS AS (+RAISE(IGNORE) NOT NULL) STORED, c3 VARCHAR(255)); CREATE INDEX IF NOT EXISTS idx1 ON p(c2); WITH RECURSIVE cnt(x) AS (VALUES(1) UNION ALL "
+    },
+    {
+      "hash": "335a37e5386b39aa",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000025707",
+      "top_frames": [
+        "<no-stack-8898d43735b43063>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 INTEGER, c2 TEXT, c3 REAL, a INTEGER, b TEXT, d BLOB, e NUMERIC); WITH RECURSIVE cnt(x) AS (VALUES(1) UNION ALL SELECT x+1 FROM cnt WHERE x < 100000) SELECT string_agg("
+    },
+    {
+      "hash": "1975b9c2aad7f30f",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000025713",
+      "top_frames": [
+        "<no-stack-1a86a62f9afa26c0>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 BLOB PRIMARY KEY); CREATE INDEX IF NOT EXISTS idx1 ON p(c2); WITH RECURSIVE cnt(x) AS (VALUES(1) UNION ALL SELECT x+1 FROM cnt WHERE x < 100000) SELECT string_agg(CAST("
+    },
+    {
+      "hash": "b15bfafd05e6d670",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000040286",
+      "top_frames": [
+        "<no-stack-b5c6f341e59210ce>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 INTEGER, c2 TEXT, c3 REAL, a INTEGER, b TEXT, d BLOB, e NUMERIC); VALUES (CURRENT_TIMESTAMP) UNION SELECT NULL FROM jsonb_tree('[{\"a\":1},{\"b\":2}]') GROUP BY NOT CURRENT"
+    },
+    {
+      "hash": "6c965363d3457cbc",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000045650",
+      "top_frames": [
+        "<no-stack-40242798c2608e45>"
+      ],
+      "sql_preview": "SELECT substr('X--0', -1); SELECT fpdecode(1e308, 2147483648, 4294967296);"
+    },
+    {
+      "hash": "c184d6ea82e6bb65",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000052153",
+      "top_frames": [
+        "<no-stack-c2a9bba4a9ba6f32>"
+      ],
+      "sql_preview": "WITH RECURSIVE cnt(x) AS (VALUES(1) UNION ALL SELECT x+1 FROM cnt WHERE x < 100000) SELECT DISTINCT * FROM jsonb_each('{}') ORDER BY CURRENT_TIMESTAMP DESC NULLS LAST LIMIT FALSE; SELECT fpdecode(1e30"
+    },
+    {
+      "hash": "df73003ba8bc2bcc",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000053076",
+      "top_frames": [
+        "<no-stack-266d0408e87b4a3f>"
+      ],
+      "sql_preview": "EXPLAIN VALUES (TRUE) EXCEPT VALUES (TRUE); SELECT fpdecode(1e308, 2147483648, 65536);"
+    },
+    {
+      "hash": "6bd518f97316666f",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000059306",
+      "top_frames": [
+        "<no-stack-4409568db75e5384>"
+      ],
+      "sql_preview": "SELECT char(FALSE, TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NULL, CURRENT_DATE, CURRENT_TIME, TRUE); SELECT fpdecode(1e308, 2147483648, 65536);"
+    },
+    {
+      "hash": "93f878ced3ae7136",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000064097",
+      "top_frames": [
+        "<no-stack-67ce1b90351335df>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(_rowid_ NUMERIC); CREATE INDEX IF NOT EXISTS idx1 ON p(_rowid_); INSERT INTO p DEFAULT VALUES; PRAGMA integrity_check; SELECT fpdecode(1e308, 2147483648, 65536);"
+    },
+    {
+      "hash": "1c009def50ca2344",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000064219",
+      "top_frames": [
+        "<no-stack-0f6e3e8efd7fdaa6>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 INTEGER, c2 TEXT, c3 REAL, a INTEGER, b TEXT, d BLOB, e NUMERIC); INSERT INTO p DEFAULT VALUES; PRAGMA integrity_check; SELECT fpdecode(1e308, 2147483648, 65536);"
+    },
+    {
+      "hash": "fa7519642b4f8d81",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000065666",
+      "top_frames": [
+        "<no-stack-3bc08695599aa17c>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 INTEGER, c2 TEXT, c3 REAL, a INTEGER, b TEXT, d BLOB, e NUMERIC); INSERT INTO p DEFAULT VALUES; INSERT INTO p DEFAULT VALUES; SELECT * FROM p JOIN p n ON NULL IS DISTIN"
+    },
+    {
+      "hash": "a9a48b9c8d5411ae",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000088222",
+      "top_frames": [
+        "<no-stack-06b570ad39062da7>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p AS WITH p AS MATERIALIZED (SELECT *) SELECT NULL AS of, * FROM json_tree('{\"a\":1}'); SELECT fpdecode(1e308, 2147483648, 65536);"
+    },
+    {
+      "hash": "a319d71801098f76",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000090934",
+      "top_frames": [
+        "<no-stack-690565e048e9387d>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p AS SELECT TRUE IS NOT FALSE AS bo FROM json_each('[1,2,3]') GROUP BY FALSE ORDER BY CURRENT_TIMESTAMP ASC; SELECT fpdecode(1e308, 2147483648, 65536);"
+    },
+    {
+      "hash": "6beae3e795e8225d",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000091081",
+      "top_frames": [
+        "<no-stack-8a3b621c91818c96>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p AS SELECT * FROM json_each('[1,2,3]') GROUP BY FALSE ORDER BY CURRENT_TIMESTAMP ASC; SELECT fpdecode(1e308, 2147483648, 65536);"
+    },
+    {
+      "hash": "c348ccb3e0e39014",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000102879",
+      "top_frames": [
+        "<no-stack-55210cbf3a6a426a>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 INTEGER, c2 TEXT, c3 REAL, a INTEGER, b TEXT, d BLOB, e NUMERIC); INSERT INTO p DEFAULT VALUES; INSERT INTO p DEFAULT VALUES; SELECT * FROM p JOIN p n ON CURRENT_TIME C"
+    },
+    {
+      "hash": "c971a9848c7596d7",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000103020",
+      "top_frames": [
+        "<no-stack-46b914acb12a3b7c>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 INTEGER, c2 TEXT, c3 REAL, a INTEGER, b TEXT, d BLOB, e NUMERIC); INSERT INTO p DEFAULT VALUES; INSERT INTO p DEFAULT VALUES; SELECT parseuri(TRUE) FROM p; SELECT fpdec"
+    },
+    {
+      "hash": "92de108f22aa3177",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000103027",
+      "top_frames": [
+        "<no-stack-6325fd9e536cbebc>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 INTEGER, c2 TEXT, c3 REAL, a INTEGER, b TEXT, d BLOB, e NUMERIC); INSERT INTO p DEFAULT VALUES; INSERT INTO p DEFAULT VALUES; SELECT * FROM p JOIN p n ON CURRENT_DATE I"
+    },
+    {
+      "hash": "1d4cd05ecca00824",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000107069",
+      "top_frames": [
+        "<no-stack-a70c92617957e799>"
+      ],
+      "sql_preview": "SELECT round(-1.0, -1); SELECT fpdecode(1e308, -2147483648, 65536);"
+    },
+    {
+      "hash": "15a0b1d4115b85d9",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000114589",
+      "top_frames": [
+        "<no-stack-45b07f7e5b730948>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 VARCHAR(255) PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(e INT NOT NULL); INSERT INTO p VALUES (FALSE) RETURNING NOT EXISTS (VALUES (TRUE)), RAISE(IGNORE); PRAGMA integr"
+    },
+    {
+      "hash": "e23dfce1c5a3164b",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000114895",
+      "top_frames": [
+        "<no-stack-7ccdf0560f82390c>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 VARCHAR(255) PRIMARY KEY); CREATE TABLE IF NOT EXISTS q(e INT NOT NULL); INSERT INTO p VALUES (FALSE) RETURNING NOT EXISTS (VALUES (cume_dist() OVER () IN (CURRENT_TIME"
+    },
+    {
+      "hash": "02ef8516b7b8533c",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000115237",
+      "top_frames": [
+        "<no-stack-95b0a578c63a8d33>"
+      ],
+      "sql_preview": "SELECT hex(zeroblob(32768)); SELECT fpdecode(1e308, 2147483648, 2147483647);"
+    },
+    {
+      "hash": "d67520cbe398dc56",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000120119",
+      "top_frames": [
+        "<no-stack-568947bc87befedb>"
+      ],
+      "sql_preview": "EXPLAIN SELECT * FROM json_each('{}') NATURAL LEFT JOIN json_each('{\"a\":1}') WHERE FALSE IN (CURRENT_DATE); SELECT fpdecode(1e308, -2147483648, 65536);"
+    },
+    {
+      "hash": "507493a175748266",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000136688",
+      "top_frames": [
+        "<no-stack-3ee7b74c5f5e67f1>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c2 BLOB NOT NULL DEFAULT X'f38A01'); INSERT INTO p DEFAULT VALUES; PRAGMA integrity_check; SELECT fpdecode(1e308, 2147483648, 4294967296);"
+    },
+    {
+      "hash": "0b0775ae3686792a",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000137130",
+      "top_frames": [
+        "<no-stack-46e5d5963b2578f0>"
+      ],
+      "sql_preview": "SELECT concat(4294967295, -1e308, '--g_-5Fc '); SELECT fpdecode(1e308, 2147483648, -2147483648);"
+    },
+    {
+      "hash": "858c1a93e8293968",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000140856",
+      "top_frames": [
+        "<no-stack-458d9d2606374078>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 INTEGER, c2 TEXT, c3 REAL, a INTEGER, b TEXT, d BLOB, e NUMERIC); VALUES (max(CURRENT_DATE << -CURRENT_TIME COLLATE NOCASE) || CURRENT_TIMESTAMP) UNION VALUES (FALSE); "
+    },
+    {
+      "hash": "1f94393f34b902bd",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000141005",
+      "top_frames": [
+        "<no-stack-98b2fbb681e2cc4e>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 INTEGER, c2 TEXT, c3 REAL, a INTEGER, b TEXT, d BLOB, e NUMERIC); VALUES (TRUE) UNION VALUES (FALSE); SELECT fpdecode(1e308, -2147483648, 65536);"
+    },
+    {
+      "hash": "ff8655969b6fca08",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000141015",
+      "top_frames": [
+        "<no-stack-89f7fc265162cec2>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 INTEGER, c2 TEXT, c3 REAL, a INTEGER, b TEXT, d BLOB, e NUMERIC); VALUES (max(FALSE) || CURRENT_TIMESTAMP) UNION VALUES (FALSE); SELECT fpdecode(1e308, -2147483648, 655"
+    },
+    {
+      "hash": "e3804ebbf3019eba",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000141021",
+      "top_frames": [
+        "<no-stack-4664c2c83a60e5f6>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 INTEGER, c2 TEXT, c3 REAL, a INTEGER, b TEXT, d BLOB, e NUMERIC); VALUES (max(CURRENT_TIME COLLATE NOCASE) || CURRENT_TIMESTAMP) UNION VALUES (FALSE); SELECT fpdecode(1"
+    },
+    {
+      "hash": "3e466921138a5fcc",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000141027",
+      "top_frames": [
+        "<no-stack-c323156b0f3f8a03>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 INTEGER, c2 TEXT, c3 REAL, a INTEGER, b TEXT, d BLOB, e NUMERIC); VALUES (max(CURRENT_DATE << NULL COLLATE NOCASE) || CURRENT_TIMESTAMP) UNION VALUES (FALSE); SELECT fp"
+    },
+    {
+      "hash": "30da976c8d306a4a",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000141033",
+      "top_frames": [
+        "<no-stack-95f1510663a3e8e6>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 INTEGER, c2 TEXT, c3 REAL, a INTEGER, b TEXT, d BLOB, e NUMERIC); VALUES (max(CURRENT_DATE << -CURRENT_TIME COLLATE NOCASE) || NULL) UNION VALUES (FALSE); SELECT fpdeco"
+    },
+    {
+      "hash": "425e2fbfeda70b01",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000141050",
+      "top_frames": [
+        "<no-stack-ce53bf9ba049f046>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 INTEGER, c2 TEXT, c3 REAL, a INTEGER, b TEXT, d BLOB, e NUMERIC); WITH RECURSIVE cnt(x) AS (VALUES(1) UNION ALL SELECT x+1 FROM cnt WHERE x < 100) SELECT concat_ws('', "
+    },
+    {
+      "hash": "6bbaa0e6bc2bed5f",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000141064",
+      "top_frames": [
+        "<no-stack-3ace2fe19d4cab38>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c1 INTEGER, c2 TEXT, c3 REAL, a INTEGER, b TEXT, d BLOB, e NUMERIC); VALUES (max(CURRENT_DATE << NULL COLLATE NOCASE) || NULL) UNION VALUES (FALSE); SELECT fpdecode(1e308,"
+    },
+    {
+      "hash": "cee01fd314181c01",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000150469",
+      "top_frames": [
+        "<no-stack-6319a9a26bcf2660>"
+      ],
+      "sql_preview": "WITH RECURSIVE cnt(x) AS (VALUES(1) UNION ALL SELECT x+1 FROM cnt WHERE x < 100) SELECT DISTINCT * FROM json_tree('{\"a\":{\"b\":1}}') WHERE NULL LIMIT CURRENT_TIMESTAMP, FALSE; SELECT fpdecode(1e308, -21"
+    },
+    {
+      "hash": "5ebc2140dae38174",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000150612",
+      "top_frames": [
+        "<no-stack-793dc3bd209ccf24>"
+      ],
+      "sql_preview": "WITH RECURSIVE cnt(x) AS (VALUES(1) UNION ALL SELECT x+1 FROM cnt WHERE x < 100) SELECT DISTINCT * FROM json_tree('{\"a\":{\"b\":1}}') WHERE NULL LIMIT TRUE; SELECT fpdecode(1e308, -2147483648, 65536);"
+    },
+    {
+      "hash": "3f2fb8db6a3bdd43",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000152845",
+      "top_frames": [
+        "<no-stack-dd14e92894bcea45>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(c3 INTEGER PRIMARY KEY) STRICT; INSERT INTO p (rowid) VALUES (NULL); WITH RECURSIVE cnt(x) AS (VALUES(1) UNION ALL SELECT x+1 FROM cnt WHERE x < 100) SELECT string_agg(CAS"
+    }
+  ]
+}
