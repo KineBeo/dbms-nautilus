@@ -142,8 +142,7 @@ ctx.rule("Wide-Result-Col-List",
     "{Expr}, {Expr}, {Expr}, {Expr}, {Expr}, {Expr}, {Expr}, {Expr}, "
     "{Expr}, {Expr}, {Expr}, {Expr}, {Expr}, {Expr}, {Expr}, {Expr}")
 ctx.rule("Wide-Result-Col-List",
-    "{Wide-Result-Col-List}, {Wide-Result-Col-List}",
-    weight=1.5)
+    "{Wide-Result-Col-List}, {Wide-Result-Col-List}")
 
 # v4.0: Wide ORDER BY (many ordering terms)
 ctx.rule("Wide-Order-By",
@@ -449,8 +448,8 @@ ctx.rule("Col-Def", "{Col-Name} {Type-Name} GENERATED ALWAYS AS ({Expr}) STORED"
 ctx.rule("Col-Def", "{Col-Name} {Type-Name} GENERATED ALWAYS AS ({Expr}) VIRTUAL")
 ctx.rule("Col-Def", "{Col-Name} {Type-Name} GENERATED ALWAYS AS ({Expr}) {Gen-Storage}")
 
-ctx.rule("Gen-Storage", "VIRTUAL", weight=2.0)
-ctx.rule("Gen-Storage", "STORED", weight=1.5)
+ctx.rule("Gen-Storage", "VIRTUAL")
+ctx.rule("Gen-Storage", "STORED")
 
 ctx.rule("Type-Name", "INTEGER")
 ctx.rule("Type-Name", "REAL")
@@ -579,25 +578,25 @@ ctx.rule("Signed-Number", "{Int-Literal}")
 ctx.rule("Signed-Number", "+{Int-Literal}")
 ctx.rule("Signed-Number", "-{Int-Literal}")
 
-ctx.rule("Table-Name", "t1", weight=0.3)
-ctx.rule("Table-Name", "t2", weight=0.3)
-ctx.rule("Table-Name", "t3", weight=0.3)
-ctx.rule("Table-Name", "p", weight=2.0)
-ctx.rule("Table-Name", "q", weight=1.5)
-ctx.rule("Table-Name", "r", weight=0.5)
-ctx.rule("Table-Name", "s", weight=0.3)
-ctx.rule("Col-Name", "c1", weight=1.0)
-ctx.rule("Col-Name", "c2", weight=1.0)
-ctx.rule("Col-Name", "c3", weight=1.0)
-ctx.rule("Col-Name", "a", weight=0.8)
-ctx.rule("Col-Name", "b", weight=0.8)
-ctx.rule("Col-Name", "rowid", weight=0.5)
-ctx.rule("Col-Name", "_rowid_", weight=0.3)
+ctx.rule("Table-Name", "t1")
+ctx.rule("Table-Name", "t2")
+ctx.rule("Table-Name", "t3")
+ctx.rule("Table-Name", "p")
+ctx.rule("Table-Name", "q")
+ctx.rule("Table-Name", "r")
+ctx.rule("Table-Name", "s")
+ctx.rule("Col-Name", "c1")
+ctx.rule("Col-Name", "c2")
+ctx.rule("Col-Name", "c3")
+ctx.rule("Col-Name", "a")
+ctx.rule("Col-Name", "b")
+ctx.rule("Col-Name", "rowid")
+ctx.rule("Col-Name", "_rowid_")
 # v4.0: additional column name for wider schemas
-ctx.rule("Col-Name", "d", weight=0.5)
-ctx.rule("Col-Name", "e", weight=0.3)
-ctx.rule("Col-Ref", "{Col-Name}", weight=1.0)
-ctx.rule("Col-Ref", "{Table-Name}.{Col-Name}", weight=1.0)
+ctx.rule("Col-Name", "d")
+ctx.rule("Col-Name", "e")
+ctx.rule("Col-Ref", "{Col-Name}")
+ctx.rule("Col-Ref", "{Table-Name}.{Col-Name}")
 
 # ============================================================
 # LAYER 1: FUNCTION CALLS
@@ -644,90 +643,90 @@ ctx.rule("Func-Call", "instr({Expr}, {Expr})")
 # --- v4.0: New functions (SQLite 3.44+) ---
 
 # String concatenation (CVE-2025-3277 class attack surface)
-ctx.rule("Func-Call", "concat({Expr}, {Expr})", weight=2.0)
-ctx.rule("Func-Call", "concat({Expr}, {Expr}, {Expr})", weight=2.0)
-ctx.rule("Func-Call", "concat({Expr}, {Expr}, {Expr}, {Expr})", weight=1.5)
-ctx.rule("Func-Call", "concat_ws({Expr}, {Expr}, {Expr})", weight=2.5)
-ctx.rule("Func-Call", "concat_ws({Expr}, {Expr}, {Expr}, {Expr})", weight=2.0)
-ctx.rule("Func-Call", "concat_ws({Expr}, {Expr}, {Expr}, {Expr}, {Expr})", weight=2.0)
+ctx.rule("Func-Call", "concat({Expr}, {Expr})")
+ctx.rule("Func-Call", "concat({Expr}, {Expr}, {Expr})")
+ctx.rule("Func-Call", "concat({Expr}, {Expr}, {Expr}, {Expr})")
+ctx.rule("Func-Call", "concat_ws({Expr}, {Expr}, {Expr})")
+ctx.rule("Func-Call", "concat_ws({Expr}, {Expr}, {Expr}, {Expr})")
+ctx.rule("Func-Call", "concat_ws({Expr}, {Expr}, {Expr}, {Expr}, {Expr})")
 
 # string_agg (SQL standard alias for group_concat)
-ctx.rule("Func-Call", "string_agg({Expr}, {Str-Literal})", weight=2.0)
+ctx.rule("Func-Call", "string_agg({Expr}, {Str-Literal})")
 
 # octet_length (byte length — different from character length for multi-byte)
-ctx.rule("Func-Call", "octet_length({Expr})", weight=1.5)
+ctx.rule("Func-Call", "octet_length({Expr})")
 
 # unhex (hex decode — parsing edge cases)
-ctx.rule("Func-Call", "unhex({Expr})", weight=2.0)
-ctx.rule("Func-Call", "unhex({Expr}, {Expr})", weight=1.5)
+ctx.rule("Func-Call", "unhex({Expr})")
+ctx.rule("Func-Call", "unhex({Expr}, {Expr})")
 
 # substring (SQL standard alias)
-ctx.rule("Func-Call", "substring({Expr}, {Expr})", weight=1.0)
-ctx.rule("Func-Call", "substring({Expr}, {Expr}, {Expr})", weight=1.0)
+ctx.rule("Func-Call", "substring({Expr}, {Expr})")
+ctx.rule("Func-Call", "substring({Expr}, {Expr}, {Expr})")
 
 # unistr (Unicode string processing — uses typed Unicode-Literal for domain coverage)
-ctx.rule("Func-Call", "unistr({Expr})", weight=1.5)
-ctx.rule("Func-Call", "unistr({Unicode-Literal})", weight=2.5)
+ctx.rule("Func-Call", "unistr({Expr})")
+ctx.rule("Func-Call", "unistr({Unicode-Literal})")
 
 # subtype introspection
-ctx.rule("Func-Call", "subtype({Expr})", weight=1.5)
+ctx.rule("Func-Call", "subtype({Expr})")
 
 # parseuri (URI parsing — uses typed Uri-Literal for domain coverage)
-ctx.rule("Func-Call", "parseuri({Expr})", weight=1.5)
-ctx.rule("Func-Call", "parseuri({Uri-Literal}, {Boundary-Int})", weight=3.0)
-ctx.rule("Func-Call", "parseuri({Uri-Literal}, {Boundary-Int}, {Str-Literal})", weight=2.0)
+ctx.rule("Func-Call", "parseuri({Expr})")
+ctx.rule("Func-Call", "parseuri({Uri-Literal}, {Boundary-Int})")
+ctx.rule("Func-Call", "parseuri({Uri-Literal}, {Boundary-Int}, {Str-Literal})")
 
 # fpdecode (floating point decode)
-ctx.rule("Func-Call", "fpdecode({Expr}, {Expr}, {Expr})", weight=2.0)
+ctx.rule("Func-Call", "fpdecode({Expr}, {Expr}, {Expr})")
 
 # Math functions (new in 3.45+, numerical edge cases)
-ctx.rule("Func-Call", "ceil({Expr})", weight=1.5)
-ctx.rule("Func-Call", "floor({Expr})", weight=1.5)
-ctx.rule("Func-Call", "trunc({Expr})", weight=1.5)
-ctx.rule("Func-Call", "ln({Expr})", weight=1.5)
-ctx.rule("Func-Call", "log({Expr})", weight=1.5)
-ctx.rule("Func-Call", "log10({Expr})", weight=1.5)
-ctx.rule("Func-Call", "log2({Expr})", weight=1.5)
-ctx.rule("Func-Call", "log({Expr}, {Expr})", weight=1.0)
-ctx.rule("Func-Call", "exp({Expr})", weight=1.5)
-ctx.rule("Func-Call", "pow({Expr}, {Expr})", weight=1.5)
-ctx.rule("Func-Call", "mod({Expr}, {Expr})", weight=1.5)
-ctx.rule("Func-Call", "acos({Expr})", weight=1.0)
-ctx.rule("Func-Call", "asin({Expr})", weight=1.0)
-ctx.rule("Func-Call", "atan({Expr})", weight=1.0)
-ctx.rule("Func-Call", "atan2({Expr}, {Expr})", weight=1.0)
-ctx.rule("Func-Call", "cos({Expr})", weight=1.0)
-ctx.rule("Func-Call", "sin({Expr})", weight=1.0)
-ctx.rule("Func-Call", "tan({Expr})", weight=1.0)
+ctx.rule("Func-Call", "ceil({Expr})")
+ctx.rule("Func-Call", "floor({Expr})")
+ctx.rule("Func-Call", "trunc({Expr})")
+ctx.rule("Func-Call", "ln({Expr})")
+ctx.rule("Func-Call", "log({Expr})")
+ctx.rule("Func-Call", "log10({Expr})")
+ctx.rule("Func-Call", "log2({Expr})")
+ctx.rule("Func-Call", "log({Expr}, {Expr})")
+ctx.rule("Func-Call", "exp({Expr})")
+ctx.rule("Func-Call", "pow({Expr}, {Expr})")
+ctx.rule("Func-Call", "mod({Expr}, {Expr})")
+ctx.rule("Func-Call", "acos({Expr})")
+ctx.rule("Func-Call", "asin({Expr})")
+ctx.rule("Func-Call", "atan({Expr})")
+ctx.rule("Func-Call", "atan2({Expr}, {Expr})")
+ctx.rule("Func-Call", "cos({Expr})")
+ctx.rule("Func-Call", "sin({Expr})")
+ctx.rule("Func-Call", "tan({Expr})")
 
 # New aggregate functions (median, percentile — new in 3.46+)
-ctx.rule("Func-Call", "median({Expr})", weight=2.5)
-ctx.rule("Func-Call", "percentile({Expr}, {Expr})", weight=2.0)
-ctx.rule("Func-Call", "percentile_cont({Expr}, {Expr})", weight=2.0)
-ctx.rule("Func-Call", "percentile_disc({Expr}, {Expr})", weight=2.0)
+ctx.rule("Func-Call", "median({Expr})")
+ctx.rule("Func-Call", "percentile({Expr}, {Expr})")
+ctx.rule("Func-Call", "percentile_cont({Expr}, {Expr})")
+ctx.rule("Func-Call", "percentile_disc({Expr}, {Expr})")
 
 # soundex
-ctx.rule("Func-Call", "soundex({Expr})", weight=1.0)
+ctx.rule("Func-Call", "soundex({Expr})")
 
 # total (separate from sum — returns 0.0 for empty sets)
-ctx.rule("Func-Call", "total({Expr})", weight=1.5)
+ctx.rule("Func-Call", "total({Expr})")
 
 # --- v4.0: Variadic function calls with wide argument lists ---
 # These drive the concat/concat_ws overflow class
 ctx.rule("Variadic-Func-Call",
-    "concat({Wide-Expr-List})", weight=3.0)
+    "concat({Wide-Expr-List})")
 ctx.rule("Variadic-Func-Call",
-    "concat_ws({Expr}, {Wide-Expr-List})", weight=3.0)
+    "concat_ws({Expr}, {Wide-Expr-List})")
 ctx.rule("Variadic-Func-Call",
-    "printf({Str-Literal}, {Wide-Expr-List})", weight=2.0)
+    "printf({Str-Literal}, {Wide-Expr-List})")
 ctx.rule("Variadic-Func-Call",
-    "char({Wide-Expr-List})", weight=1.5)
+    "char({Wide-Expr-List})")
 ctx.rule("Variadic-Func-Call",
-    "coalesce({Wide-Expr-List})", weight=1.5)
+    "coalesce({Wide-Expr-List})")
 ctx.rule("Variadic-Func-Call",
-    "max({Wide-Expr-List})", weight=1.5)
+    "max({Wide-Expr-List})")
 ctx.rule("Variadic-Func-Call",
-    "min({Wide-Expr-List})", weight=1.5)
+    "min({Wide-Expr-List})")
 
 # ============================================================
 # JSON/JSONB expansion
@@ -805,49 +804,49 @@ ctx.rule("Func-Call", "cume_dist()")
 # ============================================================
 # GenCol-Expr
 # ============================================================
-ctx.rule("GenCol-Expr", "a", weight=3.0)
-ctx.rule("GenCol-Expr", "a + {Int-Literal}", weight=2.0)
-ctx.rule("GenCol-Expr", "coalesce(a, b)", weight=2.0)
-ctx.rule("GenCol-Expr", "a = {Int-Literal}", weight=2.0)
-ctx.rule("GenCol-Expr", "a IS NULL", weight=1.0)
-ctx.rule("GenCol-Expr", "a * a", weight=1.0)
-ctx.rule("GenCol-Expr", "a || b", weight=1.0)
-ctx.rule("GenCol-Expr", "b", weight=2.0)
-ctx.rule("GenCol-Expr", "c1", weight=1.5)
-ctx.rule("GenCol-Expr", "c2", weight=1.0)
+ctx.rule("GenCol-Expr", "a")
+ctx.rule("GenCol-Expr", "a + {Int-Literal}")
+ctx.rule("GenCol-Expr", "coalesce(a, b)")
+ctx.rule("GenCol-Expr", "a = {Int-Literal}")
+ctx.rule("GenCol-Expr", "a IS NULL")
+ctx.rule("GenCol-Expr", "a * a")
+ctx.rule("GenCol-Expr", "a || b")
+ctx.rule("GenCol-Expr", "b")
+ctx.rule("GenCol-Expr", "c1")
+ctx.rule("GenCol-Expr", "c2")
 
 # ============================================================
 # LAYER 1: BOUNDARY LITERALS
 # ============================================================
 
-ctx.rule("Boundary-Int", "2147483647", weight=3.0)      # INT32_MAX
-ctx.rule("Boundary-Int", "2147483648", weight=3.0)      # INT32_MAX + 1
-ctx.rule("Boundary-Int", "-2147483648", weight=3.0)     # INT32_MIN
-ctx.rule("Boundary-Int", "-2147483649", weight=2.0)     # INT32_MIN - 1
-ctx.rule("Boundary-Int", "4294967295", weight=2.0)      # UINT32_MAX
-ctx.rule("Boundary-Int", "4294967296", weight=2.0)      # UINT32_MAX + 1
-ctx.rule("Boundary-Int", "9223372036854775807", weight=3.0)   # INT64_MAX
-ctx.rule("Boundary-Int", "-9223372036854775808", weight=3.0)  # INT64_MIN
-ctx.rule("Boundary-Int", "0", weight=2.0)
-ctx.rule("Boundary-Int", "-1", weight=2.0)
-ctx.rule("Boundary-Int", "1", weight=1.0)
+ctx.rule("Boundary-Int", "2147483647")      # INT32_MAX
+ctx.rule("Boundary-Int", "2147483648")      # INT32_MAX + 1
+ctx.rule("Boundary-Int", "-2147483648")     # INT32_MIN
+ctx.rule("Boundary-Int", "-2147483649")     # INT32_MIN - 1
+ctx.rule("Boundary-Int", "4294967295")      # UINT32_MAX
+ctx.rule("Boundary-Int", "4294967296")      # UINT32_MAX + 1
+ctx.rule("Boundary-Int", "9223372036854775807")   # INT64_MAX
+ctx.rule("Boundary-Int", "-9223372036854775808")  # INT64_MIN
+ctx.rule("Boundary-Int", "0")
+ctx.rule("Boundary-Int", "-1")
+ctx.rule("Boundary-Int", "1")
 # v4.0: Additional boundary values for size overflow patterns
-ctx.rule("Boundary-Int", "65535", weight=2.0)            # UINT16_MAX
-ctx.rule("Boundary-Int", "65536", weight=2.0)            # UINT16_MAX + 1
-ctx.rule("Boundary-Int", "32767", weight=1.5)            # INT16_MAX
-ctx.rule("Boundary-Int", "32768", weight=1.5)            # INT16_MAX + 1
+ctx.rule("Boundary-Int", "65535")            # UINT16_MAX
+ctx.rule("Boundary-Int", "65536")            # UINT16_MAX + 1
+ctx.rule("Boundary-Int", "32767")            # INT16_MAX
+ctx.rule("Boundary-Int", "32768")            # INT16_MAX + 1
 
-ctx.rule("Boundary-Float", "0.01", weight=3.0)
-ctx.rule("Boundary-Float", "0.0", weight=2.0)
-ctx.rule("Boundary-Float", "1.0", weight=2.0)
-ctx.rule("Boundary-Float", "-1.0", weight=1.0)
-ctx.rule("Boundary-Float", "1e308", weight=2.0)
-ctx.rule("Boundary-Float", "-1e308", weight=2.0)
-ctx.rule("Boundary-Float", "1e-308", weight=1.0)
-ctx.rule("Boundary-Float", "-0.0", weight=1.0)
+ctx.rule("Boundary-Float", "0.01")
+ctx.rule("Boundary-Float", "0.0")
+ctx.rule("Boundary-Float", "1.0")
+ctx.rule("Boundary-Float", "-1.0")
+ctx.rule("Boundary-Float", "1e308")
+ctx.rule("Boundary-Float", "-1e308")
+ctx.rule("Boundary-Float", "1e-308")
+ctx.rule("Boundary-Float", "-0.0")
 # v4.0: NaN/Inf-adjacent values for math functions
-ctx.rule("Boundary-Float", "9e999", weight=2.0)
-ctx.rule("Boundary-Float", "-9e999", weight=2.0)
+ctx.rule("Boundary-Float", "9e999")
+ctx.rule("Boundary-Float", "-9e999")
 
 # ============================================================
 # LAYER 2: Schema-Setup
@@ -921,19 +920,19 @@ ctx.rule("Col-Def-List-GenCol",
 ctx.rule("Col-Def-List-GenCol",
     "{Col-Name} {Type-Name}, {Col-Name} GENERATED ALWAYS AS ({GenCol-Expr}) {Gen-Constraint}, {Col-Def}")
 ctx.rule("Col-Def-List-GenCol",
-    "a {Type-Name}, b AS(b) UNIQUE", weight=2.0)
+    "a {Type-Name}, b AS(b) UNIQUE")
 ctx.rule("Col-Def-List-GenCol",
-    "a {Type-Name}, c1 AS(c1) UNIQUE", weight=1.5)
+    "a {Type-Name}, c1 AS(c1) UNIQUE")
 ctx.rule("Col-Def-List-GenCol",
-    "a {Type-Name}, b AS(b) NOT NULL", weight=1.5)
+    "a {Type-Name}, b AS(b) NOT NULL")
 
-ctx.rule("Gen-Constraint", "UNIQUE", weight=2.0)
-ctx.rule("Gen-Constraint", "NOT NULL", weight=2.0)
-ctx.rule("Gen-Constraint", "NOT NULL UNIQUE", weight=1.5)
-ctx.rule("Gen-Constraint", "", weight=1.0)
+ctx.rule("Gen-Constraint", "UNIQUE")
+ctx.rule("Gen-Constraint", "NOT NULL")
+ctx.rule("Gen-Constraint", "NOT NULL UNIQUE")
+ctx.rule("Gen-Constraint", "")
 
-ctx.rule("Fts-Engine", "fts5", weight=2.0)
-ctx.rule("Fts-Engine", "fts3", weight=1.0)
+ctx.rule("Fts-Engine", "fts5")
+ctx.rule("Fts-Engine", "fts3")
 
 # ============================================================
 # LAYER 2: Stress-Query
@@ -1019,22 +1018,22 @@ ctx.rule("Stress-Query",
     weight=2.0)
 
 # v4.0: New aggregate function calls
-ctx.rule("New-Agg-Func", "median({Expr})", weight=3.0)
-ctx.rule("New-Agg-Func", "percentile({Expr}, {Boundary-Float})", weight=2.5)
-ctx.rule("New-Agg-Func", "percentile_cont({Expr}, {Boundary-Float})", weight=2.0)
-ctx.rule("New-Agg-Func", "percentile_disc({Expr}, {Boundary-Float})", weight=2.0)
-ctx.rule("New-Agg-Func", "string_agg({Expr}, {Str-Literal})", weight=2.0)
-ctx.rule("New-Agg-Func", "total({Expr})", weight=1.5)
+ctx.rule("New-Agg-Func", "median({Expr})")
+ctx.rule("New-Agg-Func", "percentile({Expr}, {Boundary-Float})")
+ctx.rule("New-Agg-Func", "percentile_cont({Expr}, {Boundary-Float})")
+ctx.rule("New-Agg-Func", "percentile_disc({Expr}, {Boundary-Float})")
+ctx.rule("New-Agg-Func", "string_agg({Expr}, {Str-Literal})")
+ctx.rule("New-Agg-Func", "total({Expr})")
 
 # v4.0: Math function chains (compose boundary values through multiple math ops)
-ctx.rule("Math-Func-Chain", "ceil(ln({Expr}))", weight=2.0)
-ctx.rule("Math-Func-Chain", "floor(exp({Boundary-Float}))", weight=2.0)
-ctx.rule("Math-Func-Chain", "trunc(pow({Expr}, {Boundary-Int}))", weight=2.0)
-ctx.rule("Math-Func-Chain", "log(abs({Expr}) + 1)", weight=1.5)
-ctx.rule("Math-Func-Chain", "asin(cos({Expr}))", weight=1.5)
-ctx.rule("Math-Func-Chain", "atan2({Boundary-Float}, {Boundary-Float})", weight=1.5)
-ctx.rule("Math-Func-Chain", "mod({Boundary-Int}, {Expr})", weight=2.0)
-ctx.rule("Math-Func-Chain", "pow({Expr}, {Expr})", weight=1.5)
+ctx.rule("Math-Func-Chain", "ceil(ln({Expr}))")
+ctx.rule("Math-Func-Chain", "floor(exp({Boundary-Float}))")
+ctx.rule("Math-Func-Chain", "trunc(pow({Expr}, {Boundary-Int}))")
+ctx.rule("Math-Func-Chain", "log(abs({Expr}) + 1)")
+ctx.rule("Math-Func-Chain", "asin(cos({Expr}))")
+ctx.rule("Math-Func-Chain", "atan2({Boundary-Float}, {Boundary-Float})")
+ctx.rule("Math-Func-Chain", "mod({Boundary-Int}, {Expr})")
+ctx.rule("Math-Func-Chain", "pow({Expr}, {Expr})")
 
 # ============================================================
 # LAYER 2: Validation-Op
@@ -1049,78 +1048,78 @@ ctx.rule("Validation-Op", "{Reindex-Stmt}", weight=0.5)
 # LAYER 2: Boundary-Func-Call
 # ============================================================
 ctx.rule("Boundary-Func-Call",
-    "printf({Format-Spec}, {Boundary-Int}, {Boundary-Float})", weight=3.0)
+    "printf({Format-Spec}, {Boundary-Int}, {Boundary-Float})")
 ctx.rule("Boundary-Func-Call",
-    "printf({Format-Spec}, {Boundary-Int})", weight=2.0)
+    "printf({Format-Spec}, {Boundary-Int})")
 ctx.rule("Boundary-Func-Call",
-    "printf({Printf-Fmt-Spec}, {Boundary-Int}, {Str-Literal})", weight=1.5)
+    "printf({Printf-Fmt-Spec}, {Boundary-Int}, {Str-Literal})")
 ctx.rule("Boundary-Func-Call",
-    "substr({Str-Literal}, {Boundary-Int})", weight=2.0)
+    "substr({Str-Literal}, {Boundary-Int})")
 ctx.rule("Boundary-Func-Call",
-    "substr({Str-Literal}, {Boundary-Int}, {Boundary-Int})", weight=1.5)
+    "substr({Str-Literal}, {Boundary-Int}, {Boundary-Int})")
 ctx.rule("Boundary-Func-Call",
-    "hex(zeroblob({Boundary-Int}))", weight=2.0)
+    "hex(zeroblob({Boundary-Int}))")
 ctx.rule("Boundary-Func-Call",
-    "round({Boundary-Float}, {Boundary-Int})", weight=1.5)
+    "round({Boundary-Float}, {Boundary-Int})")
 
 # v4.0: New boundary function calls targeting recent code
 ctx.rule("Boundary-Func-Call",
-    "concat_ws({Str-Literal}, {Boundary-Int}, {Boundary-Int}, {Boundary-Int})", weight=2.5)
+    "concat_ws({Str-Literal}, {Boundary-Int}, {Boundary-Int}, {Boundary-Int})")
 ctx.rule("Boundary-Func-Call",
-    "concat({Boundary-Int}, {Boundary-Float}, {Str-Literal})", weight=2.0)
+    "concat({Boundary-Int}, {Boundary-Float}, {Str-Literal})")
 ctx.rule("Boundary-Func-Call",
-    "parseuri({Str-Literal})", weight=3.0)
+    "parseuri({Str-Literal})")
 ctx.rule("Boundary-Func-Call",
-    "unistr({Str-Literal})", weight=2.5)
+    "unistr({Str-Literal})")
 ctx.rule("Boundary-Func-Call",
-    "unhex({Str-Literal})", weight=2.0)
+    "unhex({Str-Literal})")
 ctx.rule("Boundary-Func-Call",
-    "fpdecode({Boundary-Float}, {Boundary-Int}, {Boundary-Int})", weight=2.5)
+    "fpdecode({Boundary-Float}, {Boundary-Int}, {Boundary-Int})")
 ctx.rule("Boundary-Func-Call",
-    "octet_length({Str-Literal})", weight=1.5)
+    "octet_length({Str-Literal})")
 ctx.rule("Boundary-Func-Call",
-    "ceil({Boundary-Float})", weight=1.5)
+    "ceil({Boundary-Float})")
 ctx.rule("Boundary-Func-Call",
-    "floor({Boundary-Float})", weight=1.5)
+    "floor({Boundary-Float})")
 ctx.rule("Boundary-Func-Call",
-    "trunc({Boundary-Float})", weight=1.5)
+    "trunc({Boundary-Float})")
 ctx.rule("Boundary-Func-Call",
-    "exp({Boundary-Float})", weight=1.5)
+    "exp({Boundary-Float})")
 ctx.rule("Boundary-Func-Call",
-    "pow({Boundary-Float}, {Boundary-Int})", weight=2.0)
+    "pow({Boundary-Float}, {Boundary-Int})")
 ctx.rule("Boundary-Func-Call",
-    "log({Boundary-Float})", weight=1.5)
+    "log({Boundary-Float})")
 ctx.rule("Boundary-Func-Call",
-    "mod({Boundary-Int}, {Boundary-Int})", weight=2.0)
+    "mod({Boundary-Int}, {Boundary-Int})")
 
-ctx.rule("Format-Spec", "'%.*g'", weight=3.0)
-ctx.rule("Format-Spec", "'%.*f'", weight=2.0)
-ctx.rule("Format-Spec", "'%.*e'", weight=2.0)
-ctx.rule("Format-Spec", "'%.*d'", weight=1.0)
-ctx.rule("Format-Spec", "'%.*s'", weight=1.0)
+ctx.rule("Format-Spec", "'%.*g'")
+ctx.rule("Format-Spec", "'%.*f'")
+ctx.rule("Format-Spec", "'%.*e'")
+ctx.rule("Format-Spec", "'%.*d'")
+ctx.rule("Format-Spec", "'%.*s'")
 
-ctx.rule("Printf-Fmt-Spec", "'%d'", weight=2.0)
-ctx.rule("Printf-Fmt-Spec", "'%u'", weight=1.0)
-ctx.rule("Printf-Fmt-Spec", "'%x'", weight=1.0)
-ctx.rule("Printf-Fmt-Spec", "'%f'", weight=1.0)
-ctx.rule("Printf-Fmt-Spec", "'%s'", weight=2.0)
-ctx.rule("Printf-Fmt-Spec", "'%lld'", weight=3.0)
-ctx.rule("Printf-Fmt-Spec", "'%lli'", weight=2.0)
-ctx.rule("Printf-Fmt-Spec", "'%llu'", weight=2.0)
+ctx.rule("Printf-Fmt-Spec", "'%d'")
+ctx.rule("Printf-Fmt-Spec", "'%u'")
+ctx.rule("Printf-Fmt-Spec", "'%x'")
+ctx.rule("Printf-Fmt-Spec", "'%f'")
+ctx.rule("Printf-Fmt-Spec", "'%s'")
+ctx.rule("Printf-Fmt-Spec", "'%lld'")
+ctx.rule("Printf-Fmt-Spec", "'%lli'")
+ctx.rule("Printf-Fmt-Spec", "'%llu'")
 
 # ============================================================
 # v4.0: URI/Unicode test literals (structural patterns, not PoC)
 # ============================================================
-ctx.rule("Uri-Literal", "'file:test.db'", weight=2.0)
-ctx.rule("Uri-Literal", "'file::memory:'", weight=2.0)
-ctx.rule("Uri-Literal", "'file:test.db?mode=ro'", weight=1.5)
-ctx.rule("Uri-Literal", "'https://example.com/path?q=1&r=2#frag'", weight=2.0)
-ctx.rule("Uri-Literal", "''", weight=1.5)
-ctx.rule("Uri-Literal", "'%00%01%02'", weight=2.0)
-ctx.rule("Uri-Literal", "'://invalid'", weight=1.5)
+ctx.rule("Uri-Literal", "'file:test.db'")
+ctx.rule("Uri-Literal", "'file::memory:'")
+ctx.rule("Uri-Literal", "'file:test.db?mode=ro'")
+ctx.rule("Uri-Literal", "'https://example.com/path?q=1&r=2#frag'")
+ctx.rule("Uri-Literal", "''")
+ctx.rule("Uri-Literal", "'%00%01%02'")
+ctx.rule("Uri-Literal", "'://invalid'")
 
-ctx.rule("Unicode-Literal", "'\\u0041'", weight=2.0)
-ctx.rule("Unicode-Literal", "'\\u0000'", weight=2.5)
-ctx.rule("Unicode-Literal", "'\\uFFFF'", weight=2.0)
-ctx.rule("Unicode-Literal", "'\\U0001F600'", weight=1.5)
-ctx.rule("Unicode-Literal", "'hello\\u0000world'", weight=2.0)
+ctx.rule("Unicode-Literal", "'\\u0041'")
+ctx.rule("Unicode-Literal", "'\\u0000'")
+ctx.rule("Unicode-Literal", "'\\uFFFF'")
+ctx.rule("Unicode-Literal", "'\\U0001F600'")
+ctx.rule("Unicode-Literal", "'hello\\u0000world'")

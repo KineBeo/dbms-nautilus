@@ -1,0 +1,241 @@
+{
+  "total_crashes": 19,
+  "unique_crashes": 19,
+  "summary": {
+    "asan": 0,
+    "ubsan": 0,
+    "debug_assert": 19,
+    "signal": 0,
+    "timeout": 0
+  },
+  "crashes": [
+    {
+      "hash": "4a18bf30693e133d",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000037765",
+      "top_frames": [
+        "<no-stack-6f6710042e562a34>"
+      ],
+      "sql_preview": "SELECT fpdecode(1e308, 2147483648, -1);"
+    },
+    {
+      "hash": "4c34ca5f694c5013",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000046920",
+      "top_frames": [
+        "<no-stack-f546face4be4ed4f>"
+      ],
+      "sql_preview": "SELECT fpdecode(-1e308, -2147483648, 2147483647);"
+    },
+    {
+      "hash": "ee633d9ffacb20d7",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000054210",
+      "top_frames": [
+        "<no-stack-7a779be8c073a832>"
+      ],
+      "sql_preview": "SELECT fpdecode(-1.0, -2147483648, -9223372036854775808); PRAGMA integrity_check;"
+    },
+    {
+      "hash": "289231ee1d53553e",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000081375",
+      "top_frames": [
+        "<no-stack-813e0eb705c3f66d>"
+      ],
+      "sql_preview": "SELECT fpdecode(-1e308, 2147483648, 0); VACUUM INTO ':memory:';"
+    },
+    {
+      "hash": "8ea8b0d1328229c8",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000106311",
+      "top_frames": [
+        "<no-stack-cc791ef2640da09a>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(rowid BLOB); CREATE TABLE IF NOT EXISTS q(a INT UNIQUE); ALTER TABLE q RENAME TO r; SELECT fpdecode(1e308, 2147483648, -1);"
+    },
+    {
+      "hash": "8c6c914a22ed4093",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000119996",
+      "top_frames": [
+        "<no-stack-67eb0ebfde50e41d>"
+      ],
+      "sql_preview": "SELECT fpdecode(-1e308, -2147483648, 9223372036854775807);"
+    },
+    {
+      "hash": "0a9fb2cb6ab27596",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000142805",
+      "top_frames": [
+        "<no-stack-a26395a1a24ff28f>"
+      ],
+      "sql_preview": "WITH RECURSIVE cnt(x) AS (VALUES(1) UNION ALL SELECT x+1 FROM cnt WHERE x < 100) SELECT DISTINCT random(), CURRENT_TIMESTAMP, FALSE, FALSE, TRUE, CURRENT_DATE, TRUE, CURRENT_TIMESTAMP FROM jsonb_each("
+    },
+    {
+      "hash": "5b432c533ca18714",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000158942",
+      "top_frames": [
+        "<no-stack-fd2d764a3b5f7caa>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p(rowid NUMERIC); CREATE VIEW IF NOT EXISTS v1 AS SELECT *; WITH RECURSIVE cnt(x) AS (VALUES(1) UNION ALL SELECT x+1 FROM cnt WHERE x < 100) SELECT last_insert_rowid() FROM "
+    },
+    {
+      "hash": "0ba4c35957b35021",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000163812",
+      "top_frames": [
+        "<no-stack-bd580a3480f826a8>"
+      ],
+      "sql_preview": "SELECT concat(NULL, TRUE, (VALUES (CURRENT_TIMESTAMP)), NULL, rank() OVER (), TRUE, TRUE, FALSE); SELECT fpdecode(-1e308, -2147483648, 2147483647);"
+    },
+    {
+      "hash": "44548fd13bf2d01b",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000220356",
+      "top_frames": [
+        "<no-stack-73c0a95ed9081ed4>"
+      ],
+      "sql_preview": "CREATE TABLE IF NOT EXISTS p AS WITH t3 AS (VALUES (CURRENT_TIMESTAMP)) SELECT DISTINCT * FROM t3 WHERE CURRENT_TIME LIKE FALSE ESCAPE NULL; SELECT fpdecode(1.0, -2147483648, -1);"
+    },
+    {
+      "hash": "55f4a652bcdfd4a6",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000253934",
+      "top_frames": [
+        "<no-stack-fc96c7d6a60b5778>"
+      ],
+      "sql_preview": "SELECT round(-1.0, 0); SELECT fpdecode(-1e308, -2147483648, 2147483647);"
+    },
+    {
+      "hash": "5e291bbdf551136f",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000254044",
+      "top_frames": [
+        "<no-stack-14a285e5ef4174f7>"
+      ],
+      "sql_preview": "PRAGMA integrity_check; SELECT fpdecode(-1e308, -2147483648, 2147483647);"
+    },
+    {
+      "hash": "2ff20dbf8b713fb5",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000267586",
+      "top_frames": [
+        "<no-stack-61b86b517a5bc5ba>"
+      ],
+      "sql_preview": "SELECT printf('%.*s', -1, 1e-308); SELECT fpdecode(-1e308, -2147483648, 2147483647);"
+    },
+    {
+      "hash": "2eb34cf52a4ecd47",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000289888",
+      "top_frames": [
+        "<no-stack-4d361d6df601c3d9>"
+      ],
+      "sql_preview": "SELECT concat(2147483647, -9e999, '-'); SELECT fpdecode(1e308, 2147483648, -1);"
+    },
+    {
+      "hash": "a3f230f34f355a3d",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000315631",
+      "top_frames": [
+        "<no-stack-0bbbe4260a3b1fb1>"
+      ],
+      "sql_preview": "SELECT printf('%.*g', 32767); SELECT fpdecode(1e308, 2147483648, -1);"
+    },
+    {
+      "hash": "d9552a95dc0326b6",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000315726",
+      "top_frames": [
+        "<no-stack-d7d1f1da2bbc2a67>"
+      ],
+      "sql_preview": "REINDEX; SELECT fpdecode(1e308, 2147483648, -1);"
+    },
+    {
+      "hash": "fa46ffd3e26b3395",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000336513",
+      "top_frames": [
+        "<no-stack-53558a4770757741>"
+      ],
+      "sql_preview": "PRAGMA quick_check; PRAGMA journal_mode=PERSIST; SELECT fpdecode(1e308, 2147483648, -1); PRAGMA journal_mode=TRUNCATE;"
+    },
+    {
+      "hash": "c2dc8491ec234024",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000336616",
+      "top_frames": [
+        "<no-stack-99565d5ced39ea79>"
+      ],
+      "sql_preview": "PRAGMA quick_check; VACUUM INTO ':memory:'; SELECT fpdecode(1e308, 2147483648, -1); PRAGMA journal_mode=TRUNCATE;"
+    },
+    {
+      "hash": "ebb9d5c405513936",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000336622",
+      "top_frames": [
+        "<no-stack-2f0c508f863adaa6>"
+      ],
+      "sql_preview": "PRAGMA quick_check; PRAGMA page_size; SELECT fpdecode(1e308, 2147483648, -1); PRAGMA journal_mode=TRUNCATE;"
+    }
+  ]
+}
