@@ -13,6 +13,7 @@
 \usepackage{scrextend}
 \usepackage{enumitem}
 \usepackage{url}
+\PassOptionsToPackage{table}{xcolor}
 \usepackage{tikz}
 \usepackage{float}
 \usepackage{afterpage}
@@ -29,7 +30,6 @@
 \usepackage[flushleft]{threeparttable}
 \usepackage{perpage}
 \MakePerPage{footnote}
-\PassOptionsToPackage{table}{xcolor}
 
 \def\changemargin#1#2{\list{}{\rightmargin#2\leftmargin#1}\item[]}
 \let\endchangemargin=\endlist
@@ -87,7 +87,6 @@
   numbersep=5pt,
   backgroundcolor=\color{bg_gray},
   showspaces=false,
-  showstringspaces=false,
   showtabs=false,
   frame=none,
   rulecolor=\color{black},
@@ -105,6 +104,8 @@
 \input{chapters/acknowledgement}\newpage\cleardoublepage
 \input{chapters/assurance}\newpage\cleardoublepage
 \input{chapters/abstract_en}\newpage\cleardoublepage
+% Vietnamese abstract requires vntex or XeLaTeX for proper diacritics
+% \input{chapters/abstract_vi}\newpage\cleardoublepage
 \addcontentsline{toc}{chapter}{Contents}
 \tableofcontents\newpage\cleardoublepage
 
