@@ -23,13 +23,14 @@
 @misc{libfuzzer,
   author       = {{LLVM Project}},
   title        = {{libFuzzer} -- a Library for Coverage-Guided Fuzz Testing},
+  year         = {2015},
   howpublished = {\url{https://llvm.org/docs/LibFuzzer.html}},
 }
 
 % --------------- Database fuzzing ---------------
 
 @inproceedings{squirrel,
-  author    = {Rui Zhong and Yongheng Chen and Hong Wen and Hangfan Zhang
+  author    = {Rui Zhong and Yongheng Chen and Hong Hu and Hangfan Zhang
                and Wenke Lee and Dinghao Wu and Peng Liu},
   title     = {Squirrel: Testing Database Management Systems with Language
                Validity and Coverage Feedback},
@@ -112,6 +113,42 @@
   pages   = {972--975},
 }
 
+% --------------- Textbooks ---------------
+
+@book{hopcroft,
+  author    = {Hopcroft, John E. and Motwani, Rajeev and Ullman, Jeffrey D.},
+  title     = {Introduction to Automata Theory, Languages, and Computation},
+  edition   = {3rd},
+  publisher = {Pearson},
+  year      = {2006},
+}
+
+% --------------- General references ---------------
+
+@misc{dbms-wiki,
+  author       = {{Wikipedia}},
+  title        = {Database},
+  year         = {2024},
+  howpublished = {\url{https://en.wikipedia.org/wiki/Database}},
+  note         = {Accessed: May 2026},
+}
+
+@misc{dbengines,
+  author       = {{DB-Engines}},
+  title        = {{DB-Engines} Ranking},
+  year         = {2024},
+  howpublished = {\url{https://db-engines.com/en/ranking}},
+  note         = {Accessed: May 2026},
+}
+
+@misc{sql-standard,
+  author       = {{ISO/IEC}},
+  title        = {{ISO/IEC 9075}: Information Technology --- Database Languages --- {SQL}},
+  year         = {2023},
+  howpublished = {\url{https://www.iso.org/standard/76583.html}},
+  note         = {SQL:2023 standard},
+}
+
 % --------------- Survey ---------------
 
 @article{fuzzingsurvey,
@@ -157,6 +194,7 @@
   title        = {{CVE-2020-13435}},
   year         = {2020},
   howpublished = {\url{https://nvd.nist.gov/vuln/detail/CVE-2020-13435}},
+  note         = {SQLite \texttt{alter.c} null pointer dereference},
 }
 
 @misc{cve202013871,
@@ -164,6 +202,7 @@
   title        = {{CVE-2020-13871}},
   year         = {2020},
   howpublished = {\url{https://nvd.nist.gov/vuln/detail/CVE-2020-13871}},
+  note         = {SQLite use-after-free in \texttt{resetAccumulator}},
 }
 
 @misc{cve202015358,
@@ -171,6 +210,7 @@
   title        = {{CVE-2020-15358}},
   year         = {2020},
   howpublished = {\url{https://nvd.nist.gov/vuln/detail/CVE-2020-15358}},
+  note         = {SQLite heap buffer overflow in \texttt{multiSelectOrderBy}},
 }
 
 % --------------- Additional references ---------------
