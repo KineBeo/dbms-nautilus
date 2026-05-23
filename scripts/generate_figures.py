@@ -30,8 +30,8 @@ VERSIONS = ["3.30.1", "3.31.1", "3.32.0", "3.32.2"]
 RUNS = list(range(1, 6))
 
 # Brand colours
-COLOR_V35 = "#2196F3"   # blue – proposed grammar
-COLOR_EBNF = "#9E9E9E"  # grey – EBNF baseline
+COLOR_V35 = "#2196F3"   # blue – DBMS-Nautilus
+COLOR_EBNF = "#9E9E9E"  # grey – EBNF-Baseline
 
 # ---------------------------------------------------------------------------
 # Shared style
@@ -362,20 +362,20 @@ def plot_f3() -> None:
 
     fig, ax = plt.subplots(figsize=(10, 6))
 
-    ax.plot(t_v35, mean_v35, color=COLOR_V35, linewidth=2, label="Proposed (v3.5)")
+    ax.plot(t_v35, mean_v35, color=COLOR_V35, linewidth=2, label="DBMS-Nautilus")
     ax.fill_between(t_v35, mean_v35 - std_v35, mean_v35 + std_v35,
                     color=COLOR_V35, alpha=0.15)
 
-    ax.plot(t_ebnf, mean_ebnf, color=COLOR_EBNF, linewidth=2, label="EBNF baseline")
+    ax.plot(t_ebnf, mean_ebnf, color=COLOR_EBNF, linewidth=2, label="EBNF-Baseline")
     ax.fill_between(t_ebnf, mean_ebnf - std_ebnf, mean_ebnf + std_ebnf,
                     color=COLOR_EBNF, alpha=0.15)
 
     ax.set_xlabel("Time (seconds)", fontsize=12)
     ax.set_ylabel("Cumulative edge coverage (edges)", fontsize=12)
-    ax.set_title("Coverage Growth – Proposed vs. EBNF Baseline (averaged across 4 versions × 5 runs)", fontsize=11)
+    ax.set_title("Edge Coverage Growth (mean ± 1 std, 4 versions × 5 runs)", fontsize=11)
     ax.set_xlim(0, 900)
     ax.tick_params(labelsize=10)
-    ax.legend(fontsize=11)
+    ax.legend(fontsize=11, loc="lower right")
 
     fig.tight_layout()
     out = OUT_DIR / "fig_4_3_coverage_growth.pdf"
@@ -442,7 +442,7 @@ def plot_f4() -> None:
     x = np.arange(len(VERSIONS))
     width = 0.35
 
-    fig, ax = plt.subplots(figsize=(8, 5))
+    fig, ax = plt.subplots(figsize=(9, 5.5))
 
     v35_means = [np.mean(v35_tput[v]) if v35_tput[v] else 0 for v in VERSIONS]
     v35_stds  = [np.std(v35_tput[v])  if v35_tput[v] else 0 for v in VERSIONS]
@@ -450,18 +450,19 @@ def plot_f4() -> None:
     ebnf_stds  = [np.std(ebnf_tput[v])  if ebnf_tput[v] else 0 for v in VERSIONS]
 
     bars_v35 = ax.bar(x - width / 2, v35_means, width, yerr=v35_stds,
-                      label="Proposed (v3.5)", color=COLOR_V35, alpha=0.85,
+                      label="DBMS-Nautilus", color=COLOR_V35, alpha=0.85,
                       capsize=4, error_kw=dict(elinewidth=1.2))
     bars_ebnf = ax.bar(x + width / 2, ebnf_means, width, yerr=ebnf_stds,
-                       label="EBNF baseline", color=COLOR_EBNF, alpha=0.85,
+                       label="EBNF-Baseline", color=COLOR_EBNF, alpha=0.85,
+                       edgecolor="#666",
                        capsize=4, error_kw=dict(elinewidth=1.2))
 
     ax.set_xticks(x)
-    ax.set_xticklabels([f"SQLite\n{v}" for v in VERSIONS], fontsize=10)
+    ax.set_xticklabels([f"SQLite {v}" for v in VERSIONS], fontsize=10)
     ax.set_ylabel("Executions per second", fontsize=12)
     ax.set_xlabel("SQLite version", fontsize=12)
-    ax.set_title("Fuzzer Throughput – Proposed vs. EBNF Baseline (mean ± 1 std, 5 runs)", fontsize=11)
-    ax.legend(fontsize=11)
+    ax.set_title("Throughput Comparison (mean ± 1 std, 5 runs)", fontsize=11)
+    ax.legend(fontsize=11, loc="upper left")
     ax.tick_params(labelsize=10)
 
     fig.tight_layout()
@@ -557,14 +558,14 @@ def plot_f5() -> None:
         ax.plot([], [], color=color, linewidth=6, alpha=0.85, label=label)
         return bp
 
-    make_bp(data_v35,  positions_v35,  COLOR_V35,  "Proposed (v3.5)")
-    make_bp(data_ebnf, positions_ebnf, COLOR_EBNF, "EBNF baseline")
+    make_bp(data_v35,  positions_v35,  COLOR_V35,  "DBMS-Nautilus")
+    make_bp(data_ebnf, positions_ebnf, COLOR_EBNF, "EBNF-Baseline")
 
     ax.set_xticks([i * group_gap for i in range(n_versions)])
-    ax.set_xticklabels([f"SQLite\n{v}" for v in VERSIONS], fontsize=10)
+    ax.set_xticklabels([f"SQLite {v}" for v in VERSIONS], fontsize=10)
     ax.set_ylabel("Time to first real crash (seconds)", fontsize=12)
     ax.set_xlabel("SQLite version", fontsize=12)
-    ax.set_title("Time to First UBSan/ASan Crash – Proposed vs. EBNF Baseline (5 runs)", fontsize=11)
+    ax.set_title("Time to First Crash (5 runs per version)", fontsize=11)
     ax.legend(fontsize=11, loc="upper right")
     ax.tick_params(labelsize=10)
 
