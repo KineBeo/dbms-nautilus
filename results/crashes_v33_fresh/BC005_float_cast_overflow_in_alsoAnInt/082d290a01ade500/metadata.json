@@ -1,0 +1,17 @@
+{
+  "hash": "082d290a01ade500",
+  "crash_type": "ubsan",
+  "subtype": "float-cast-overflow",
+  "exit_code": -6,
+  "version": "3.32.2",
+  "error_message": "../cve_builds/sqlite-3.32.2/sqlite3.c:85335:16: runtime error: inf is outside the range of representable values of type 'long long'",
+  "sql_preview": "CREATE TABLE IF NOT EXISTS p(a INTEGER UNIQUE, b TEXT); INSERT INTO p VALUES(9, ' 5T NTEhg_Oe-'); SELECT * FROM p WHERE CAST(CURRENT_TIME AS FLOAT) NOT IN (VALUES (hex(hex(hex(hex(hex(hex(hex(hex(CURR",
+  "campaigns": [
+    "sqlite-3.32.2_v33_run3"
+  ],
+  "total_count": 2,
+  "sample_file": "5_000168377",
+  "bug_class": "BC005",
+  "cve": null,
+  "severity": "LOW"
+}

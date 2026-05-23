@@ -1,0 +1,5 @@
+../../cve_builds/sqlite-3.31.1/sqlite3.c:102748:16: runtime error: member access within misaligned address 0x1e0e70a8078c for type 'struct AggInfo_func', which requires 8 byte alignment
+0x1e0e70a8078c: note: pointer points here
+  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+              ^ 
+SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior ../../cve_builds/sqlite-3.31.1/sqlite3.c:102748:16 in 

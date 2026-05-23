@@ -1,0 +1,40 @@
+{
+  "generated": "2026-05-22T06:05:02.691146+00:00",
+  "git_hash": "a48c46c9cc94844bd70e1b42c14d316286c75941",
+  "script": "scripts/ch4_pipeline.py",
+  "workdir_mapping": {
+    "RQ1": {
+      "pattern": "sqlite-{ver}_v35_run{run}",
+      "grammar": "DBMS-Nautilus (v35)",
+      "expected": 20,
+      "found": 20,
+      "missing": []
+    },
+    "RQ2": {
+      "pattern": "sqlite-{ver}_v33_run{run}",
+      "grammar": "DBMS-Nautilus (v33)",
+      "expected": 20,
+      "found": 20,
+      "missing": []
+    },
+    "RQ3_proposed": {
+      "pattern": "sqlite-{ver}_comparison_v3.4_run{run}",
+      "grammar": "DBMS-Nautilus (v3.4)",
+      "expected": 20,
+      "found": 20,
+      "missing": []
+    },
+    "RQ3_baseline": {
+      "pattern": "sqlite-{ver}_comparison_ebnf_run{run}",
+      "grammar": "EBNF-Baseline",
+      "expected": 20,
+      "found": 19,
+      "missing": [
+        "sqlite-3.32.0_comparison_ebnf_run1"
+      ]
+    }
+  },
+  "missing_workdirs": [
+    "sqlite-3.32.0_comparison_ebnf_run1"
+  ]
+}

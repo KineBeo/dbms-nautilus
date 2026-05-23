@@ -1,0 +1,17 @@
+{
+  "hash": "378bf38a628a91c2",
+  "crash_type": "ubsan",
+  "subtype": "float-cast-overflow",
+  "exit_code": -6,
+  "version": "3.32.2",
+  "error_message": "../cve_builds/sqlite-3.32.2/sqlite3.c:76366:47: runtime error: 3.33233e+39 is outside the range of representable values of type 'long long'",
+  "sql_preview": "CREATE TABLE IF NOT EXISTS p(a, b NOT NULL GENERATED ALWAYS AS (a + -290773)); INSERT INTO p(a) VALUES(0); PRAGMA integrity_check; SELECT group_concat(CURRENT_TIMESTAMP, ' 9') FROM p GROUP BY CAST(hex",
+  "campaigns": [
+    "sqlite-3.32.2_v33_run3"
+  ],
+  "total_count": 5,
+  "sample_file": "5_000205936",
+  "bug_class": "BC009",
+  "cve": null,
+  "severity": "LOW"
+}

@@ -1,0 +1,21 @@
+{
+  "hash": "78bd3886e40881c5",
+  "crash_type": "ubsan",
+  "subtype": "null-pointer",
+  "exit_code": -6,
+  "version": "3.31.1",
+  "error_message": "../cve_builds/sqlite-3.31.1/sqlite3.c:142594:32: runtime error: member access within null pointer of type 'Table' (aka 'struct Table')",
+  "sql_preview": "CREATE TABLE IF NOT EXISTS v0(v3, v1 GENERATED ALWAYS AS (v3) UNIQUE); CREATE TABLE IF NOT EXISTS v5(v6 UNIQUE, v7 UNIQUE); CREATE VIEW IF NOT EXISTS v8 AS SELECT coalesce(v3, v1) AS v9 FROM v0 WHERE ",
+  "campaigns": [
+    "sqlite-3.31.1_v33_run1",
+    "sqlite-3.31.1_v33_run2",
+    "sqlite-3.31.1_v33_run3",
+    "sqlite-3.31.1_v33_run4",
+    "sqlite-3.31.1_v33_run5"
+  ],
+  "total_count": 20,
+  "sample_file": "5_000027865",
+  "bug_class": "BC006",
+  "cve": null,
+  "severity": "HIGH"
+}

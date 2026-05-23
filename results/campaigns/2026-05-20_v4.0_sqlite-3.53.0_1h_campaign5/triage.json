@@ -1,0 +1,49 @@
+{
+  "total_crashes": 3,
+  "unique_crashes": 3,
+  "summary": {
+    "asan": 0,
+    "ubsan": 0,
+    "debug_assert": 3,
+    "signal": 0,
+    "timeout": 0
+  },
+  "crashes": [
+    {
+      "hash": "c6665f1edcb0237e",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000015570",
+      "top_frames": [
+        "<no-stack-7e2e1eedc4f44f98>"
+      ],
+      "sql_preview": "SELECT fpdecode(-1.0, 2147483648, 0); EXPLAIN ALTER TABLE p DROP COLUMN a;"
+    },
+    {
+      "hash": "e597adac7ccf563c",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000024258",
+      "top_frames": [
+        "<no-stack-a46d157172d6ac06>"
+      ],
+      "sql_preview": "SELECT fpdecode(1.0, 2147483648, 32767);"
+    },
+    {
+      "hash": "8498fe02dd77be56",
+      "type": "debug_assert",
+      "subtype": null,
+      "exit_code": -5,
+      "count": 1,
+      "sample_file": "5_000034034",
+      "top_frames": [
+        "<no-stack-5b5ca8ef1ff54c6e>"
+      ],
+      "sql_preview": "SELECT fpdecode(1e308, -2147483648, -2147483648);"
+    }
+  ]
+}

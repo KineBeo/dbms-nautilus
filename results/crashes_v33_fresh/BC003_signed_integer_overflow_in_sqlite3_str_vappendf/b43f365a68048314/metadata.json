@@ -1,0 +1,21 @@
+{
+  "hash": "b43f365a68048314",
+  "crash_type": "ubsan",
+  "subtype": "signed-integer-overflow",
+  "exit_code": -6,
+  "version": "3.31.1",
+  "error_message": "../cve_builds/sqlite-3.31.1/sqlite3.c:28488:24: runtime error: signed integer overflow: 2147483647 + 341 cannot be represented in type 'int'",
+  "sql_preview": "SELECT printf('%.*f', -2147483649, -1e308), substr('  Vv 6b W_-U_  ', -1); PRAGMA cache_size=0; CREATE VIRTUAL TABLE IF NOT EXISTS rtree1 USING rtree(id, x1, x2, y1, y2);",
+  "campaigns": [
+    "sqlite-3.31.1_v33_run1",
+    "sqlite-3.31.1_v33_run2",
+    "sqlite-3.31.1_v33_run3",
+    "sqlite-3.31.1_v33_run4",
+    "sqlite-3.31.1_v33_run5"
+  ],
+  "total_count": 29,
+  "sample_file": "5_000028331",
+  "bug_class": "BC003",
+  "cve": "CVE-2020-13434",
+  "severity": "MEDIUM"
+}

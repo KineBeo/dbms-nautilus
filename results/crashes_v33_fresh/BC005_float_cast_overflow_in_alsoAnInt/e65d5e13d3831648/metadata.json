@@ -1,0 +1,17 @@
+{
+  "hash": "e65d5e13d3831648",
+  "crash_type": "ubsan",
+  "subtype": "float-cast-overflow",
+  "exit_code": -6,
+  "version": "3.32.2",
+  "error_message": "../cve_builds/sqlite-3.32.2/sqlite3.c:85335:16: runtime error: inf is outside the range of representable values of type 'long long'",
+  "sql_preview": "WITH RECURSIVE a(x) AS (SELECT 1 UNION ALL SELECT x+1 FROM a WHERE x < 5), b(y) AS (SELECT CAST(TRUE AS INTEGER) NOT BETWEEN hex(hex(hex(hex(hex(hex(hex(hex(random())))))))) AND FALSE FROM a) SELECT *",
+  "campaigns": [
+    "sqlite-3.32.2_v33_run3"
+  ],
+  "total_count": 1,
+  "sample_file": "5_000155462",
+  "bug_class": "BC005",
+  "cve": null,
+  "severity": "LOW"
+}

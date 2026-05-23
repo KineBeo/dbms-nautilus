@@ -1,0 +1,17 @@
+{
+  "hash": "203fe090abe775e0",
+  "crash_type": "ubsan",
+  "subtype": "null-pointer",
+  "exit_code": -6,
+  "version": "3.32.0",
+  "error_message": "../cve_builds/sqlite-3.32.0/sqlite3.c:134653:15: runtime error: member access within null pointer of type 'Table' (aka 'struct Table')",
+  "sql_preview": "WITH RECURSIVE a(x) AS (SELECT 1 UNION ALL SELECT x+1 FROM a WHERE x < 5), b(y) AS (SELECT TRUE IN (VALUES (NULL) EXCEPT SELECT CURRENT_TIMESTAMP ORDER BY CURRENT_TIMESTAMP COLLATE NOCASE COLLATE NOCA",
+  "campaigns": [
+    "sqlite-3.32.0_v33_run3"
+  ],
+  "total_count": 4,
+  "sample_file": "5_000277208",
+  "bug_class": "BC010",
+  "cve": "CVE-2020-9327",
+  "severity": "HIGH"
+}

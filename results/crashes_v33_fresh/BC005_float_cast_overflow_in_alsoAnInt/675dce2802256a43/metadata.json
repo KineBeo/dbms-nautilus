@@ -1,0 +1,17 @@
+{
+  "hash": "675dce2802256a43",
+  "crash_type": "ubsan",
+  "subtype": "float-cast-overflow",
+  "exit_code": -6,
+  "version": "3.31.1",
+  "error_message": "../cve_builds/sqlite-3.31.1/sqlite3.c:85071:16: runtime error: 3.33233e+75 is outside the range of representable values of type 'long long'",
+  "sql_preview": "CREATE TABLE t1 AS SELECT * FROM (VALUES (CURRENT_DATE)) AS h_08__4___3_4ls2sg37v_j_u___6712_05r__sh_dbl_t_zsv5_v__11__6w_4a WHERE FALSE ORDER BY CURRENT_DATE DESC LIMIT hex(hex(random()));",
+  "campaigns": [
+    "sqlite-3.31.1_v33_run4"
+  ],
+  "total_count": 1,
+  "sample_file": "5_000180371",
+  "bug_class": "BC005",
+  "cve": null,
+  "severity": "LOW"
+}

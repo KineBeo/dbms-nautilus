@@ -271,8 +271,17 @@ def group_into_classes(
             bug_class.versions.add(entry.version)
             bug_class.total_crashes += entry.total_count
 
-    # Return keyed by class_id for stable lookup
-    return {bc.class_id: bc for bc in classes.values()}
+    # Re-assign BC IDs sorted by total_crashes desc, key_function asc to match ch4_pipeline
+    sorted_classes = sorted(
+        classes.values(),
+        key=lambda bc: (-bc.total_crashes, bc.key_function),
+    )
+    result: dict[str, BugClass] = {}
+    for i, bc in enumerate(sorted_classes, 1):
+        bc.class_id = f"BC{i:03d}"
+        bc.name = _make_class_name(bc.subtype, bc.key_function)
+        result[bc.class_id] = bc
+    return result
 
 
 # ---------------------------------------------------------------------------

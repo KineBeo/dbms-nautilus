@@ -1,0 +1,17 @@
+{
+  "hash": "7335fd423e7df525",
+  "crash_type": "ubsan",
+  "subtype": "misaligned-access",
+  "exit_code": -6,
+  "version": "3.31.1",
+  "error_message": "../cve_builds/sqlite-3.31.1/sqlite3.c:102748:16: runtime error: member access within misaligned address 0x1ffffcd3feef for type 'struct AggInfo_func', which requires 8 byte alignment",
+  "sql_preview": "CREATE TABLE IF NOT EXISTS p(a INTEGER); CREATE TABLE IF NOT EXISTS q(b INTEGER); INSERT INTO p VALUES(-238),(-7736); INSERT INTO q VALUES(0),(0); SELECT a FROM p INTERSECT SELECT b FROM q; CREATE TAB",
+  "campaigns": [
+    "sqlite-3.31.1_v33_run5"
+  ],
+  "total_count": 1,
+  "sample_file": "5_000103439",
+  "bug_class": "BC008",
+  "cve": null,
+  "severity": "HIGH"
+}

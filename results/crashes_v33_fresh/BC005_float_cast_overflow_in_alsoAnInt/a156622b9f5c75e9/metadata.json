@@ -1,0 +1,17 @@
+{
+  "hash": "a156622b9f5c75e9",
+  "crash_type": "ubsan",
+  "subtype": "float-cast-overflow",
+  "exit_code": -6,
+  "version": "3.32.0",
+  "error_message": "../cve_builds/sqlite-3.32.0/sqlite3.c:85315:16: runtime error: 1.11111e+257 is outside the range of representable values of type 'long long'",
+  "sql_preview": "SELECT json_valid(json(json_object('a', CURRENT_TIMESTAMP NOT IN (SELECT CURRENT_DATE AS z6 ORDER BY CURRENT_TIME DESC NULLS FIRST LIMIT TRUE || TRUE || TRUE || TRUE || TRUE || TRUE || TRUE || TRUE ||",
+  "campaigns": [
+    "sqlite-3.32.0_v33_run5"
+  ],
+  "total_count": 1,
+  "sample_file": "5_000159661",
+  "bug_class": "BC005",
+  "cve": null,
+  "severity": "LOW"
+}

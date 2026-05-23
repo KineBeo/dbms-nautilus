@@ -1,0 +1,17 @@
+{
+  "hash": "7e847453d5f9a926",
+  "crash_type": "ubsan",
+  "subtype": "float-cast-overflow",
+  "exit_code": -6,
+  "version": "3.31.1",
+  "error_message": "../cve_builds/sqlite-3.31.1/sqlite3.c:85071:16: runtime error: 1.11111e+37 is outside the range of representable values of type 'long long'",
+  "sql_preview": "CREATE TABLE IF NOT EXISTS p(a INTEGER); PRAGMA integrity_check; INSERT INTO p (_rowid_) VALUES (TRUE || TRUE || TRUE || TRUE || TRUE || TRUE || TRUE || TRUE || TRUE || TRUE || TRUE || TRUE || TRUE ||",
+  "campaigns": [
+    "sqlite-3.31.1_v33_run2"
+  ],
+  "total_count": 1,
+  "sample_file": "5_000278464",
+  "bug_class": "BC005",
+  "cve": null,
+  "severity": "LOW"
+}

@@ -1,0 +1,17 @@
+{
+  "hash": "24cb8086d4e4ccd4",
+  "crash_type": "signal",
+  "subtype": "signal-6",
+  "exit_code": -6,
+  "version": "3.30.1",
+  "error_message": "",
+  "sql_preview": "CREATE TABLE t3 (c1 TEXT CHECK ((SELECT * LIMIT EXISTS (SELECT * INTERSECT SELECT * FROM t1 WHERE CURRENT_DATE GROUP BY FALSE WINDOW w1 AS () ORDER BY CURRENT_TIMESTAMP COLLATE NOCASE ASC NULLS FIRST)",
+  "campaigns": [
+    "sqlite-3.30.1_v33_run3"
+  ],
+  "total_count": 2,
+  "sample_file": "6_000173549",
+  "bug_class": "BC011",
+  "cve": null,
+  "severity": "MEDIUM"
+}

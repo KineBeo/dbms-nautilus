@@ -1,0 +1,17 @@
+{
+  "hash": "9d7c1388cbe903ca",
+  "crash_type": "ubsan",
+  "subtype": "float-cast-overflow",
+  "exit_code": -6,
+  "version": "3.31.1",
+  "error_message": "../cve_builds/sqlite-3.31.1/sqlite3.c:85071:16: runtime error: -2.026e+272 is outside the range of representable values of type 'long long'",
+  "sql_preview": "CREATE TABLE IF NOT EXISTS p(a, b GENERATED ALWAYS AS (a) UNIQUE); CREATE TABLE IF NOT EXISTS q(x UNIQUE, y UNIQUE); SELECT * FROM p JOIN q ON p.a = q.x; REPLACE INTO p VALUES (-CURRENT_DATE || FALSE ",
+  "campaigns": [
+    "sqlite-3.31.1_v33_run4"
+  ],
+  "total_count": 1,
+  "sample_file": "5_000270418",
+  "bug_class": "BC005",
+  "cve": null,
+  "severity": "LOW"
+}

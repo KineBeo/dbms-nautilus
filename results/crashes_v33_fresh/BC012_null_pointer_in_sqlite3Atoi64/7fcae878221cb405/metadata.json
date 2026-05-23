@@ -1,0 +1,17 @@
+{
+  "hash": "7fcae878221cb405",
+  "crash_type": "ubsan",
+  "subtype": "null-pointer",
+  "exit_code": -6,
+  "version": "3.30.1",
+  "error_message": "../cve_builds/sqlite-3.30.1/sqlite3.c:31024:27: runtime error: applying zero offset to null pointer",
+  "sql_preview": "CREATE TABLE IF NOT EXISTS p(a INTEGER); INSERT INTO p VALUES(-351675),(0),(0); SELECT last_value(length(TRUE) >> zeroblob(CURRENT_TIMESTAMP)) OVER (PARTITION BY (SELECT 0 INTERSECT SELECT a FROM p) O",
+  "campaigns": [
+    "sqlite-3.30.1_v33_run4"
+  ],
+  "total_count": 3,
+  "sample_file": "5_000183784",
+  "bug_class": "BC012",
+  "cve": null,
+  "severity": "HIGH"
+}
