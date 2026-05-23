@@ -523,7 +523,7 @@ def plot_f5() -> None:
     group_gap = 1.0
     box_width = 0.28
 
-    fig, ax = plt.subplots(figsize=(10, 5))
+    fig, ax = plt.subplots(figsize=(10, 5.5))
 
     positions_v35  = []
     positions_ebnf = []
@@ -532,13 +532,15 @@ def plot_f5() -> None:
 
     for i, v in enumerate(VERSIONS):
         base = i * group_gap
-        positions_v35.append(base - box_width * 0.6)
-        positions_ebnf.append(base + box_width * 0.6)
+        positions_v35.append(base - box_width * 0.65)
+        positions_ebnf.append(base + box_width * 0.65)
         data_v35.append(v35_times[v] if v35_times[v] else [])
         data_ebnf.append(ebnf_times[v] if ebnf_times[v] else [])
 
+    from matplotlib.patches import Patch
+    legend_handles = []
+
     def make_bp(data, positions, color, label):
-        # Filter out empty lists
         valid = [(d, p) for d, p in zip(data, positions) if d]
         if not valid:
             return None
@@ -548,26 +550,32 @@ def plot_f5() -> None:
             positions=list(vpos),
             widths=box_width,
             patch_artist=True,
-            medianprops=dict(color="white", linewidth=2),
-            boxprops=dict(facecolor=color, alpha=0.85),
-            whiskerprops=dict(color=color),
-            capprops=dict(color=color),
-            flierprops=dict(marker="o", markerfacecolor=color, markersize=4, alpha=0.6),
+            medianprops=dict(color="white", linewidth=2.5),
+            boxprops=dict(facecolor=color, edgecolor="black", linewidth=1.5, alpha=0.9),
+            whiskerprops=dict(color="black", linewidth=1.2),
+            capprops=dict(color="black", linewidth=1.5),
+            flierprops=dict(marker="o", markerfacecolor=color, markeredgecolor="black",
+                           markersize=6, alpha=0.8, linewidth=0.8),
         )
-        # Dummy patch for legend
-        ax.plot([], [], color=color, linewidth=6, alpha=0.85, label=label)
+        legend_handles.append(Patch(facecolor=color, edgecolor="black",
+                                    linewidth=1.5, alpha=0.9, label=label))
         return bp
 
     make_bp(data_v35,  positions_v35,  COLOR_V35,  "DBMS-Nautilus")
     make_bp(data_ebnf, positions_ebnf, COLOR_EBNF, "EBNF-Baseline")
 
+    ax.legend(handles=legend_handles, fontsize=11, loc="upper center",
+              ncol=2, framealpha=0.95, edgecolor="black", fancybox=False)
+
     ax.set_xticks([i * group_gap for i in range(n_versions)])
-    ax.set_xticklabels([f"SQLite {v}" for v in VERSIONS], fontsize=10)
-    ax.set_ylabel("Time to first real crash (seconds)", fontsize=12)
+    ax.set_xticklabels([f"SQLite {v}" for v in VERSIONS], fontsize=11)
+    ax.set_ylabel("Time to first crash (seconds)", fontsize=12)
     ax.set_xlabel("SQLite version", fontsize=12)
-    ax.set_title("Time to First Crash (5 runs per version)", fontsize=11)
-    ax.legend(fontsize=11, loc="upper right")
+    ax.set_title("Time to First Crash (5 runs per version)", fontsize=12, fontweight="bold")
     ax.tick_params(labelsize=10)
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    ax.grid(axis="y", alpha=0.3, linestyle="--")
 
     fig.tight_layout()
     out = OUT_DIR / "fig_4_5_time_to_first_crash.pdf"
