@@ -461,12 +461,13 @@ def plot_f4() -> None:
     ax.set_xticklabels([f"SQLite {v}" for v in VERSIONS], fontsize=10)
     ax.set_ylabel("Executions per second", fontsize=12)
     ax.set_xlabel("SQLite version", fontsize=12)
-    ax.set_title("Throughput Comparison (mean ± 1 std, 5 runs)", fontsize=11)
-    ax.legend(fontsize=11, loc="upper center", ncol=2, framealpha=0.95,
-              edgecolor="black", fancybox=False)
+    ax.set_title("Throughput Comparison (mean ± 1 std, 5 runs)", fontsize=11, pad=10)
     ax.tick_params(labelsize=10)
 
-    fig.tight_layout()
+    fig.legend(*ax.get_legend_handles_labels(), fontsize=11, ncol=2,
+               loc="upper center", framealpha=0.95, edgecolor="black",
+               fancybox=False, bbox_to_anchor=(0.5, 1.0))
+    fig.tight_layout(rect=[0, 0, 1, 0.95])
     out = OUT_DIR / "fig_4_4_throughput.pdf"
     fig.savefig(out, bbox_inches="tight")
     plt.close(fig)
