@@ -1,10 +1,10 @@
 \chapter{Background}
 \label{chap:background}
 
-\section{Database Management Systems}
+\section{Database Management Systems and SQLite}
 \label{sec:bg-dbms}
 
-A database management system (DBMS) is software that stores and manages data based on a database model~\citep{dbms-wiki}. Among the various models, the relational model is the most widely adopted: data is organized into tables, where each row represents a record and each column represents an attribute~\citep{dbms-wiki}. Structured Query Language (SQL) is a domain-specific language used to create, query, and modify data in relational DBMSs~\citep{sql-standard}. In practice, although hundreds of DBMSs have been developed~\citep{dbengines}, each one extends or deviates from the SQL standard in different ways, resulting in dialect-specific syntax and behavior~\citep{sqlancer}.
+A database management system (DBMS) is software that stores and manages data based on a database model~\citep{dbms-wiki}. Among the various models, the relational model is the most widely adopted: data is organized into tables, where each row represents a record and each column represents an attribute~\citep{dbms-wiki}. Structured Query Language (SQL) is a domain-specific language used to create, query, and modify data in relational DBMSs~\citep{sql-standard}. In practice, although hundreds of DBMSs have been developed~\citep{dbengines}, each one extends or deviates from the SQL standard in different ways, resulting in dialect-specific syntax and behavior~\citep{griffin}.
 
 In this thesis, we focus on SQLite as the target DBMS. SQLite is a self-contained, serverless database engine embedded directly into the host application, written in approximately 150{,}000 lines of C code~\citep{sqlite}. It is deployed in every major smartphone operating system, web browser, and the Python standard library, making it one of the most widely used software components in the world~\citep{sqlite}. Despite its maturity and extensive testing, SQLite has had memory safety vulnerabilities in deep subsystems such as the expression evaluator, the window function engine, and the generated column processor, which are the focus of our fuzzing campaigns.
 
@@ -17,7 +17,7 @@ SQL grammar describes the syntax and semantic features of the SQL language~\cite
 For grammar-based fuzzing, the SQL grammar serves as the specification that guides input generation. By formally modeling the grammar, a fuzzer can systematically produce syntactically valid SQL statements that pass the DBMS parser and reach the deeper execution stages where vulnerabilities reside. Section~\ref{sec:bg-cfg} introduces the formal framework --- context-free grammars --- used to represent such grammars.
 
 
-\section{Context-Free Grammars}
+\section{Context-Free Grammar}
 \label{sec:bg-cfg}
 
 Programs that process structured input, such as SQL interpreters, cannot be effectively tested by methods that operate on raw bytes, because random byte sequences almost never produce syntactically valid inputs~\citep{nautilus}. Context-free grammars (CFGs) provide a formalism to specify the structure of such input languages, enabling the systematic generation of valid inputs~\citep{hopcroft}.
@@ -35,58 +35,80 @@ More formally, a CFG is defined as a tuple $G = (N, T, R, S)$ where~\citep{hopcr
 
 Since the left-hand side of each rule consists of exactly one non-terminal, the possible derivations depend only on that non-terminal and not on the surrounding context --- hence the name \textit{context free}~\citep{hopcroft}.
 
-To derive a string, a matching production rule is applied to the start symbol $S$. As long as the resulting sequence contains non-terminals, another rule is selected and applied to one of them. This process continues until only terminal symbols remain. Consider the following grammar fragment that generates simple SQL queries, written in the Nautilus Python DSL:
+To derive a string, a matching production rule is applied to the start symbol $S$. As long as the resulting sequence contains non-terminals, another rule is selected and applied to one of them. This process continues until only terminal symbols remain. Listing~\ref{lst:sql-grammar} shows a grammar fragment (G1) that generates simple SQL queries.
 
-\begin{lstlisting}[language=Python, caption={A grammar fragment for SQL in the Nautilus Python DSL. Non-terminals are enclosed in curly braces. Each \texttt{ctx.rule} call defines one production rule.}, label={lst:sql-grammar}]
-ctx.rule("Stmt", "SELECT {Expr} FROM {Table}")  # (1)
-ctx.rule("Stmt", "{Stmt}; {Stmt}")               # (2)
-ctx.rule("Expr", "{Col}")                         # (3)
-ctx.rule("Expr", "{Func}({Expr})")                # (4)
-ctx.rule("Table", "t1")                           # (5)
-ctx.rule("Func", "printf")                        # (6)
-ctx.rule("Col", "c1")                             # (7)
+\begin{lstlisting}[caption={Grammar G1 for simple SQL queries.}, label={lst:sql-grammar}, basicstyle=\ttfamily\small, numbers=none, frame=single, xleftmargin=1cm, xrightmargin=1cm]
+N: {Stmt, Expr, Table, Func, Col}
+T: {SELECT, FROM, printf, c1, t1, (, ), ;}
+R: {
+    Stmt  -> SELECT Expr FROM Table    (1)
+    Stmt  -> Stmt ; Stmt               (2)
+    Expr  -> Col                       (3)
+    Expr  -> Func(Expr)                (4)
+    Table -> t1                        (5)
+    Func  -> printf                    (6)
+    Col   -> c1                        (7)
+   }
+S: Stmt
 \end{lstlisting}
 
-Starting from \texttt{Stmt}, one possible derivation applies rules in sequence:
+Therefore, one possible derivation from G1 would be:
 
 \begin{center}
-\texttt{Stmt} $\xrightarrow{(1)}$ \texttt{SELECT \{Expr\} FROM \{Table\}} $\xrightarrow{(4)}$ \texttt{SELECT \{Func\}(\{Expr\}) FROM \{Table\}} $\xrightarrow{(6)}$ \texttt{SELECT printf(\{Expr\}) FROM \{Table\}} $\xrightarrow{(3)}$ \texttt{SELECT printf(\{Col\}) FROM \{Table\}} $\xrightarrow{(7)}$ \texttt{SELECT printf(c1) FROM \{Table\}} $\xrightarrow{(5)}$ \texttt{SELECT printf(c1) FROM t1}
+\textit{Stmt} $\xrightarrow{(1)}$ SELECT \textit{Expr} FROM \textit{Table} $\xrightarrow{(4)}$ SELECT \textit{Func}(\textit{Expr}) FROM \textit{Table} $\xrightarrow{(6)}$ SELECT printf(\textit{Expr}) FROM \textit{Table} $\xrightarrow{(3)}$ SELECT printf(\textit{Col}) FROM \textit{Table} $\xrightarrow{(7)}$ SELECT printf(c1) FROM \textit{Table} $\xrightarrow{(5)}$ SELECT printf(c1) FROM t1
 \end{center}
+
+\noindent Numbers over arrows denote applied production rules. The derived string is \texttt{SELECT printf(c1) FROM t1}.
 
 Each string generated by a CFG can be represented by its \textit{derivation tree}: the root is labeled with the start symbol, each internal node is a non-terminal, and the children of each node correspond to the right-hand side of the applied rule~\citep{hopcroft}. Leaf nodes are terminals. The generated string is obtained by reading leaves left to right --- a process called \textit{unparsing} in the context of grammar-based fuzzing~\citep{nautilus}. Figure~\ref{fig:derivation-tree} shows the derivation tree for the example above.
 
 \begin{figure}[htbp]
 \centering
 \begin{tikzpicture}[
-    level distance=1.3cm,
-    sibling distance=2.2cm,
+    x=13.6mm, y=13.6mm,
     every node/.style={font=\small},
-    nonterminal/.style={rectangle, rounded corners=3pt, draw=black!60,
-        fill=blue!8, minimum width=1.2cm, minimum height=0.6cm,
-        align=center, font=\small\itshape},
-    terminal/.style={font=\small\ttfamily, text=black!80},
-    edge from parent/.style={draw=black!50, thick},
+    nt/.style={ellipse, draw=black, line width=0.55pt,
+        inner xsep=3pt, inner ysep=2pt, font=\small\sffamily,
+        minimum width=13.6mm, minimum height=6.1mm},
+    lf/.style={rectangle, rounded corners=2.5pt, draw=black, line width=0.55pt,
+        inner xsep=3.5pt, inner ysep=2pt, font=\small\ttfamily,
+        minimum width=10.2mm, minimum height=5.8mm},
+    te/.style={draw=black, line width=0.45pt},
 ]
-\node[nonterminal] {Stmt}
-    child { node[terminal] {SELECT} }
-    child { node[nonterminal] {Expr}
-        child { node[nonterminal] {Func}
-            child { node[terminal] {printf} }
-        }
-        child { node[terminal] {(} }
-        child { node[nonterminal] {Expr}
-            child { node[nonterminal] {Col}
-                child { node[terminal] {c1} }
-            }
-        }
-        child { node[terminal] {)} }
-    }
-    child { node[terminal] {FROM} }
-    child { node[nonterminal] {Table}
-        child { node[terminal] {t1} }
-    };
+    % Level 0
+    \node[nt] (root) at (0,0) {Stmt};
+
+    % Level 1
+    \node[lf] (sel)   at (-3.2,-1.3) {SELECT};
+    \node[nt] (expr1) at (-0.3,-1.3) {Expr};
+    \node[lf] (from)  at (2.2,-1.3)  {FROM};
+    \node[nt] (tab)   at (3.8,-1.3)  {Table};
+
+    % Level 2
+    \node[nt] (func)  at (-1.8,-2.6)  {Func};
+    \node[lf] (lpar)  at (-0.5,-2.6) {\textup{(}};
+    \node[nt] (expr2) at (0.6,-2.6)  {Expr};
+    \node[lf] (rpar)  at (1.7,-2.6)  {\textup{)}};
+    \node[lf] (t1)    at (3.8,-2.6)  {t1};
+
+    % Level 3
+    \node[lf] (printf) at (-1.8,-3.9) {printf};
+    \node[nt] (col)    at (0.6,-3.9)  {Col};
+
+    % Level 4
+    \node[lf] (c1) at (0.6,-5.2) {c1};
+
+    % Edges
+    \foreach \a/\b in {root/sel, root/expr1, root/from, root/tab,
+        expr1/func, expr1/lpar, expr1/expr2, expr1/rpar,
+        tab/t1, func/printf, expr2/col, col/c1}
+        \draw[te] (\a) -- (\b);
+
+    % Output string
+    \node[font=\small\ttfamily, anchor=north] at (0.3,-5.9)
+        {SELECT printf(c1) FROM t1};
 \end{tikzpicture}
-\caption{Derivation tree for the SQL query \texttt{SELECT printf(c1) FROM t1}, generated from the grammar in Listing~\ref{lst:sql-grammar}. Internal nodes (rounded boxes) are non-terminals; leaf nodes are terminal symbols.}
+\caption{Derivation tree for \texttt{SELECT printf(c1) FROM t1}.}
 \label{fig:derivation-tree}
 \end{figure}
 
@@ -112,7 +134,7 @@ The AFL fork server model provides an efficient execution mechanism: rather than
 General-purpose greybox fuzzers such as AFL are effective for binary formats but struggle with structured inputs like SQL, because random byte-level mutations overwhelmingly produce parser-rejected inputs~\citep{nautilus}. Grammar-based fuzzing addresses this by generating inputs from a context-free grammar (Section~\ref{sec:bg-cfg}), ensuring syntactic validity. Combining grammar-based generation with coverage-guided feedback yields a \textit{grammar-based greybox fuzzer}: a system that generates syntactically valid inputs and uses coverage feedback to steer generation toward unexplored program regions. Nautilus~\citep{nautilus} is the first fuzzer to implement this combination, maintaining a corpus of derivation trees rather than flat strings and applying tree-level mutations guided by edge coverage. Nautilus discovered 13 previously unknown bugs across four interpreter targets (mruby, PHP, ChakraCore, and Lua), of which six were assigned CVEs, demonstrating that the grammar-plus-feedback combination significantly outperforms either approach alone.
 
 
-\section{Related Work}
+\section{Existing Solutions}
 \label{sec:bg-related}
 
 Several lines of research address the challenge of testing software that processes structured inputs. This section reviews the most relevant approaches and positions DBMS-Nautilus relative to each.
@@ -124,16 +146,17 @@ CSmith~\citep{csmith} generates random C programs that avoid undefined behavior,
 SQLsmith~\citep{sqlsmith} generates random SQL queries by introspecting database schema metadata, producing type-correct queries with valid table and column references. However, SQLsmith operates without coverage feedback and without weighted sampling over its query templates. Squirrel~\citep{squirrel} introduces an intermediate representation for SQL that encodes semantic relationships, enabling type-aware mutations with coverage feedback. However, Squirrel requires a custom IR parser for each SQL dialect and does not support weighted sampling over structural patterns. SQLancer~\citep{sqlancer} takes a different approach: rather than searching for crashes, it generates queries and checks whether the DBMS returns correct results. NoREC~\citep{norec} and TLP~\citep{tlp} extend this differential testing methodology. These tools are effective at detecting logic bugs (incorrect query results) but do not target memory safety violations, which require a crash-based oracle.
 
 \paragraph{Grammar-based greybox fuzzers.}
-Nautilus~\citep{nautilus} combines grammar-based generation with coverage-guided feedback in a closed loop, maintaining derivation trees as its internal representation and applying tree-level mutations. It discovered 13 bugs (six assigned CVEs) across four interpreter targets and demonstrated that the grammar-plus-feedback combination significantly outperforms either approach alone. However, Nautilus uses a general-purpose grammar with uniform sampling: all production rules have equal probability, with no mechanism to bias generation toward specific vulnerability classes.
+Nautilus~\citep{nautilus} was the first to combine grammar-based generation with coverage feedback, discovering 13 bugs (six CVEs) across four interpreter targets. However, Nautilus uses a general-purpose grammar with uniform sampling: all production rules have equal probability, with no mechanism to bias generation toward specific vulnerability classes.
 
 \paragraph{Positioning of DBMS-Nautilus.}
-DBMS-Nautilus extends the Nautilus architecture with three domain-specific enhancements. First, the grammar is designed around structural primitives extracted from CVE root-cause analysis, encoding the SQL constructs that stress vulnerability-prone code paths. Second, production rules carry numeric weights that bias sampling toward vulnerability-relevant constructs. Third, the grammar generates self-contained SQL programs from an empty database, eliminating the need for a pre-populated schema. Table~\ref{tab:related-comparison} summarizes the key differences.
+DBMS-Nautilus extends the Nautilus architecture with three domain-specific enhancements. First, the grammar is designed around structural primitives extracted from CVE root-cause analysis, encoding the SQL constructs that stress vulnerability-prone code paths. Second, production rules carry numeric weights that bias sampling toward vulnerability-relevant constructs. Third, the grammar generates self-contained SQL programs from an empty database, eliminating the need for a pre-populated schema. Table~\ref{tab:related-comparison} summarizes the key differences; a checkmark indicates the tool supports the feature and a cross indicates it does not; ``SQL-specific'' indicates whether the tool is specifically designed for SQL or DBMS testing.
 
 \begin{table}[htbp]
-\caption{Comparison of DBMS-Nautilus with related fuzzing tools. A checkmark indicates the tool supports the feature; a cross indicates it does not. ``SQL-specific'' indicates whether the tool is specifically designed for SQL or DBMS testing.}
+\caption{Comparison of DBMS-Nautilus with related fuzzing tools.}
 \label{tab:related-comparison}
 \centering
 \small
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{lccccc}
 \toprule
 \textbf{Tool} & \textbf{Grammar} & \textbf{Feedback} & \textbf{Corpus-free} & \textbf{SQL-specific} & \textbf{Weighted} \\
@@ -145,5 +168,5 @@ Squirrel~\citep{squirrel}  & \checkmark & \checkmark & $\times$ & \checkmark & $
 Nautilus~\citep{nautilus}  & \checkmark & \checkmark & \checkmark & $\times$ & $\times$ \\
 DBMS-Nautilus             & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \end{table}

@@ -145,54 +145,107 @@ def gather_f1_data() -> dict[str, list[int]]:
     return cve_times
 
 
+def load_ttfc_csv() -> list[dict]:
+    """Load the pre-computed TTFC-per-CVE CSV with both grammars."""
+    p = RESULTS / "ch4_final" / "rq1_ttfc_per_cve.csv"
+    with open(p) as f:
+        return list(csv.DictReader(f))
+
+
 def plot_f1(cve_times: dict[str, list[int]]) -> None:
-    # Only keep CVEs that were actually found
-    found = {k: v for k, v in cve_times.items() if v}
-    if not found:
-        print("F1: no CVE timing data found – skipping")
-        return
+    CAMPAIGN_CEIL = 900
+    CVE_ORDER = ["CVE-2020-13434", "CVE-2020-13435", "CVE-2020-13871", "CVE-2020-15358"]
 
-    labels = list(found.keys())
-    data = [found[k] for k in labels]
+    rows = load_ttfc_csv()
 
-    fig, ax = plt.subplots(figsize=(8, 5))
+    dbms_data: dict[str, list[int]] = {c: [] for c in CVE_ORDER}
+    ebnf_data: dict[str, list[int]] = {c: [] for c in CVE_ORDER}
 
-    positions = range(1, len(labels) + 1)
-    bp = ax.boxplot(
-        data,
-        positions=list(positions),
-        widths=0.45,
-        patch_artist=True,
-        medianprops=dict(color="white", linewidth=2),
-        boxprops=dict(facecolor=COLOR_V35, alpha=0.85),
-        whiskerprops=dict(color=COLOR_V35),
-        capprops=dict(color=COLOR_V35),
-        flierprops=dict(marker="o", markerfacecolor=COLOR_V35, markersize=5, alpha=0.6),
+    for r in rows:
+        cve = r["cve"]
+        t = int(r["ttfc_sec"])
+        if r["grammar"] == "DBMS-Nautilus":
+            dbms_data[cve].append(t)
+        else:
+            ebnf_data[cve].append(t)
+
+    fig, ax = plt.subplots(figsize=(9, 5.5))
+
+    bar_width = 0.32
+    x = np.arange(len(CVE_ORDER))
+    rng = np.random.default_rng(42)
+
+    dbms_medians = []
+    ebnf_medians = []
+    for cve in CVE_ORDER:
+        dbms_medians.append(float(np.median(dbms_data[cve])) if dbms_data[cve] else 0)
+        ebnf_medians.append(float(np.median(ebnf_data[cve])) if ebnf_data[cve] else CAMPAIGN_CEIL)
+
+    bars_dbms = ax.bar(
+        x - bar_width / 2, dbms_medians, bar_width,
+        color=COLOR_V35, alpha=0.85, label="DBMS-Nautilus", zorder=2,
+    )
+    bars_ebnf = ax.bar(
+        x + bar_width / 2, ebnf_medians, bar_width,
+        color=COLOR_EBNF, alpha=0.85, label="EBNF-Baseline", zorder=2,
     )
 
-    # Overlay individual points
-    for i, (pos, times) in enumerate(zip(positions, data)):
-        jitter = np.random.default_rng(42 + i).uniform(-0.12, 0.12, len(times))
-        ax.scatter(
-            [pos + j for j in jitter],
-            times,
-            color=COLOR_V35,
-            s=30,
-            zorder=3,
-            alpha=0.75,
-            edgecolors="white",
-            linewidths=0.5,
-        )
-        # Annotate n
-        ax.text(pos, ax.get_ylim()[0] if ax.get_ylim()[0] > 0 else 1,
-                f"n={len(times)}", ha="center", va="top", fontsize=8, color="#555")
+    for i, cve in enumerate(CVE_ORDER):
+        if dbms_data[cve]:
+            jitter = rng.uniform(-0.06, 0.06, len(dbms_data[cve]))
+            ax.scatter(
+                [i - bar_width / 2 + j for j in jitter],
+                dbms_data[cve],
+                color="white", edgecolors=COLOR_V35, linewidths=1.0,
+                s=28, zorder=4, alpha=0.9,
+            )
+            ax.text(
+                i - bar_width / 2, -55,
+                f"n={len(dbms_data[cve])}", ha="center", va="top",
+                fontsize=8, color="#444",
+            )
 
-    short_labels = [l.replace("CVE-2020-", "CVE-\n") for l in labels]
-    ax.set_xticks(list(positions))
-    ax.set_xticklabels(short_labels, fontsize=10)
-    ax.set_ylabel("Time to first crash (seconds)", fontsize=12)
-    ax.set_xlabel("CVE", fontsize=12)
-    ax.set_title("Time to First CVE Crash – Proposed Grammar (v3.5, 15 min)", fontsize=12)
+        if ebnf_data[cve]:
+            jitter = rng.uniform(-0.06, 0.06, len(ebnf_data[cve]))
+            ax.scatter(
+                [i + bar_width / 2 + j for j in jitter],
+                ebnf_data[cve],
+                color="white", edgecolors=COLOR_EBNF, linewidths=1.0,
+                s=28, zorder=4, alpha=0.9,
+            )
+            ax.text(
+                i + bar_width / 2, -55,
+                f"n={len(ebnf_data[cve])}", ha="center", va="top",
+                fontsize=8, color="#444",
+            )
+        else:
+            bars_ebnf[i].set_hatch("///")
+            bars_ebnf[i].set_edgecolor("#666")
+            bars_ebnf[i].set_alpha(0.35)
+            ax.text(
+                i + bar_width / 2, CAMPAIGN_CEIL / 2,
+                "Not\nfound", ha="center", va="center",
+                fontsize=10, color="#B71C1C", fontweight="bold",
+                rotation=90,
+            )
+
+    short_labels = [c.replace("CVE-2020-", "CVE-") for c in CVE_ORDER]
+    ax.set_xticks(x)
+    ax.set_xticklabels(short_labels, fontsize=11)
+    ax.set_ylabel("Time to first CVE crash (seconds)", fontsize=11)
+    ax.set_xlabel("CVE", fontsize=11)
+    ax.set_title(
+        "Time to First CVE-Matching Crash: DBMS-Nautilus vs EBNF-Baseline",
+        fontsize=12,
+    )
+    ax.set_ylim(-75, CAMPAIGN_CEIL + 50)
+    ax.axhline(y=CAMPAIGN_CEIL, color="#B71C1C", linestyle="--", linewidth=0.8, alpha=0.4)
+    ax.text(
+        len(CVE_ORDER) - 0.15, CAMPAIGN_CEIL + 15,
+        "campaign limit (900 s)", ha="right", va="bottom",
+        fontsize=10, color="black", alpha=0.9, fontweight="bold",
+    )
+    ax.legend(loc="upper left", fontsize=9, framealpha=0.9)
     ax.tick_params(labelsize=10)
 
     fig.tight_layout()
@@ -207,18 +260,16 @@ def plot_f1(cve_times: dict[str, list[int]]) -> None:
 # ---------------------------------------------------------------------------
 
 def plot_f2() -> None:
-    registry_path = RESULTS / "rq2_fresh" / "registry.json"
-    with open(registry_path) as f:
-        registry = json.load(f)
+    csv_path = RESULTS / "ch4_final" / "rq2_bug_classes.csv"
+    with open(csv_path) as f:
+        classes = list(csv.DictReader(f))
 
-    classes = registry["classes"]
-    # Sort by unique_hashes descending
-    classes = sorted(classes, key=lambda c: c["unique_hashes"], reverse=True)
+    classes = sorted(classes, key=lambda c: int(c["unique_hashes"]), reverse=True)
 
     labels = [c["class_id"] for c in classes]
-    unique_hashes = [c["unique_hashes"] for c in classes]
+    unique_hashes = [int(c["unique_hashes"]) for c in classes]
     severities = [c["severity"] for c in classes]
-    has_cve = [c["cve"] is not None for c in classes]
+    has_cve = [bool(c["cve"].strip()) for c in classes]
 
     sev_colors = {"HIGH": "#F44336", "MEDIUM": "#FF9800", "LOW": "#4CAF50"}
     bar_colors = [sev_colors[s] for s in severities]
@@ -240,7 +291,7 @@ def plot_f2() -> None:
     ax.set_xticklabels(labels, rotation=30, ha="right", fontsize=9)
     ax.set_ylabel("Unique crash hashes", fontsize=12)
     ax.set_xlabel("Bug class", fontsize=12)
-    ax.set_title("Bug Class Breakdown – Unseen Grammar v3.3 (RQ2, 4 × 5 runs)", fontsize=12)
+    ax.set_title("Bug Class Breakdown – DBMS-Nautilus (RQ2, 4 × 5 runs)", fontsize=12)
     ax.tick_params(labelsize=10)
 
     # Legend
