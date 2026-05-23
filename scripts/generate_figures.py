@@ -525,53 +525,45 @@ def plot_f5() -> None:
 
     fig, ax = plt.subplots(figsize=(10, 5.5))
 
-    positions_v35  = []
-    positions_ebnf = []
-    data_v35       = []
-    data_ebnf      = []
+    x = np.arange(len(VERSIONS))
+    bar_width = 0.32
+    rng = np.random.default_rng(42)
+
+    v35_means = [np.mean(v35_times[v]) if v35_times[v] else 0 for v in VERSIONS]
+    v35_stds  = [np.std(v35_times[v])  if v35_times[v] else 0 for v in VERSIONS]
+    ebnf_means = [np.mean(ebnf_times[v]) if ebnf_times[v] else 0 for v in VERSIONS]
+    ebnf_stds  = [np.std(ebnf_times[v])  if ebnf_times[v] else 0 for v in VERSIONS]
+
+    bars1 = ax.bar(x - bar_width / 2, v35_means, bar_width, yerr=v35_stds,
+                   label="DBMS-Nautilus", color=COLOR_V35, edgecolor="black",
+                   linewidth=1.2, alpha=0.85, capsize=4,
+                   error_kw=dict(elinewidth=1.2, capthick=1.2))
+    bars2 = ax.bar(x + bar_width / 2, ebnf_means, bar_width, yerr=ebnf_stds,
+                   label="EBNF-Baseline", color=COLOR_EBNF, edgecolor="black",
+                   linewidth=1.2, alpha=0.85, capsize=4,
+                   error_kw=dict(elinewidth=1.2, capthick=1.2))
 
     for i, v in enumerate(VERSIONS):
-        base = i * group_gap
-        positions_v35.append(base - box_width * 0.65)
-        positions_ebnf.append(base + box_width * 0.65)
-        data_v35.append(v35_times[v] if v35_times[v] else [])
-        data_ebnf.append(ebnf_times[v] if ebnf_times[v] else [])
+        if v35_times[v]:
+            jitter = rng.uniform(-0.06, 0.06, len(v35_times[v]))
+            ax.scatter(np.full(len(v35_times[v]), i - bar_width / 2) + jitter,
+                      v35_times[v], color="white", edgecolors=COLOR_V35,
+                      linewidths=1.0, s=30, zorder=4, alpha=0.9)
+        if ebnf_times[v]:
+            jitter = rng.uniform(-0.06, 0.06, len(ebnf_times[v]))
+            ax.scatter(np.full(len(ebnf_times[v]), i + bar_width / 2) + jitter,
+                      ebnf_times[v], color="white", edgecolors=COLOR_EBNF,
+                      linewidths=1.0, s=30, zorder=4, alpha=0.9)
 
-    from matplotlib.patches import Patch
-    legend_handles = []
+    ax.legend(fontsize=11, loc="upper left", framealpha=0.95,
+              edgecolor="black", fancybox=False)
 
-    def make_bp(data, positions, color, label):
-        valid = [(d, p) for d, p in zip(data, positions) if d]
-        if not valid:
-            return None
-        vdata, vpos = zip(*valid)
-        bp = ax.boxplot(
-            list(vdata),
-            positions=list(vpos),
-            widths=box_width,
-            patch_artist=True,
-            medianprops=dict(color="white", linewidth=2.5),
-            boxprops=dict(facecolor=color, edgecolor="black", linewidth=1.5, alpha=0.9),
-            whiskerprops=dict(color="black", linewidth=1.2),
-            capprops=dict(color="black", linewidth=1.5),
-            flierprops=dict(marker="o", markerfacecolor=color, markeredgecolor="black",
-                           markersize=6, alpha=0.8, linewidth=0.8),
-        )
-        legend_handles.append(Patch(facecolor=color, edgecolor="black",
-                                    linewidth=1.5, alpha=0.9, label=label))
-        return bp
-
-    make_bp(data_v35,  positions_v35,  COLOR_V35,  "DBMS-Nautilus")
-    make_bp(data_ebnf, positions_ebnf, COLOR_EBNF, "EBNF-Baseline")
-
-    ax.legend(handles=legend_handles, fontsize=11, loc="upper center",
-              ncol=2, framealpha=0.95, edgecolor="black", fancybox=False)
-
-    ax.set_xticks([i * group_gap for i in range(n_versions)])
+    ax.set_xticks(x)
     ax.set_xticklabels([f"SQLite {v}" for v in VERSIONS], fontsize=11)
     ax.set_ylabel("Time to first crash (seconds)", fontsize=12)
     ax.set_xlabel("SQLite version", fontsize=12)
-    ax.set_title("Time to First Crash (5 runs per version)", fontsize=12, fontweight="bold")
+    ax.set_title("Time to First Crash (mean ± 1 std, 5 runs per version)",
+                 fontsize=12, fontweight="bold")
     ax.tick_params(labelsize=10)
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
