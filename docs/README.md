@@ -17,12 +17,6 @@
 | [Grammar Bandit (Thompson Sampling)](extensions/bandit.md) | Runtime grammar weight adaptation via Thompson Sampling |
 | [DQN Agent (archived)](extensions/dqn-archived.md) | DQN mutation policy design (code removed 2026-05-14) |
 
-## CVE-to-Grammar Pipeline
-
-| Document | Description |
-|----------|-------------|
-| [Pipeline Reference](cve2grammar/pipeline.md) | CVE bug reports to generalized grammar rules (4-stage pipeline) |
-
 ## Experiments
 
 | Document | Description |
