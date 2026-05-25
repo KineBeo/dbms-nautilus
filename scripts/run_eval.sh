@@ -10,7 +10,7 @@
 #
 # Environment variables (override defaults):
 #   WORKDIR_BASE    base directory for workdirs (default: /tmp/nautilus_eval)
-#   GRAMMAR         grammar file (default: grammars/sqlite.py)
+#   GRAMMAR         grammar file (default: grammars/active/sqlite_v3.py)
 #   MAX_TREE_SIZE   Nautilus max_tree_size (default: 300)
 #   TIMEOUT_MS      per-execution timeout in ms (default: 500)
 #   DURATION        fuzzing duration in seconds (default: 86400 = 24h)
@@ -40,7 +40,7 @@ if [[ ! -f "$HARNESS_BIN" ]]; then
 fi
 
 WORKDIR_BASE="${WORKDIR_BASE:-$ROOT/workdirs}"
-GRAMMAR="${GRAMMAR:-$ROOT/grammars/sqlite.py}"
+GRAMMAR="${GRAMMAR:-$ROOT/grammars/active/sqlite_v3.py}"
 MAX_TREE_SIZE="${MAX_TREE_SIZE:-300}"
 TIMEOUT_MS="${TIMEOUT_MS:-500}"
 THREADS="${THREADS:-1}"
