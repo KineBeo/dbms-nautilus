@@ -66,7 +66,7 @@ Create `docs/defense/demo-features.md` with this content:
 |---------|-------------|---------------|
 | Crash collection | `python3 scripts/collect_crashes.py --scan-only` | Scans all campaigns, dedup by stack hash |
 | CVE signature matching | `python3 -c "from triage.cve_signatures import _CVES; print(_CVES)"` | 6 CVE patterns as regex lists |
-| Bug class registry | `cat results/crashes/registry.md` | 10 bug classes, 85 unique crashes |
+| Bug class registry | `cat results/crashes/registry.md` | 13 bug classes, 48 unique stack hashes |
 
 ## 5. Evaluation Pipeline (scripts/)
 
@@ -89,7 +89,7 @@ Create `docs/defense/demo-features.md` with this content:
 | Result | Evidence |
 |--------|----------|
 | 4/4 CVEs rediscovered | `results/ch4_final/rq1_cve_hits.csv` |
-| 10 bug classes found | `results/crashes/registry.md` |
+| 13 bug classes found | `results/crashes/registry.md` |
 | TTFC ~1-2 seconds | `results/ch4_final/rq1_ttfc_per_cve.csv` |
 | 108x more root causes vs baseline | `results/ch4_final/rq3_summary.csv` |
 ```
@@ -203,7 +203,7 @@ User runs: ./scripts/run_eval.sh sqlite-3.31.1 run1
 | `forksrv/src/lib.rs` | `ForkServer::run()` line 192 | Write to control pipe → fork child → read status pipe → collect bitmap |
 | `harness/src/sqlite_harness.c` | `main()` line 68 | `__AFL_INIT()` → read SQL file → `sqlite3_exec()` → exit |
 | `fuzzer/src/python_grammar_loader.rs` | `load_python_grammar()` | PyO3: exec Python file, call `ctx.rule()` → Rust `Context::add_rule()` |
-| `fuzzer/src/grammar_bandit.rs` | `select_group()` line 166, `observe_reward()` line 203 | Thompson Sampling: sample Beta(α,β) per group → normalize → apply multipliers |
+| `fuzzer/src/grammar_bandit.rs` | `select_group()` line 166, `observe_reward()` line 203 | **NOT in thesis.** Experimental Thompson Sampling bandit (future work). All experiments use uniform policy. |
 | `triage/cve_signatures.py` | `_CVES` list (line 15) | 6 CVEs as regex pattern lists; `missing_patterns()` (line 85) checks coverage |
 | `triage/stack_dedup.py` | `hash_frames()` (line 56) | Extract top 5 GDB frames → filter to SQLite-internal → SHA256 → dedup key |
 
@@ -222,10 +222,10 @@ User runs: ./scripts/run_eval.sh sqlite-3.31.1 run1
    → Each execution updates a shared memory bitmap (AFL-style). Each edge in the control flow graph maps to a bitmap index. After execution, the fuzzer compares the bitmap against the global bitmap. If any new bit is set (= new edge discovered), the input is "interesting" → added to queue for further mutation.
 
 5. **"How do mutations work?"**
-   → Six strategies: (a) minimize_tree: try removing subtrees, keep if coverage preserved. (b) mut_rules: try every alternative rule for each node (deterministic). (c) mut_random (havoc): pick random node, regenerate subtree. (d) mut_random_recursion: inflate/deflate recursive structures. (e) mut_splice: replace node with same-type subtree from ChunkStore. ChunkStore accumulates subtrees from all interesting inputs → enables cross-input recombination.
+   → Five mutation operators (as described in thesis Section 3.1): (a) mut_rules — deterministic rule substitution: try every alternative production at each node. (b) mut_random — random subtree regeneration: pick random node, replace with fresh grammar derivation. (c) mut_random_recursion — random recursion expansion: repeat recursive productions to increase nesting depth. (d) mut_splice — splice: replace node with same-type subtree from ChunkStore (cross-input recombination). (e) bulk random havoc — apply multiple random subtree replacements in succession. Minimization (minimize_tree) is a separate preprocessing step applied in the Init phase, not counted as a mutation operator.
 
 6. **"What is the difference between your grammar and EBNF baseline?"**
-   → EBNF baseline (`grammars/baseline/sqlite-ebnf.py`) is derived from SQLite's grammar spec — generates syntactically valid SQL but without attack patterns. Our grammar (`grammars/active/sqlite_v3.py`) decomposes SQL into Schema-Setup + Stress-Query + Validation-Op, adds boundary values (INT32_MAX, 1e308), window functions, CTE recursion, FTS queries — structural patterns that exercise CVE-bearing code paths. Result: 108x more unique root causes.
+   → EBNF baseline (`grammars/baseline/sqlite-ebnf.py`) is derived from SQLite's grammar spec — generates syntactically valid SQL but without attack patterns. Our grammar (`grammars/active/sqlite_v3.py`) decomposes SQL into Schema-Setup + Stress-Query + Validation-Op, adds boundary values (INT32_MAX, 1e308), window functions, CTE recursion, FTS queries — structural patterns that exercise CVE-bearing code paths. Result: 108x more unique root causes per campaign (mean 205.6 vs 1.9).
 
 ---
 
@@ -322,7 +322,7 @@ The teacher hint says they may ask to: change hyperparameters, change evaluation
                    hashes.add(h)
    print(f"Unique crash hashes: {len(hashes)}")
    ```
-4. Compare: "We report 10 bug classes (grouped by crash site function name) and 85 unique stack hashes."
+4. Compare: "We report 13 bug classes (grouped by crashing function + sanitizer diagnostic type) and 48 unique stack hashes after cross-campaign deduplication. The EBNF-Baseline finds only 4 of the same 13 classes."
 
 **What to explain:** Bug class = grouping by the crashing function name (higher-level). Stack hash = grouping by top-3 stack frames (finer-grained). We chose bug classes for the thesis because different inputs can crash at the same line but via different paths — bug classes are more meaningful for comparing grammar effectiveness.
 
@@ -378,8 +378,8 @@ AddressSanitizer (ASan) = compiler instrumentation that detects memory errors (b
 ### C3: What is a CVE?
 Common Vulnerabilities and Exposures — a standardized identifier for security bugs. We target 6 CVEs across 4 SQLite versions. Our grammar rediscovers 4/4 target CVEs without embedding the PoC SQL.
 
-### C4: What is Thompson Sampling?
-A Bayesian bandit algorithm. Each grammar rule group has a Beta(α,β) distribution. After each execution: if the input found new coverage, increment α (success); otherwise increment β (failure). To select weights: sample from each group's Beta distribution, normalize. The effect: groups that produce more coverage get higher weights over time.
+### C4: What is the Thompson Sampling code in your repo?
+**IMPORTANT: Thompson Sampling is NOT part of the thesis.** The code exists in `fuzzer/src/grammar_bandit.rs` (492 lines) as an experimental feature activated by `policy: "bandit"` in config. It implements a Bayesian bandit that adapts grammar rule group weights at runtime using Beta(α,β) distributions. However, all thesis experiments use `policy: "uniform"` (fixed weights). The thesis conclusion mentions reinforcement learning as a *future direction*, not a current contribution. If the teacher asks about it, say: "This is experimental code I implemented for future work. The thesis experiments all use fixed weights. The bandit code is preserved but not evaluated in the thesis."
 
 ### C5: What is the fork server?
 AFL's optimization: instead of exec()+loading the binary each time, the binary is loaded once and calls `__AFL_INIT()`. After that, the fuzzer tells the binary to `fork()`. The child runs one input and exits. The parent waits, reads the bitmap, and forks again. This avoids the overhead of process creation and binary loading (~10-100x speedup vs naive exec).
@@ -599,10 +599,10 @@ A: Larger trees = more complex SQL = deeper state exploration. But: more complex
 ## Category 3: Evaluation Metric Questions
 
 **Q: What metrics did you use to compare grammars?**
-A: Five metrics: (1) CVE rediscovery rate — how many of the 4 target CVEs were found. (2) Unique bug classes — grouping crashes by the function where they occur. (3) Unique root causes — distinct stack traces (finer-grained than bug classes). (4) Edge coverage — number of unique edges in the coverage bitmap over time. (5) Throughput — executions per second. (6) Time-to-first-crash (TTFC) — seconds until first crash in each campaign.
+A: Six metrics across three RQs (thesis Section 4.2): (1) CVE rediscovery rate (RQ1) — proportion of 4 target CVEs found, matched via structural signature with 80% fidelity threshold. (2) Unique bug classes (RQ2) — distinct combinations of crashing function + sanitizer diagnostic type. (3) Unique root causes (RQ3) — distinct stack hashes per campaign (top 5 GDB frames, filtered to SQLite-internal). (4) Edge coverage (RQ3) — unique control-flow edges in the coverage bitmap. (5) Throughput (RQ3) — executions per second. (6) Time-to-first-crash/TTFC (RQ3) — wall-clock seconds to first non-zero exit.
 
 **Q: How did you measure statistical significance?**
-A: Mann-Whitney U test (non-parametric, doesn't assume normal distribution) with N=5 runs per configuration. Effect size via rank-biserial correlation. We chose Mann-Whitney because: (a) small sample size (N=5), (b) crash counts are not normally distributed, (c) it's the standard in fuzzing literature (e.g., Klees et al. USENIX'18 recommendations).
+A: Mann-Whitney U test (non-parametric, doesn't assume normal distribution) with N=5 runs per configuration (N=4 for one EBNF cell). Effect size via Cliff's d (not rank-biserial). We chose Mann-Whitney because: (a) small sample size (N=5), (b) crash counts are not normally distributed, (c) it's the standard in fuzzing literature (e.g., Klees et al. USENIX'18 recommendations). All four RQ3 metrics show large effect sizes (d=1.00, p<0.05) for unique root causes.
 
 **Q: Could you use a different metric?**
 A: Yes. Alternative metrics: (a) unique code branches (vs edges) — coarser but simpler. (b) Vargha-Delaney A₁₂ effect size — standard alternative to rank-biserial. (c) Time-to-N-crashes — more informative than TTFC for sustained bug finding. (d) Bug severity weighting — weight HIGH bugs more than LOW. The choice depends on what aspect of fuzzer effectiveness you want to measure.
@@ -665,14 +665,14 @@ Create `docs/defense/quick-reference.md`:
 | Metric | Value |
 |--------|-------|
 | CVEs rediscovered | 4/4 (100%) |
-| Bug classes found | 10 (7 unique to our grammar) |
-| Unique root causes | 85 crash hashes |
+| Bug classes found | 13 (9 unique to DBMS-Nautilus, 4 shared with baseline) |
+| Unique stack hashes | 48 (after cross-campaign dedup) |
 | TTFC | ~1-2 seconds |
 | Root cause advantage | 108x vs EBNF baseline |
-| Throughput cost | 2.1x slower than baseline |
+| Throughput cost | 52.1% lower (90.8 vs 189.9 exec/s); TTFC shows no significant difference |
 | Grammar rules | 526 (v3.4) / 520 (uniform v3.3) |
 | Total Rust LoC | ~6,200 |
-| Total campaigns | 54 |
+| Total campaigns | 79 (20 RQ1 + 20 RQ2 + 39 RQ3) |
 
 ## File Locations
 
