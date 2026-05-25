@@ -13,7 +13,9 @@
 
 | Feature | Demo Command | What It Shows |
 |---------|-------------|---------------|
-| Full fuzzing campaign | `DURATION=60 ./scripts/run_eval.sh sqlite-3.31.1 demo` | 60s campaign: config → fuzz → triage |
+| Full fuzzing campaign (default grammar) | `DURATION=60 ./scripts/run_eval.sh sqlite-3.31.1 demo` | 60s campaign with active/sqlite_v3.py (default) |
+| Campaign with specific grammar | `GRAMMAR=grammars/active/sqlite_v3_uniform.py DURATION=60 ./scripts/run_eval.sh sqlite-3.31.1 demo_uniform` | Run with uniform grammar (no CVE seeds) |
+| Campaign with EBNF baseline | `GRAMMAR=grammars/baseline/sqlite-ebnf.py DURATION=60 ./scripts/run_eval.sh sqlite-3.31.1 demo_ebnf` | Run with EBNF-Baseline for comparison |
 | Config system | `cat workdirs/sqlite-3.31.1_demo/config.ron` | RON config: threads, timeout, bitmap size, grammar path |
 | Execution logging | `head -20 workdirs/sqlite-3.31.1_demo/exec.log` | Per-execution: strategy, new_bits, exit_reason |
 | Multi-threaded mode | `THREADS=2 DURATION=30 ./scripts/run_eval.sh sqlite-3.31.1 mt_demo` | Shared bitmap, thread-safe queue |
