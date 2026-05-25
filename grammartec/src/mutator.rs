@@ -152,28 +152,6 @@ impl Mutator {
         return Ok(());
     }
 
-    //pub fn rec_splice<F>(
-    //    &mut self,
-    //    tree: &Tree,
-    //    ctx: &Context,
-    //    cks: &ChunkStore,
-    //    tester: &mut F
-    //    )-> Result<(), SubprocessError>
-    //where
-    //    F: FnMut(&TreeMutation, &Context) -> Result<(), SubprocessError>,
-    //{
-    //    let n = NodeID::from(rand::thread_rng().gen_range(0, tree.size()));
-    //    if let Some(old_rule_id) = tree.get_rule_id(n){
-    //        let nterm_id = ctx.get_rule(old_rule).nonterm();
-    //        if let Some((repl_tree, repl_node)) = cks.get_alternative_to(old_rule_id, ctx) {
-    //            let repl = tree.mutate_replace_from_tree(n, repl_tree, repl_node);
-    //            tester(&repl, ctx)?;
-    //        }
-    //    }
-    //
-    //    return Ok(());
-    //}
-
     pub fn mut_random<F>(
         &mut self,
         tree: &Tree,

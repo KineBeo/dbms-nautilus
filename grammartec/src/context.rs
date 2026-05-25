@@ -353,27 +353,6 @@ impl Context {
         self.rules[idx].set_weight(weight.max(0.001));
     }
 
-    /// Phase 2 bandit API: multiply all rule weights for a nonterminal by a factor.
-    /// Preserves relative weights within the group. Clamps each result to [0.01, 100.0].
-    pub fn scale_weights_for_nt(&mut self, nt: NTermID, multiplier: f32) {
-        if let Some(rule_ids) = self.nts_to_rules.get(&nt) {
-            let rule_ids = rule_ids.clone();
-            for rid in rule_ids {
-                let idx: usize = rid.into();
-                let new_w = (self.rules[idx].weight() * multiplier).clamp(0.01, 100.0);
-                self.rules[idx].set_weight(new_w);
-            }
-        }
-    }
-
-    /// Phase 2 bandit API: reset all rule weights for a nonterminal to their base values.
-    pub fn reset_weights_for_nt(&mut self, nt: NTermID, base_weights: &[(RuleID, f32)]) {
-        for &(rid, base_w) in base_weights {
-            let idx: usize = rid.into();
-            self.rules[idx].set_weight(base_w.clamp(0.01, 100.0));
-        }
-    }
-
     pub fn all_nt_ids(&self) -> Vec<(NTermID, String)> {
         self.nt_ids_to_name.iter().map(|(&id, name)| (id, name.clone())).collect()
     }

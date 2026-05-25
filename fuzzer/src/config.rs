@@ -1,10 +1,6 @@
 // Nautilus
 // Copyright (C) 2024  Daniel Teuchert, Cornelius Aschermann, Sergej Schumilo
 
-fn default_policy() -> String {
-    "uniform".to_string()
-}
-
 #[derive(Deserialize, Clone)]
 pub struct Config {
     pub number_of_threads: u8,
@@ -18,8 +14,4 @@ pub struct Config {
     pub path_to_grammar: String,
     pub path_to_workdir: String,
     pub arguments: Vec<String>,
-
-    // Grammar weight policy: "uniform" or "bandit"
-    #[serde(default = "default_policy")]
-    pub policy: String,
 }

@@ -106,16 +106,7 @@ pub struct Fuzzer {
     pub bits_found_by_min_rec: u64,
     pub bits_found_by_splice: u64,
     pub bits_found_by_det: u64,
-    pub bits_found_by_det_afl: u64,
     pub bits_found_by_gen: u64,
-    pub asan_found_by_havoc: u64,
-    pub asan_found_by_havoc_rec: u64,
-    pub asan_found_by_min: u64,
-    pub asan_found_by_min_rec: u64,
-    pub asan_found_by_splice: u64,
-    pub asan_found_by_det: u64,
-    pub asan_found_by_det_afl: u64,
-    pub asan_found_by_gen: u64,
     work_dir: String,
     exec_logger: ExecLogger,
 }
@@ -152,16 +143,7 @@ impl Fuzzer {
             bits_found_by_min_rec: 0,
             bits_found_by_splice: 0,
             bits_found_by_det: 0,
-            bits_found_by_det_afl: 0,
             bits_found_by_gen: 0,
-            asan_found_by_havoc: 0,
-            asan_found_by_havoc_rec: 0,
-            asan_found_by_min: 0,
-            asan_found_by_min_rec: 0,
-            asan_found_by_splice: 0,
-            asan_found_by_det: 0,
-            asan_found_by_det_afl: 0,
-            asan_found_by_gen: 0,
             work_dir: work_dir,
             exec_logger,
         });
@@ -433,18 +415,13 @@ impl Fuzzer {
 
     fn check_deterministic_behaviour(
         &mut self,
-        old_bitmap: &[u8],
+        _old_bitmap: &[u8],
         new_bits: &mut Vec<usize>,
         code: &[u8],
     ) -> Result<(), SubprocessError> {
         for _ in 0..5 {
             let (_, _) = self.exec_raw(code)?;
             let run_bitmap = self.forksrv.get_shared();
-            for (i, &v) in old_bitmap.iter().enumerate() {
-                if run_bitmap[i] != v {
-                    println!("found fucky bit {}", i);
-                }
-            }
             new_bits.retain(|&i| run_bitmap[i] != 0);
         }
         return Ok(());

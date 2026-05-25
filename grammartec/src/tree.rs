@@ -1,7 +1,6 @@
 // Nautilus
 // Copyright (C) 2024  Daniel Teuchert, Cornelius Aschermann, Sergej Schumilo
 
-use std::cmp;
 use std::collections::HashSet;
 use std::io;
 use std::io::Write;
@@ -366,27 +365,6 @@ impl Tree {
         return Some(ret);
     }
 
-    fn find_recursions_iter(&self, ctx: &Context) -> Vec<(NodeID, NodeID)> {
-        let mut found_recursions = Vec::new();
-        //Only search for iterations for up to 10000 nodes
-        for i in 1..cmp::min(self.size(), 10000) {
-            let node_id = NodeID::from(self.size() - i);
-            let current_nterm: NTermID = self.get_rule(node_id, ctx).nonterm();
-            let mut current_node_id = self.paren[node_id.to_i()];
-            let mut depth = 0;
-            while current_node_id != NodeID::from(0) {
-                if self.get_rule(current_node_id, ctx).nonterm() == current_nterm {
-                    found_recursions.push((current_node_id, node_id));
-                }
-                current_node_id = self.paren[current_node_id.to_i()];
-                if depth > 15 {
-                    break;
-                }
-                depth += 1;
-            }
-        }
-        return found_recursions;
-    }
 }
 
 pub struct TreeMutation<'a> {
